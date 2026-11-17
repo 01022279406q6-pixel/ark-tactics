@@ -515,7 +515,7 @@ const U={
 const facs=d=>d.os||[d.o];
 const jobs=d=>d.js||[d.j];
 const BASE_CRIT=.2, BASE_CRITDMG=.5;
-const BOND=[null,{hp:50,cr:.05,cd:.05},{hp:150,cr:.1,cd:.1},{hp:300,cr:.15,cd:.15}];
+const BOND=[null,{hp:50,cr:.05,cd:.05},{hp:150,cr:.1,cd:.1},{hp:300,cr:.15,cd:.15},{hp:300,cr:.15,cd:.15}]; // 마지막 단계(8명)는 결속 Ⅲ 유지 + 고유 효과 1.25배
 const wpick=(arr,wf)=>{ let t=arr.reduce((a,k)=>a+wf(k),0), r=Math.random()*t; for(const k of arr){ r-=wf(k); if(r<0)return k; } return arr[arr.length-1]; };
 const POOL=[1,2,3,4,5].map(c=>Object.keys(U).filter(k=>U[k].c===c));
 const MAXLV=10;
@@ -567,7 +567,7 @@ const XPNEED={1:2,2:2,3:6,4:10,5:20,6:36,7:48,8:76,9:84};
 const JOBN=[1,2,3,4,5], JHP=[50,75,100,125,150], THP=[150,175,200,225,250];
 const JOB={전사:{pct:[1,2,4,6,8],lab:'공격력'},마법사:{pct:[1.5,3,4.5,6,7.5],lab:'스킬 피해'},사냥꾼:{pct:[5,10,12,14,15],lab:'공격 속도'},서포터:{pct:[3,5,7,10,12],lab:'체력 회복량'},탱커:{pct:[1,2,3,4,5],lab:'피해 감소'}};
 const SYN=[
-  {k:'에스더',f:'o',th:[1,2,4,6],d:['에스더 고유 효과 활성','고유 효과 + 결속 Ⅰ: 에스더 체력 +50 · 치명타 확률 +5% · 치명타 피해 +5%','고유 효과 + 결속 Ⅱ: 에스더 체력 +150 · 치명타 확률 +10% · 치명타 피해 +10%','고유 효과 + 결속 Ⅲ: 에스더 체력 +300 · 치명타 확률 +15% · 치명타 피해 +15%']},
+  {k:'에스더',f:'o',th:[1,2,4,6,8],d:['에스더 고유 효과 활성','고유 효과 + 결속 Ⅰ: 에스더 체력 +50 · 치명타 확률 +5% · 치명타 피해 +5%','고유 효과 + 결속 Ⅱ: 에스더 체력 +150 · 치명타 확률 +10% · 치명타 피해 +10%','고유 효과 + 결속 Ⅲ: 에스더 체력 +300 · 치명타 확률 +15% · 치명타 피해 +15%','에스더 8명 전원: 결속 Ⅲ + 모든 에스더 고유 효과 1.25배']},
   {k:'군단',f:'o',th:[2,4,6],d:['군단 체력 +300','군단 체력 +600 · 피해 +10%','군단 체력 +900 · 피해 +20%']},
   {k:'아르데타인',f:'o',th:[2],d:['아르데타인 공격 속도 +35%']},
   {k:'세이크리아',f:'o',th:[2,4,6],d:['전투 시작 시 아군 전체 보호막 200','아군 전체 보호막 300 · 세이크리아 회복량 +15%','아군 전체 보호막 400 · 세이크리아 회복량 +25% · 세이크리아 받는 피해 -8%']},
@@ -591,7 +591,9 @@ const els=new Map();
 const rnd=n=>Math.floor(Math.random()*n);
 
 // 라운드별 BGM: 카제로스·군단장(전용 곡이 있는 경우)·기본
-function roundTrack(r){ const lg=legionOf(r); return KZ[r]||(lg&&BGM[lg]?lg:'main'); }
+function roundTrack(r){
+  const lg=legionOf(r)||(S&&S.mode!=='hard'&&r%5===0&&!KZ[r]?['valtan','biakiss','kamen'][(r/5-1)%3]:null); // 이지·노말: 5라운드마다 군단장
+  return KZ[r]||(lg&&BGM[lg]?lg:'main'); }
 function bossIntro(k){
   const el=$('#bossIntro'), d=U[k];
   const img=el.querySelector('img'), bf=el.querySelector('.bfig'); const lg=LEGION_HINT[k]&&!d.boss;
@@ -921,15 +923,16 @@ function startCombat(){
   for(const u of C.units)if(!u.team)u.atk0=u.atk;
   // 에스더 고유 효과: 실리안 — 아군 전체 공격력 +10%
   const allies=C.units.filter(u=>!u.team);
+  C.euMul=T['에스더']>=5?1.25:1; const EM=C.euMul; // 에스더 전원 집결: 고유 효과 1.25배
   C.execute=T['환영술사']>=1; C.execTh=execTh();
-  if(allies.some(u=>u.eu&&u.key==='bahun'))for(const u of allies)addShield(u,150);
-  if(allies.some(u=>u.eu&&u.key==='silian'))for(const u of allies)u.atk*=1.1;
+  if(allies.some(u=>u.eu&&u.key==='bahun'))for(const u of allies)addShield(u,150*EM);
+  if(allies.some(u=>u.eu&&u.key==='silian'))for(const u of allies)u.atk*=1+.1*EM;
   // 에스더 결속 (2/4/6명): 전투 시작 시 즉시 발동, 에스더 기물에만 적용
   const bt=T['에스더']-1, bond=BOND[bt]||null;
   if(bond){ const es=allies.filter(u=>facs(U[u.key]).includes('에스더'));
     for(const u of es){u.maxHp+=bond.hp;u.hp+=bond.hp;u.crit+=bond.cr;u.critDmg+=bond.cd;}
     setTimeout(()=>{for(const u of es){FX.ring(u,.1,.9,'#ffd76a',.08,.6);FX.rise(u,8,'#ffe9a8');}},60); }
-  banner(bond?'에스더 결속 '+['Ⅰ','Ⅱ','Ⅲ'][bt-1]+' 발동!':'전투 시작!');
+  banner(bond?(bt>=4?'에스더 전원 집결! 결속 Ⅲ · 고유 효과 강화':'에스더 결속 '+['Ⅰ','Ⅱ','Ⅲ'][bt-1]+' 발동!'):'전투 시작!');
   render();
   clearInterval(timer); timer=setInterval(tick,50);
 }
@@ -975,7 +978,7 @@ function step(dt){
       if(u.atkCd<=0&&u.boss){ bossAttack(u,t); u.mana=Math.min(u.maxMana,u.mana+u.manaGain); u.atkCd=1/u.as; }
       else if(u.atkCd<=0){
         if(u.rg>1)fxShot(u,t,u.team?'#ff7a6e':u.key==='solas'?'#b48cff':'#7ec0ff');
-        hurt(u,t,u.atk); if(u.eu&&u.key==='wei'&&++u.hits%3===0&&t.alive){hurt(u,t,u.atk*.8);FX.sky(t,'#fff2b0',.05);} FX.burst(t,4,u.team?'#ff8a7a':'#bfe0ff',2.4,.07);
+        hurt(u,t,u.atk); if(u.eu&&u.key==='wei'&&++u.hits%3===0&&t.alive){hurt(u,t,u.atk*.8*(C.euMul||1));FX.sky(t,'#fff2b0',.05);} FX.burst(t,4,u.team?'#ff8a7a':'#bfe0ff',2.4,.07);
         u.mana=Math.min(u.maxMana,u.mana+u.manaGain);
         if(u.lance){ const amt=u.maxHp*u.lance; addShield(u,amt); (u.ltok=u.ltok||[]).push({t:3,amt,rem:amt}); }
         if(u.moonSp)u.atk+=u.atk0*u.moonSp;
@@ -1057,7 +1060,7 @@ function hurt(src,t,raw,o){
     t.hp=0; fxText(cx(t),cy(t)-.3,'즉사','mag'); FX.magic(t,.9,'#b48cff',.7); FX.ring(t,0,1,'#e0d0ff',.12); FX.burst(t,16,'#9a6cff',4.5,.1); }
   if(src.ancient&&src.store>0&&t.alive&&t.hp>0&&t.hp<=t.maxHp*.5){ const sv=src.store, was=src.inSkill; src.store=0; src.inSkill=false; fxText(cx(t),cy(t)-.4,'고대의 창','sk'); FX.beam(src,t,'#ffb347',.16,.4); hurt(src,t,sv/(src.dmgMul||1)); src.inSkill=was; }
   if(t.hp<=0&&src.team===0&&t.team===1&&has('ether')&&Math.random()<.3){ const al=C.units.filter(a=>a.alive&&!a.team&&(a.eth||0)<10); const a=al[rnd(al.length)]; if(a){a.eth=(a.eth||0)+1;a.atk*=1.03;a.ar+=5;FX.rise(a,6,'#9fe8ff');S.ether=(S.ether||0)+1; if(S.ether%20===0){S.gold+=2;toast('에테르 20개: +2골드');}} }
-  if(t.hp<=0){ kill(t); if(!t.alive&&src.eu&&src.key==='kadan'){src.mana=Math.min(src.maxMana,src.mana+50);fxText(src.x,src.y-.4,'마나 +50','sk');} }
+  if(t.hp<=0){ kill(t); if(!t.alive&&src.eu&&src.key==='kadan'){const mg=Math.round(50*(C.euMul||1));src.mana=Math.min(src.maxMana,src.mana+mg);fxText(src.x,src.y-.4,'마나 +'+mg,'sk');} }
   return d;
 }
 function kill(t){
@@ -1163,7 +1166,7 @@ function castImpl(u,t){
     case 'ninav':{ const L=eu(u,t)||1, dx=(cx(t)-cx(u))/L, dy=(cy(t)-cy(u))/L, end={x:u.x+dx*11,y:u.y+dy*11};
       FX.magic(u,.7,'#9fe8ff',.6); FX.beam(u,end,'#9fe8ff',.36,.5); FX.beam(u,end,'#ffffff',.1,.6);
       for(let i=0;i<34;i++){const q=rr(0,9); pAdd({k:'p',x:u.x+.5+dx*q,y:u.y+.5+dy*q,vx:-dy*rr(-2.2,2.2)+dx*2,vy:dx*rr(-2.2,2.2)+dy*2,g:0,drag:2,s:rr(.05,.1),c:'#cff4ff',life:rr(.4,.9)});}
-      for(const e of F){ const vx=cx(e)-cx(u),vy=cy(e)-cy(u),pr=vx*dx+vy*dy; if(pr>0&&Math.hypot(vx-pr*dx,vy-pr*dy)<=.75){FX.burst(e,12,'#9fe8ff',4,.1);FX.ring(e,0,.8,'#cff4ff',.08);hurt(u,e,u.atk*2.6);if(u.eu)u.mana=Math.min(u.maxMana,u.mana+10);} }
+      for(const e of F){ const vx=cx(e)-cx(u),vy=cy(e)-cy(u),pr=vx*dx+vy*dy; if(pr>0&&Math.hypot(vx-pr*dx,vy-pr*dy)<=.75){FX.burst(e,12,'#9fe8ff',4,.1);FX.ring(e,0,.8,'#cff4ff',.08);hurt(u,e,u.atk*2.6);if(u.eu)u.mana=Math.min(u.maxMana,u.mana+10*(C.euMul||1));} }
       FX.shake(1); break; }
     case 'silian':{ const p={x:u.x,y:u.y}, ang=Math.atan2(cy(t)-cy(u),cx(t)-cx(u)), half=Math.PI/4, R=3.2;
       FX.magic(p,1,'#e8c170',.8);
@@ -1203,8 +1206,8 @@ function castImpl(u,t){
     case 'azena':{ let best=t,bc=0; for(const e of F){const n=F.filter(o=>dist(o,e)<=1).length; if(n>bc){bc=n;best=e;}}
       const c=P(best), before=F.filter(e=>e.alive).length; FX.magic(c,1.8,'#ff7a3a',1); FX.pillar(c,'#ff5a2a',1.6,4,.8); FX.ring(c,0,1.9,'#ffb347',.2); FX.burst(c,36,'#ff7a3a',7,.14); FX.debris(c,14,'#ffd08a'); FX.shake(2);
       for(const e of F)if(dist(e,best)<=1)hurt(u,e,u.atk*3.2,{mag:1});
-      if(u.eu&&F.filter(e=>e.alive).length<before)u.mana=Math.min(u.maxMana,u.mana+30); break; }
-    case 'inanna':{ const dur=3+(u.eu?1:0); FX.magic(u,1.8,'#bfe8ff',1.1); FX.ring(u,.2,3.2,'#ffffff',.14,.8);
+      if(u.eu&&F.filter(e=>e.alive).length<before)u.mana=Math.min(u.maxMana,u.mana+30*(C.euMul||1)); break; }
+    case 'inanna':{ const dur=3+(u.eu?1*(C.euMul||1):0); FX.magic(u,1.8,'#bfe8ff',1.1); FX.ring(u,.2,3.2,'#ffffff',.14,.8);
       for(const a of A){ (a.buffs=a.buffs||[]).push({t:dur,dr:.3,atk:1}); heal(a,a.maxHp*.1); FX.pillar(a,'#bfe8ff',.6,2.6,.8); FX.ring(a,.1,.8,'#ffffff',.08); } break; }
     case 'ren':{ let sum=0; FX.arc(u,1.4,0,TAU*1.05,'#c83a5a',.22,.45); FX.swirl(u,1.2,18,'#ff7a9a'); FX.shake(1);
       for(const e of F)if(dist(e,u)<=1){FX.burst(e,8,'#ff5a7a',3.5,.09);sum+=hurt(u,e,u.atk*2.3);} heal(u,sum*.3); break; }
@@ -1227,7 +1230,7 @@ function castImpl(u,t){
       FX.magic(u,1.6,'#6fd0ff',1); FX.ring(u,.2,3.2,'#ffd76a',.16,.7); FX.shake(1);
       for(const a of A){ (a.buffs=a.buffs||[]).push({t:dur,dr,atk:am}); a.atk*=am; FX.pillar(a,'#6fd0ff',.6,2.2,.7); FX.ring(a,.1,.8,'#bfe8ff',.1,.6); FX.rise(a,8,'#ffe9a8'); }
       fxText(cx(u),cy(u)+.3,'피해 -'+Math.round(dr*100)+'%','heal'); break; }
-    case 'shandi':{ const pct=[.2,.3,.45][u.star-1]+(u.eu?.05:0), dur=[1.5,2.5,4.5][u.star-1];
+    case 'shandi':{ const pct=[.2,.3,.45][u.star-1]+(u.eu?.05*(C.euMul||1):0), dur=[1.5,2.5,4.5][u.star-1];
       FX.magic(u,1.4,'#9a6cff',1.1); FX.swirl(u,1.3,22,'#6fd0ff'); FX.ring(u,.2,2.6,'#e0d0ff',.12,.7);
       for(const a of A){ if(a===u)continue; a.mana=Math.min(a.maxMana,a.mana+a.maxMana*pct); FX.beam(u,a,'#b48cff',.05,.35); FX.rise(a,7,'#c9b0ff'); }
       (u.buffs=u.buffs||[]).push({t:dur,atk:1.2}); u.atk*=1.2; fxText(cx(u),cy(u)+.3,'마나 +'+Math.round(pct*100)+'%','mag'); break; }
@@ -1818,7 +1821,7 @@ function showInfo(u){
     '<span>공격 속도 '+(live?u.as:d.as).toFixed(2)+'</span><span>사거리 '+d.rg+'</span><span>방어력 '+(live?u.ar:d.ar)+'</span><span>마나 '+d.mp+'</span>'+
     '<span>치명타 '+Math.round((live?u.crit:BASE_CRIT)*100)+'%</span><span>치명 피해 +'+Math.round((live?u.critDmg:BASE_CRITDMG)*100)+'%</span></div>'+
     '<div class="isk"><b>'+d.sk+'</b><br>'+d.sd+'</div>'+
-    (d.eu?'<div class="isk" style="margin-top:4px"><b>에스더 고유 효과</b><br>'+d.eu+'</div>':'')+
+    (d.eu?'<div class="isk" style="margin-top:4px"><b>에스더 고유 효과</b>'+(tiers()['에스더']>=5?' <span style="color:var(--gold)">(×1.25 강화)</span>':'')+'<br>'+d.eu+'</div>':'')+
     (u.eq?'<div class="isk" style="margin-top:4px"><b>전용 아이템: '+ITEMS[u.eq.k].n+' '+'★'.repeat(u.eq.star)+'</b><br>'+itemInfoHTML(u.eq.k,u.eq.star)+'</div>':'');
 }
 
