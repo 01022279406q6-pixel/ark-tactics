@@ -419,6 +419,7 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 <div id="bossIntro"><img alt=""><div class="bfig" style="display:none"></div><div class="bi"><small>최종 보스</small><b></b><span></span></div></div>
 <div id="over"><div><h2 id="overTitle">모험 종료</h2><p id="overTxt"></p><button id="restartBtn">다시 시작</button></div></div>
 
+<audio id="bgm_valtan" loop preload="none" src="audio/valtan.mp3"></audio>
 <audio id="bgm_biakiss" loop preload="none" src="audio/biakiss.mp3"></audio>
 <audio id="bgm_kouku" loop preload="none" src="audio/kouku.mp3"></audio>
 <audio id="bgm_abrel" loop preload="none" src="audio/abrel.mp3"></audio>
@@ -525,13 +526,13 @@ const KZ=new Proxy({},{get:(_,r)=>((typeof S!=='undefined'&&S&&S.mode==='hard')?
 let FINAL_ROUND=25;
 // 하드 모드 군단장 라운드 (3성 군단장 1기 + 기믹, 승리 시 각인 선택)
 const LEGION={10:'valtan',15:'biakiss',20:'kouku',25:'abrel',30:'illiakan',35:'kamen'};
-const LEGION_STAT={valtan:{hp:2,atk:1},biakiss:{hp:3,atk:1.2},kouku:{hp:4,atk:1.3},abrel:{hp:5,atk:1.4},illiakan:{hp:9,atk:1.8},kamen:{hp:16,atk:1.1}};
+const LEGION_STAT={valtan:{hp:2,atk:1},biakiss:{hp:3,atk:1.2},kouku:{hp:4,atk:1.3},abrel:{hp:5,atk:1.4},illiakan:{hp:9,atk:1.8},kamen:{hp:128,atk:1.1}}; // 카멘: 하드 모드 후반 전용 무기 성장에 맞춰 체력 8배 상향
 const LEGION_HINT={valtan:'특수 기믹 없음 · 쓰러지면 6초간 유령으로 부활합니다',
   biakiss:'양옆 촉수 6개(체력 1000)가 살아 있으면 촉수 1개당 매초 체력 300 회복',
   kouku:'카드가 붉게 변해야 정상 피해 (평소 피해 95% 감소) · 스킬을 3번 맞히면 4초간 붉은 카드',
   abrel:'몽환의 뿔이 하나라도 남아 있으면 받는 피해 80% 감소 · 매초 마나 +10',
   illiakan:'일리아칸이 응시하는 기물은 피해를 줄 수 없음 · 4초마다 가장 위협적인 기물을 응시',
-  kamen:'특수 기믹 없음 · 카제로스에 버금가는 능력치'};
+  kamen:'특수 기믹 없음 · 압도적인 능력치'};
 const legionOf=r=>S&&S.mode==='hard'?LEGION[r]:null;
 // TFT 레벨별 상점 등장 확률 (1~5코스트, %)
 const ODDS={1:[100,0,0,0,0],2:[100,0,0,0,0],3:[75,25,0,0,0],4:[55,30,15,0,0],5:[45,33,20,2,0],6:[30,40,25,5,0],7:[19,30,40,10,1],8:[15,20,32,30,3],9:[10,17,25,33,15],10:[5,10,20,40,25]};
@@ -824,7 +825,7 @@ function mkCU(b,team,mul){
     o.maxHp=o.hp=Math.round(o.maxHp*ITEM_HP[si]*(1+(fx.hp||0)*k)); o.atk*=ITEM_ATK[si];
     o.as*=1+(fx.as||0)*k; o.crit+=(fx.crit||0)*k; o.critDmg+=(fx.critDmg||0)*k; o.skillMul*=1+(fx.skill||0)*k; o.healMul*=1+(fx.heal||0)*k;
     o.dr=1-(1-o.dr)*(1-Math.min(.5,(fx.dr||0)*k)); o.mana=Math.min(o.maxMana-1,(fx.mana||0)*k); }
-  if(o.boss&&S.mode!=='normal'){o.maxHp*=S.mode==='hard'?3.6:3;o.hp=o.maxHp;} // 카제로스 체력: 이지 3배, 하드 3.6배
+  if(o.boss&&S.mode!=='normal'){o.maxHp*=S.mode==='hard'?54:3;o.hp=o.maxHp;} // 카제로스 체력: 이지 3배, 하드 54배(3.6배×15)
   if(b.hpMul){o.maxHp=o.hp=Math.round(U[b.key].hp*STAR[b.star-1]*b.hpMul);} o.legion=!!b.legion; o.passive=!!U[b.key].passive;
   if(o.eq&&o.eq.star>=2){ const st=o.eq.star; // 전용 아이템 2성 이상 특수 효과
     if(o.eq.k==='silverlance')o.lance=[0,0,.03,.04][st];
@@ -957,7 +958,7 @@ function step(dt){
     }else if(u.moveCd<=0&&!u.boss){ moveToward(u,t); u.moveCd=.32; }
   }
   const p=C.units.filter(u=>u.alive&&!u.team).length, e=C.units.filter(u=>u.alive&&u.team).length;
-  if(!p||!e||C.t>(KZ[S.round]?100:C.legion?90:60)){ C.over=true; const win=e===0&&p>0; setTimeout(()=>endCombat(win,e),Math.max(300,900/speed)); }
+  if(!p||!e||C.t>(S.mode==='hard'&&(KZ[S.round]||C.units.some(u=>u.legion&&u.key==='kamen'))?300:KZ[S.round]?100:C.legion?90:60)){ C.over=true; const win=e===0&&p>0; setTimeout(()=>endCombat(win,e),Math.max(300,900/speed)); }
 }
 function moveToward(u,t){
   const blocked=new Set(); for(const o of C.units)if(o.alive&&o!==u)for(let j=0;j<SZ(o);j++)for(let i=0;i<SZ(o);i++)blocked.add(o.x+i+(o.y+j)*COLS);
@@ -1792,7 +1793,7 @@ document.addEventListener('keydown',ev=>{
   else if(k===' '){ev.preventDefault(); if(S.phase==='plan')startCombat();}
 });
 /* ───────── 배경음악 ───────── */
-const BGM={main:$('#bgm'),kz1:$('#bgmKz'),kz2:$('#bgmKz2'),kz3:$('#bgmKz3'),biakiss:$('#bgm_biakiss'),kouku:$('#bgm_kouku'),abrel:$('#bgm_abrel'),illiakan:$('#bgm_illiakan'),kamen:$('#bgm_kamen')}; let bgm=BGM.main, bgmOn=true, bgmVol=.4;
+const BGM={main:$('#bgm'),kz1:$('#bgmKz'),kz2:$('#bgmKz2'),kz3:$('#bgmKz3'),valtan:$('#bgm_valtan'),biakiss:$('#bgm_biakiss'),kouku:$('#bgm_kouku'),abrel:$('#bgm_abrel'),illiakan:$('#bgm_illiakan'),kamen:$('#bgm_kamen')}; let bgm=BGM.main, bgmOn=true, bgmVol=.4;
 function bgmTrack(k){ const n=BGM[k]; if(n===bgm)return; bgm.pause(); bgm=n; bgm.currentTime=0; bgmApply(); }
 try{ const v=JSON.parse(localStorage.getItem('arcTacticsBgm')||'null'); if(v){bgmOn=!!v.on; bgmVol=Math.min(1,Math.max(0,+v.vol||0));} }catch(e){}
 function bgmApply(){
