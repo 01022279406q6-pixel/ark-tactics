@@ -283,6 +283,13 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 .card.item .ia svg{height:76%;filter:drop-shadow(0 0 8px rgba(255,215,106,.8)) drop-shadow(0 3px 2px #000)}
 .card.item .itag{position:absolute;left:6px;top:6px;font-size:10px;font-weight:800;color:#221a08;background:var(--gold);padding:1px 6px;border-radius:5px;z-index:2}
 .card.item{background:linear-gradient(160deg,#3a2e12,#131724 70%)}
+/* 카제로스 위압 연출: 스킬 단계가 오를수록 전장 가장자리가 어두워지고 맥동 */
+#dread{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .8s;border-radius:6px;
+  background:radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(60,0,0,calc(.12 + var(--dr,0)*.4)) 100%);box-shadow:inset 0 0 calc(20px + var(--dr,0)*70px) rgba(140,10,10,calc(var(--dr,0)*.8))}
+#dread.on{opacity:1}
+#dread.s3,#dread.s4,#dread.s5{animation:dreadPulse 1.6s ease-in-out infinite}
+#dread.s5{animation-duration:.9s}
+@keyframes dreadPulse{50%{filter:brightness(1.5)}}
 @media (max-width:920px){
   main{grid-template-columns:1fr}
   #center{order:-1}
@@ -326,6 +333,7 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
         <div id="cells"></div>
         <div id="units"></div>
         <div id="fx"></div>
+        <div id="dread"></div>
         <div id="banner"></div>
       </div></div>
     </section>
@@ -419,11 +427,11 @@ const U={
   ren:    {n:'렌',tr:['데스 사이드'],c:4,o:'데런',j:'사냥꾼',hp:880,atk:74,as:.8,rg:1,ar:35,mp:70,sk:'사신의 낫',sd:'주변 1칸의 적에게 공격력의 230% 피해를 주고, 준 피해의 30%만큼 회복합니다.'},
   reaper: {n:'리퍼',tr:['갈증'],c:5,o:'데런',j:'전사·사냥꾼',js:['전사','사냥꾼'],hp:1000,atk:115,as:.85,rg:1,ar:40,mp:80,sk:'그림자 처형',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 380% 피해를 줍니다.'},
   // 최종 보스: 카제로스 (마지막 3라운드)
-  kz1:{n:'대악마 카제로스',c:0,o:'카제로스',j:'보스',sz:1,boss:1,g:1,hp:13000,atk:250,as:.6,rg:99,ar:60,mp:100,aoe:1,col:'#ff3a2a',
+  kz1:{n:'대악마 카제로스',c:0,o:'카제로스',j:'보스',sz:1,boss:1,g:1,hp:15500,atk:250,as:.6,rg:99,ar:60,mp:100,aoe:1,col:'#ff3a2a',
        sk:'대악마의 낙인',sd:'기본 공격: 대상 주변 3×3 범위 피해. 스킬: 무작위 위치 3곳에 3×3 폭발을 일으켜 공격력의 220% 피해.'},
-  kz2:{n:'죽음의 현신 카제로스',c:0,o:'카제로스',j:'보스',sz:2,boss:1,g:1,hp:25000,atk:340,as:.55,rg:99,ar:70,mp:110,aoe:1,col:'#ffd76a',
+  kz2:{n:'죽음의 현신 카제로스',c:0,o:'카제로스',j:'보스',sz:2,boss:1,g:1,hp:30000,atk:340,as:.55,rg:99,ar:70,mp:110,aoe:1,col:'#ffd76a',
        sk:'죽음의 찬가',sd:'기본 공격: 대상 주변 3×3 범위 피해. 스킬: 빛의 날개로 아군 진영 전체를 휩쓸어 공격력의 160% 피해.'},
-  kz3:{n:'질서의 수호자 카제로스',c:0,o:'카제로스',j:'보스',sz:3,boss:1,g:1,hp:24000,atk:235,as:.55,rg:99,ar:80,mp:120,aoe:2,col:'#ffe9a8',
+  kz3:{n:'질서의 수호자 카제로스',c:0,o:'카제로스',j:'보스',sz:3,boss:1,g:1,hp:27000,atk:235,as:.55,rg:99,ar:80,mp:120,aoe:2,col:'#ffe9a8',
        sk:'질서의 심판',sd:'기본 공격: 대상 주변 5×5 범위 피해. 스킬: 아군 진영 전체에 공격력의 120% 피해 후, 가장 밀집한 5×5 범위에 공격력의 260% 추가 피해.'},
   // 적 전용 가디언
   urnil:  {n:'우르닐',ic:'🐗',c:0,o:'가디언',j:'근접',hp:480,atk:40,as:.7,rg:1,ar:20,mp:80,g:1,sk:'강타',sd:'대상에게 공격력의 220% 피해를 줍니다.'},
@@ -470,7 +478,7 @@ const SYN=[
   {k:'에스더',f:'o',th:[1,2,4,6],d:['에스더 고유 효과 활성','고유 효과 + 결속 Ⅰ: 에스더 체력 +50 · 치명타 확률 +5% · 치명타 피해 +5%','고유 효과 + 결속 Ⅱ: 에스더 체력 +150 · 치명타 확률 +10% · 치명타 피해 +10%','고유 효과 + 결속 Ⅲ: 에스더 체력 +300 · 치명타 확률 +15% · 치명타 피해 +15%']},
   {k:'군단',f:'o',th:[2,3],d:['군단 체력 +300','군단 체력 +700 · 피해 +15%']},
   {k:'아르데타인',f:'o',th:[2,3],d:['아르데타인 공격 속도 +20%','아르데타인 공격 속도 +45%']},
-  {k:'세이크리아',f:'o',th:[2],d:['전투 시작 시 아군 전체 보호막 250']},
+  {k:'세이크리아',f:'o',th:[2,4,6],d:['전투 시작 시 아군 전체 보호막 200','아군 전체 보호막 300 · 세이크리아 회복량 +15%','아군 전체 보호막 400 · 세이크리아 회복량 +25% · 세이크리아 받는 피해 -8%']},
   {k:'실린',f:'o',th:[2,4,6],d:['실린 스킬 피해 +10%','실린 스킬 피해 +18% · 아군 전체 평타마다 마나 +2','실린 스킬 피해 +22% · 아군 전체 평타마다 마나 +3 · 평타마다 공격 속도 +2% (최대 15중첩)']},
   {k:'갈증',f:'x',th:[1],d:['리퍼가 스킬을 쓸 때마다 필요 마나 -10% · 공격력 +6% (최대 3중첩)']},
   {k:'데스 사이드',f:'x',th:[1],d:['렌(데스 사이드 2성 이상 장착): 체력 50% 미만일 때 흡혈 +20%']},
@@ -507,6 +515,7 @@ function startPlan(){
   S.phase='plan'; C=null; S.sel=null; fxEl.querySelectorAll('.ft,.ring,.beam,.shot').forEach(e=>e.remove());
   S.enemies=genWave(S.round);
   if(KZ[S.round])bossIntro(KZ[S.round]);
+  { const el=$('#dread'); if(el){el.className='';el.style.setProperty('--dr',0);} }
   bgmTrack(KZ[S.round]||'main'); // 카제로스 라운드: 형태별 전용 BGM (라운드 시작 시)
   rollShop();
   tryMerge();
@@ -528,8 +537,8 @@ function rollShop(){
   }
 }
 function allItems(){ const a=[]; S.bench.forEach((u,i)=>{if(u&&u.item)a.push({w:'bench',i,k:u.item,star:u.star,o:u});}); for(const u of [...S.board,...S.bench])if(u&&u.key&&u.eq)a.push({w:'eq',u,k:u.eq.k,star:u.eq.star,o:u.eq}); return a; }
-// 전용 아이템은 해당 기물을 2성 이상 보유했을 때만 상점에 등장 (대기석 포함)
-const itemEligible=k=>[...S.bench,...S.board].some(u=>u&&u.key===ITEMS[k].u&&u.star>=2);
+// 전용 아이템은 레벨 10(최대)에 도달하고, 해당 기물을 2성 이상 보유했을 때만 상점에 등장 (대기석 포함)
+const itemEligible=k=>S.level>=MAXLV&&[...S.bench,...S.board].some(u=>u&&u.key===ITEMS[k].u&&u.star>=2);
 function rollItem(){
   const ban=new Set(allItems().filter(x=>x.star>=3).map(x=>x.k));
   const ks=Object.keys(ITEMS).filter(k=>!ban.has(k)&&itemEligible(k)); if(!ks.length)return null;
@@ -537,7 +546,7 @@ function rollItem(){
 }
 function reroll(){ if(S.phase==='over')return; if(S.gold<2)return toast('골드가 부족합니다'); S.gold-=2; rollShop(); render(); }
 function buyXp(){ if(S.phase==='over')return; if(S.level>=MAXLV)return toast('최대 레벨입니다'); if(S.gold<4)return toast('골드가 부족합니다'); S.gold-=4; addXp(4); render(); }
-function addXp(n){ if(S.level>=MAXLV)return; S.xp+=n; while(S.level<MAXLV && S.xp>=XPNEED[S.level]){S.xp-=XPNEED[S.level];S.level++;toast('레벨 '+S.level+' 달성! 배치 가능 기물 +1');} if(S.level>=MAXLV)S.xp=0; }
+function addXp(n){ if(S.level>=MAXLV)return; S.xp+=n; while(S.level<MAXLV && S.xp>=XPNEED[S.level]){S.xp-=XPNEED[S.level];S.level++;toast('레벨 '+S.level+' 달성! 배치 가능 기물 +1');sfxLevelUp();} if(S.level>=MAXLV)S.xp=0; }
 function interest(){ return Math.min(5,Math.floor(S.gold/10)); }
 function buy(i){
   const key=S.shop[i]; if(!key||S.phase==='over')return;
@@ -754,7 +763,8 @@ function startCombat(){
     if(F.includes('에스더')&&T['에스더']>=1&&d.eu)u.eu=true;
     if(F.includes('군단')){addHp([0,300,700][T['군단']]);if(T['군단']>=2)u.dmgMul*=1.15;}
     if(F.includes('아르데타인'))u.as*=[1,1.2,1.45][T['아르데타인']];
-    if(T['세이크리아'])u.shield+=250;
+    if(T['세이크리아']){ const st=T['세이크리아']; u.shield+=[0,200,300,400][st];
+      if(F.includes('세이크리아')){ u.healMul*=[1,1,1.15,1.25][st]; if(st>=3)u.dr=1-(1-u.dr)*.92; } }
     if(F.includes('실린')&&T['실린'])u.skillMul*=[1,1.1,1.18,1.22][T['실린']];
     if(T['실린']>=2)u.manaGain+=T['실린']>=3?3:2;
     if(u.key==='reaper'&&T['갈증'])u.thirstOn=true;
@@ -904,9 +914,21 @@ function bossAttack(u,t){
   FX.bolt(u,c,d.col,.07,.3); FX.magic(c,r+.6,d.col,.6); FX.ring(c,0,r+.7,d.col,.12); FX.burst(c,14+r*8,d.col,4+r,.11); FX.shake(.5+r*.3);
   aoeHit(u,c,r,1,d.col);
 }
+// 시전 횟수에 따른 스킬 위력: 처음 두 번은 약하게, 이후 점점 강하게 (최대 2.2배)
+const BOSS_POW=n=>n<=1?.55:n===2?.75:Math.min(2.2,1+.3*(n-3));
 function bossCast(u,t){
+  u.casts=(u.casts||0)+1; const n=u.casts, pw=BOSS_POW(n), stage=Math.min(5,Math.max(0,n-2)), a0=u.atk; u.atk*=pw;
+  try{ bossCastImpl(u,t,stage); } finally { u.atk=a0; }
+  if(n>=3){ u.as*=1.06; } // 3번째부터 공격 속도도 점점 빨라짐
+  dread(stage); sfxBoss(stage);
+  const lines=['','','카제로스의 힘이 깨어납니다','카제로스의 위압이 전장을 짓누릅니다','절망이 다가옵니다','모든 것이 끝을 향합니다'];
+  if(lines[stage])setTimeout(()=>banner(lines[stage]),900/Math.max(1,speed));
+}
+function dread(stage){ const el=$('#dread'); el.style.setProperty('--dr',Math.min(1,stage/5)); el.className='on s'+stage; }
+function bossCastImpl(u,t,stage){
   const d=U[u.key], F=foes(u);
-  banner(d.sk); FX.shake(2.6);
+  banner(d.sk+(stage?' '+'Ⅰ Ⅱ Ⅲ Ⅳ Ⅴ'.split(' ')[stage-1]:'')); FX.shake(1.2+stage*.7);
+  if(stage>=2){ FX.magic(u,2.2+stage*.4,d.col,1.2); FX.ring(u,.3,2.6+stage*.5,d.col,.2,.9); }
   if(u.key==='kz1'){
     const spots=F.slice().sort(()=>Math.random()-.5).slice(0,3).map(e=>({x:e.x,y:e.y}));
     while(spots.length<3)spots.push({x:rnd(COLS),y:4+rnd(4)});
@@ -1442,7 +1464,7 @@ function render(){
       c.addEventListener('click',()=>buy(i)); c.addEventListener('mouseenter',()=>showInfo({key:k,star:1})); }
     sh.append(c);
   });
-  $('#odds').innerHTML='등장 확률 '+ODDS[S.level].map((x,c)=>'<b class="c'+(c+1)+'">'+x+'%</b>').join('')+(Object.keys(ITEMS).some(itemEligible)?'<b class="c5" title="상점 칸마다 전용 아이템이 나올 확률 (2성 이상 보유한 기물의 아이템만)">아이템 '+Math.round(ITEM_SLOT_CHANCE*100)+'%</b>':'');
+  $('#odds').innerHTML='등장 확률 '+ODDS[S.level].map((x,c)=>'<b class="c'+(c+1)+'">'+x+'%</b>').join('')+(Object.keys(ITEMS).some(itemEligible)?'<b class="c5" title="상점 칸마다 전용 아이템이 나올 확률 (레벨 10 이후, 2성 이상 보유한 기물의 아이템만)">아이템 '+Math.round(ITEM_SLOT_CHANCE*100)+'%</b>':'');
   // 버튼
   const sb=$('#sellBtn'); sb.disabled=!f; sb.textContent=f?(f.u.item?ITEMS[f.u.item].n:U[f.u.key].n)+' 판매 (+'+sellValue(f.u)+'G)':'판매';
   $('#xpBtn').disabled=S.gold<4||S.level>=MAXLV; $('#rerollBtn').disabled=S.gold<2;
@@ -1534,7 +1556,18 @@ function bgmApply(){
 $('#bgmBtn').onclick=()=>{bgmOn=!bgmOn;bgmApply();};
 $('#bgmVol').oninput=e=>{bgmVol=e.target.value/100; if(bgmVol>0)bgmOn=true; bgmApply();};
 // 브라우저 자동재생 정책: 첫 클릭/키 입력 때 재생 시작
-const bgmKick=()=>{ if(bgmOn&&bgm.paused)bgm.play().catch(()=>{}); };
+/* ───────── 효과음 (합성) ───────── */
+let AC=null;
+function ac(){ try{ if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); }catch(e){} return AC; }
+function tone(f,t0,dur,type,vol,f2){ const a=ac(); if(!a||bgmVol<=0)return; const o=a.createOscillator(), g=a.createGain(), t=a.currentTime+t0;
+  o.type=type; o.frequency.setValueAtTime(f,t); if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol*bgmVol,t+.015); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+.05); }
+function sfxLevelUp(){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>{tone(f,i*.08,.35,'triangle',.5);tone(f*2,i*.08+.02,.25,'sine',.12);}); tone(1567.98,.34,.6,'sine',.25); tone(2093,.4,.5,'sine',.15); }
+function sfxBoss(stage){ // 카제로스 스킬: 단계가 오를수록 더 낮고 무겁게
+  const v=.35+.12*Math.min(stage,5); tone(70-stage*5,0,1+stage*.25,'sawtooth',v*.5,32); tone(55-stage*4,0,1.2+stage*.3,'sine',v,28);
+  if(stage>=2)tone(140,.05,.8,'square',v*.15,60); if(stage>=4){tone(38,.3,1.8,'sine',v,24);tone(880,0,.5,'sine',.06,440);} }
+const bgmKick=()=>{ ac(); if(bgmOn&&bgm.paused)bgm.play().catch(()=>{}); };
 document.addEventListener('pointerdown',bgmKick); document.addEventListener('keydown',bgmKick);
 bgmApply();
 window.__startPlan=startPlan; window.__rollShop=rollShop;
