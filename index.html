@@ -1328,7 +1328,7 @@ function castImpl(u,t){
 /* ───────── 운명의 편린 (하드 이상 · 15라운드 이상 · 일반 라운드 · 2성 이상 적 처치 시 10%) ───────── */
 let SHARD_CHANCE=.085; // 10% → 8.5%
 const SHARD_KZ_PER=.005;
-let KZ_HARD_ATK=1, KZ_VULN=.05; // 하드 모드 카제로스: 공격력 배율 / 3번째 스킬부터 피격 시 받는 피해 중첩량
+let KZ_HARD_ATK=1, KZ_VULN=.03; // 하드 모드 카제로스: 공격력 배율 / 3번째 스킬부터 피격 시 받는 피해 중첩량
  // 편린 1개 획득마다 카제로스 체력·공격력·방어력 +0.5%
 const shardKzMul=()=>1+SHARD_KZ_PER*((S&&S.shardTotal)||0);
 const HARD_PLUS=()=>S&&(S.mode==='hard'||S.mode==='hell');
