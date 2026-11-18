@@ -660,7 +660,7 @@ function bossIntro(k,hint){
   const img=el.querySelector('img'), bf=el.querySelector('.bfig'); const lg=LEGION_HINT[k]&&!d.boss;
   if(ILLUS[k]){img.src=ILLUS[k];img.style.display='';bf.style.display='none';} else {img.style.display='none';bf.style.display='';bf.innerHTML=figSVG(k);}
   el.querySelector('small').textContent=lg?'군단장 라운드':'최종 보스'; el.querySelector('b').textContent=d.n;
-  el.querySelector('span').textContent=hint||(lg?LEGION_HINT[k]:d.sk+' · 크기 '+d.sz+'×'+d.sz);
+  el.querySelector('span').textContent=hint||(lg?LEGION_HINT[k]:d.sk+' · 크기 '+d.sz+'×'+d.sz+(S&&S.shardTotal?' · 운명의 편린 '+S.shardTotal+'개로 강화 +'+(SHARD_KZ_PER*100*S.shardTotal).toFixed(1)+'%':''));
   el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
   clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),3200);
 }
@@ -921,7 +921,8 @@ function mkCU(b,team,mul){
     o.maxHp=o.hp=Math.round(o.maxHp*ITEM_HP[si]*(1+(fx.hp||0)*k)); o.atk*=ITEM_ATK[si];
     o.as*=1+(fx.as||0)*k; o.crit+=(fx.crit||0)*k; o.critDmg+=(fx.critDmg||0)*k; o.skillMul*=1+(fx.skill||0)*k; o.healMul*=1+(fx.heal||0)*k;
     o.dr=1-(1-o.dr)*(1-Math.min(.5,(fx.dr||0)*k)); o.mana=Math.min(o.maxMana-1,(fx.mana||0)*k); }
-  if(o.boss&&S.mode!=='normal'){o.maxHp*=S.mode==='hard'?(o.key==='kz1'?54:41.4):3;o.hp=o.maxHp;} // 카제로스 체력: 이지 3배, 하드 ⓐ 54배(3.6×15)·ⓑⓒ 41.4배(3.6×11.5)
+  if(o.boss&&S.mode!=='normal'){o.maxHp*=S.mode==='hard'?(o.key==='kz1'?54:41.4):3;o.hp=o.maxHp;}
+  if(o.boss&&S.shardTotal){ const m=shardKzMul(); o.maxHp=Math.round(o.maxHp*m); o.hp=o.maxHp; o.atk*=m; o.ar*=m; } // 운명의 편린 누적 강화 // 카제로스 체력: 이지 3배, 하드 ⓐ 54배(3.6×15)·ⓑⓒ 41.4배(3.6×11.5)
   if(b.hpMul){o.maxHp=o.hp=Math.round(U[b.key].hp*STAR[b.star-1]*b.hpMul);} o.legion=!!b.legion; o.noGim=!!b.noGim; o.passive=!!U[b.key].passive;
   if(o.eq&&o.eq.star>=2){ const st=o.eq.star; // 전용 아이템 2성 이상 특수 효과
     if(o.eq.k==='silverlance')o.lance=[0,0,.03,.04][st];
@@ -1323,7 +1324,9 @@ function castImpl(u,t){
   }
 }
 /* ───────── 운명의 편린 (하드 이상 · 15라운드 이상 · 일반 라운드 · 2성 이상 적 처치 시 10%) ───────── */
-let SHARD_CHANCE=.1;
+let SHARD_CHANCE=.085; // 10% → 8.5%
+const SHARD_KZ_PER=.005; // 편린 1개 획득마다 카제로스 체력·공격력·방어력 +0.5%
+const shardKzMul=()=>1+SHARD_KZ_PER*((S&&S.shardTotal)||0);
 const HARD_PLUS=()=>S&&(S.mode==='hard'||S.mode==='hell');
 function shardEligible(t){
   return C&&!C.retryFight&&HARD_PLUS()&&S.round>=15&&!KZ[S.round]&&!legionOf(S.round)&&t.team===1&&!t.passive&&!t.boss&&!t.legion&&t.star>=2&&Math.random()<SHARD_CHANCE;
@@ -1338,7 +1341,7 @@ const shardGold=r=>Math.round(15+30*Math.min(1,Math.max(0,(r-15)/22))); // 15라
 function collectShards(els,r){
   // 적군·아군 진영 사이로 모였다가 자동 획득
   els.forEach((el,i)=>{ el.style.transition='left .9s ease-in-out, top .9s ease-in-out'; el.style.left=(50+(i-(els.length-1)/2)*8)+'%'; el.style.top='50%'; });
-  setTimeout(()=>{ els.forEach(el=>{el.classList.add('got'); setTimeout(()=>el.remove(),500);}); S.shards=(S.shards||0)+els.length; toast('운명의 편린 '+els.length+'개 획득!'); openShardPick(r); },1300);
+  setTimeout(()=>{ els.forEach(el=>{el.classList.add('got'); setTimeout(()=>el.remove(),500);}); S.shards=(S.shards||0)+els.length; S.shardTotal=(S.shardTotal||0)+els.length; toast('운명의 편린 '+els.length+'개 획득! (카제로스 강화 +'+(SHARD_KZ_PER*100*S.shardTotal).toFixed(1)+'%)'); openShardPick(r); },1300);
 }
 function openShardPick(r){
   if(!(S.shards>0))return;
