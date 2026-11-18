@@ -349,6 +349,15 @@ html[data-kz] .cell{border-color:rgba(255,230,200,.2)}
 #arenaPick button{width:min(9vw,16vh);aspect-ratio:16/9;padding:0;border-radius:8px;border:2px solid rgba(255,255,255,.35);background:center/cover no-repeat;position:relative;box-shadow:0 3px 8px rgba(0,0,0,.6)}
 #arenaPick button b{position:absolute;left:0;right:0;bottom:0;font-size:min(.85vw,1.5vh);padding:2px 0;background:rgba(0,0,0,.6);border-radius:0 0 6px 6px}
 #arenaPick button.on{border-color:var(--gold);box-shadow:0 0 12px rgba(232,193,112,.8)}
+
+#modePick .hHell{left:60.6%;top:92.3%;width:15%;height:6.4%;clip-path:polygon(7% 0,93% 0,100% 50%,93% 100%,7% 100%,0 50%);background:linear-gradient(180deg,#b0201a,#3a0606)!important;color:#ffe0d8;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+#modePick .hHell b{font-size:min(1.15vw,2.1vh)} #modePick .hHell small{font-size:min(.75vw,1.4vh);opacity:.85}
+#modePick .hHell.locked{background:linear-gradient(180deg,#5a5a60,#2a2a30)!important;color:#9a9aa4;filter:grayscale(1);cursor:not-allowed}
+#modePick .hHell:not(.locked):hover{filter:brightness(1.25)}
+.mode.hell{color:#ff8a7a;border-color:#d02a2a;background:rgba(208,42,42,.15)}
+#vScore b{color:#ff8a7a;font-size:16px}
+.hellScore{margin-top:12px;text-align:left} .hellScore b{color:var(--gold);font-size:18px}
+.hellScore ol{margin:6px 0 0;padding-left:20px;font-size:13px;color:var(--mute)}
 #augReroll{margin-top:14px;padding:7px 18px;font-weight:700}
 #augPick h2{margin:0 0 4px;color:var(--gold)} #augPick p{margin:0 0 14px;color:var(--mute);font-size:13px}
 .augRow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
@@ -415,6 +424,7 @@ main{grid-template-rows:100%}
   <header id="top">
     <h1>아크 택틱스<small>비공식 팬 프로토타입</small></h1>
     <span id="vMode" class="mode">-</span>
+    <span id="vScore" class="stat" style="display:none"><span class="lab">점수</span><b></b></span>
     <div class="stat"><span class="lab">라운드</span><b id="vRound">1</b></div>
     <div class="stat"><span class="lab">체력</span><div class="bar"><i id="hpFill"></i></div><b id="vHp">100</b></div>
     <div class="stat"><span class="lab">레벨</span><b id="vLv">2</b><div class="bar" id="xpBar"><i id="xpFill"></i></div><span class="lab" id="vXp"></span></div>
@@ -485,6 +495,7 @@ main{grid-template-rows:100%}
     <button data-a="sea" style="background-image:url(themes/sea.webp)"><b>태만의 바다</b></button>
     <button data-a="totoike" style="background-image:url(themes/totoike.webp)"><b>토토이크</b></button>
   </div></div>
+  <button id="hellBtn" class="hot hHell"><b>헬 모드 | HELL</b><small id="hellSub">하드 모드 클리어 시 해금</small></button>
   <button id="hardBtn" class="hot hHard"><b>하드 모드 | EXTENDED</b><small>40라운드 · 군단장 · 각인</small></button>
   <button id="optBtn" class="hot hOpt" aria-label="옵션"></button>
   <button id="exitBtn" class="hot hExit" aria-label="게임 종료"></button>
@@ -602,7 +613,9 @@ for(const k in ITEMS){ ITEMS[k].c=U[ITEMS[k].u].c; ITEMS[k].price=ITEMS[k].c*2; 
 const itemPrice=k=>ITEMS[k].price;
 // 카제로스 라운드: 노말/이지 23~25, 하드(익스텐디드) 38~40
 const KZ_N={23:'kz1',24:'kz2',25:'kz3'}, KZ_H={38:'kz1',39:'kz2',40:'kz3'};
-const KZ=new Proxy({},{get:(_,r)=>((typeof S!=='undefined'&&S&&S.mode==='hard')?KZ_H:KZ_N)[r]});
+const HARDLIKE=()=>typeof S!=='undefined'&&S&&(S.mode==='hard'||S.mode==='hell'); // 하드·헬: 40라운드 구조 공유
+const HELL=()=>typeof S!=='undefined'&&S&&S.mode==='hell';
+const KZ=new Proxy({},{get:(_,r)=>(HARDLIKE()?KZ_H:KZ_N)[r]});
 let FINAL_ROUND=25;
 // 하드 모드 군단장 라운드 (3성 군단장 1기 + 기믹, 승리 시 각인 선택)
 const LEGION={10:'valtan',15:'biakiss',20:'kouku',25:'abrel',30:'illiakan',35:'kamen'};
@@ -613,11 +626,11 @@ const LEGION_HINT={valtan:'특수 기믹 없음 · 쓰러지면 6초간 유령�
   abrel:'몽환의 뿔이 하나라도 남아 있으면 받는 피해 80% 감소 · 매초 마나 +10',
   illiakan:'일리아칸이 응시하는 기물은 피해를 줄 수 없음 · 4초마다 가장 위협적인 기물을 응시',
   kamen:'특수 기믹 없음 · 압도적인 능력치'};
-const legionOf=r=>S&&S.mode==='hard'?LEGION[r]:null;
+const legionOf=r=>HARDLIKE()?LEGION[r]:null;
 // 이지·노말 군단장 라운드: 군단장 1기만, 기믹 없음. 이지·노말 진행 속도에 맞춘 기준 스펙에서 이지 -20%, 노말 -10%
 const EN_LEGION={5:'valtan',10:'biakiss',15:'kouku',20:'kamen'};
 const EN_BASE={valtan:{star:2,hp:1.1,atk:.85},biakiss:{star:3,hp:2.2,atk:1.1},kouku:{star:3,hp:4,atk:1.3},kamen:{star:3,hp:2.1,atk:.75}};
-const enLegionOf=r=>S&&S.mode!=='hard'?EN_LEGION[r]:null;
+const enLegionOf=r=>S&&!HARDLIKE()?EN_LEGION[r]:null;
 const bossOfRound=r=>legionOf(r)||enLegionOf(r);
 // TFT 레벨별 상점 등장 확률 (1~5코스트, %)
 const ODDS={1:[100,0,0,0,0],2:[100,0,0,0,0],3:[75,25,0,0,0],4:[55,30,15,0,0],5:[45,33,20,2,0],6:[30,40,25,5,0],7:[19,30,40,10,1],8:[15,20,32,30,3],9:[10,17,25,33,15],10:[5,10,20,40,25]};
@@ -665,6 +678,7 @@ function bossIntro(k,hint){
   clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),3200);
 }
 function newGame(){
+  if(typeof refreshHell==='function')refreshHell();
   document.documentElement.removeAttribute('data-kz');
   $('#modePick').classList.add('on');
   S={mode:null,augs:[],retry:null,streak:0,adren:0,ether:0,escUsed:false,immune:0,freeRolls:0,gold:8,level:2,xp:0,hp:100,round:1,phase:'plan',shop:[],bench:Array(9).fill(null),board:[],enemies:[],sel:null,log:[]};
@@ -672,7 +686,8 @@ function newGame(){
   startPlan(); S.phase='mode';
 }
 function pickMode(m){
-  S.mode=m; FINAL_ROUND=m==='hard'?40:25; $('#modePick').classList.remove('on'); $('#vMode').textContent=m==='easy'?'이지':m==='hard'?'하드':'노말'; $('#vMode').className='mode '+m;
+  if(m==='hell'&&!hellUnlocked())return toast('하드 모드를 1회 이상 클리어하면 해금됩니다');
+  S.mode=m; FINAL_ROUND=(m==='hard'||m==='hell')?40:25; S.score=0; S.lossRun=0; setSpeed(1); $('#modePick').classList.remove('on'); $('#vMode').textContent=m==='easy'?'이지':m==='hard'?'하드':m==='hell'?'헬':'노말'; $('#vMode').className='mode '+m;
   startPlan();
 }
 function startPlan(){
@@ -706,8 +721,10 @@ function rollShop(oddsLv){
 function allItems(){ const a=[]; S.bench.forEach((u,i)=>{if(u&&u.item)a.push({w:'bench',i,k:u.item,star:u.star,o:u});}); for(const u of [...S.board,...S.bench])if(u&&u.key&&u.eq)a.push({w:'eq',u,k:u.eq.k,star:u.eq.star,o:u.eq}); return a; }
 // 전용 아이템은 레벨 10(최대)에 도달하고, 해당 기물을 2성 이상 보유했을 때만 상점에 등장 (대기석 포함)
 const itemEligible=k=>S.level>=MAXLV&&[...S.bench,...S.board].some(u=>u&&u.key===ITEMS[k].u&&u.star>=2);
+// 헬 모드 전용 무기 최대 성급: 5·4코스트 2성, 3코스트 1성
+const itemCap=k=>HELL()?(ITEMS[k].c>=4?2:1):3;
 function rollItem(){
-  const ban=new Set(allItems().filter(x=>x.star>=3).map(x=>x.k));
+  const ban=new Set(allItems().filter(x=>x.star>=itemCap(x.k)).map(x=>x.k));
   const ks=Object.keys(ITEMS).filter(k=>!ban.has(k)&&itemEligible(k)); if(!ks.length)return null;
   return wpick(ks,k=>ITEM_WEIGHT[ITEMS[k].c]*(ITEMS[k].w||1));
 }
@@ -775,19 +792,19 @@ function tryMerge(){
       if(arr.length<3)continue;
       const three=arr.slice(0,3), keep=three.find(p=>p.w==='board')||three[0];
       for(const p of three){ if(p===keep)continue; if(p.w==='bench')S.bench[p.i]=null; else S.board=S.board.filter(b=>b!==p.u); if(p.u.eq){ if(!keep.u.eq){keep.u.eq=p.u.eq;p.u.eq=null;} else returnItem(p.u); } }
-      keep.u.star++;
+      keep.u.star++; if(keep.u.star===3)addScore(500,'3성 기물 제작');
       if(S.sel&&three.some(p=>p.u.id===S.sel))S.sel=null;
       toast('★'.repeat(keep.u.star)+' '+U[keep.u.key].n+' 합성 완료!');
       if(keep.w==='board')setTimeout(()=>fxRing(keep.u.x,keep.u.y,1,'#e8c170'),30);
       done=true; break;
     }
     if(!done){ // 전용 아이템 합성 (같은 아이템·같은 성급 3개 → 성급 +1)
-      const gi={}; for(const x of allItems()){ if(x.star>=3)continue; (gi[x.k+x.star]=gi[x.k+x.star]||[]).push(x); }
+      const gi={}; for(const x of allItems()){ if(x.star>=itemCap(x.k))continue; (gi[x.k+x.star]=gi[x.k+x.star]||[]).push(x); }
       for(const arr of Object.values(gi)){
         if(arr.length<3)continue;
         const three=arr.slice(0,3), keep=three.find(x=>x.w==='eq')||three[0];
         for(const x of three){ if(x===keep)continue; if(x.w==='bench')S.bench[x.i]=null; else x.u.eq=null; }
-        keep.o.star++;
+        keep.o.star++; if(keep.o.star===2)addScore(500,'2성 전용 무기 제작');
         if(S.sel&&three.some(x=>x.o.id===S.sel))S.sel=null;
         toast('★'.repeat(keep.o.star)+' '+ITEMS[keep.k].n+' 합성 완료!');
         done=true; break;
@@ -850,7 +867,7 @@ function clickCell(x,y){
 
 /* ───────── 적 웨이브 ───────── */
 function legionWave(r,key){
-  key=key||LEGION[r]; const st=LEGION_STAT[key], L=[{id:uid++,key,star:3,x:3,y:1,team:1,mul:st.atk,hpMul:st.hp,legion:true}];
+  key=key||LEGION[r]; const st=LEGION_STAT[key], hm=HELL()?1.5:1, L=[{id:uid++,key,star:3,x:3,y:1,team:1,mul:st.atk*hm,hpMul:st.hp*hm,legion:true}]; // 헬: 하드 스펙 1.5배
   // 촉수 6개를 비아키스 주변 중앙에 배치 (앞줄 3·양옆 2·뒤 1) — 가장자리에 있으면 아군이 닿지 못해 클리어가 막히던 문제
   if(key==='biakiss')for(const [x,y] of [[2,2],[3,2],[4,2],[2,1],[4,1],[3,0]])L.push({id:uid++,key:'tentacle',star:1,x,y,team:1,mul:1});
   if(key==='abrel')for(const x of [2,4])L.push({id:uid++,key:'horn',star:1,x,y:1,team:1,mul:1});
@@ -861,7 +878,7 @@ function genWave(r){
   if(enLegionOf(r)){ const k=enLegionOf(r), b=EN_BASE[k], red=S.mode==='easy'?.8:.9;
     return [{id:uid++,key:k,star:b.star,x:3,y:1,team:1,mul:b.atk*red,hpMul:b.hp*red,legion:true,noGim:true}]; }
   if(KZ[r]){ const k=KZ[r], n=U[k].sz; return [{id:uid++,key:k,star:1,x:Math.floor((COLS-n)/2),y:n===3?0:1,team:1,mul:1,sz:n}]; }
-  const f=1+(S.mode==='hard'?.045:.08)*(r-1), list=[], used=new Set();
+  const f=1+(HARDLIKE()?.045:.08)*(r-1), list=[], used=new Set();
   const place=(key,star,mul,front)=>{
     let x,y,t=0;
     do{ x=rnd(COLS); y=front?2+rnd(2):rnd(2); t++; }while(used.has(x+','+y)&&t<60);
@@ -871,7 +888,7 @@ function genWave(r){
   // 성급 규칙: 1~5라운드 1성 / 6~15라운드 2성 / 16~22라운드 약한 몹 3성 + 보통 몹 2성
   const WEAK=['vertus','nakra','helgaia'], NORMAL=['urnil','lumerus'];
   const easy=S.mode==='easy';
-  const hard=S.mode==='hard';
+  const hard=HARDLIKE();
   const starOf=key=>hard?(r<=5?1:r<=12?(Math.random()<.15+.1*(r-6)?2:1):r<=20?2:r<=28?(WEAK.includes(key)?3:2):3)  // 하드 모드
     :r<=5?1
     :easy&&r<=10?(Math.random()<.2+.1*(r-6)?2:1)        // 이지 6~10: 1·2성 혼합 (2성 비율 20%→60%)
@@ -921,8 +938,9 @@ function mkCU(b,team,mul){
     o.maxHp=o.hp=Math.round(o.maxHp*ITEM_HP[si]*(1+(fx.hp||0)*k)); o.atk*=ITEM_ATK[si];
     o.as*=1+(fx.as||0)*k; o.crit+=(fx.crit||0)*k; o.critDmg+=(fx.critDmg||0)*k; o.skillMul*=1+(fx.skill||0)*k; o.healMul*=1+(fx.heal||0)*k;
     o.dr=1-(1-o.dr)*(1-Math.min(.5,(fx.dr||0)*k)); o.mana=Math.min(o.maxMana-1,(fx.mana||0)*k); }
-  if(o.boss&&S.mode!=='normal'){o.maxHp*=S.mode==='hard'?(o.key==='kz1'?54:41.4):3;o.hp=o.maxHp;}
-  if(o.boss&&S.mode==='hard')o.atk*=KZ_HARD_ATK;
+  if(o.boss&&S.mode!=='normal'){o.maxHp*=HARDLIKE()?(o.key==='kz1'?54:41.4):3;o.hp=o.maxHp;}
+  if(o.boss&&HELL()){o.maxHp=Math.round(o.maxHp*1.85);o.hp=o.maxHp;o.atk*=1.85;} // 헬: 카제로스 하드 스펙의 1.85배
+  if(o.boss&&HARDLIKE())o.atk*=KZ_HARD_ATK;
   if(o.boss&&S.shardTotal){ const m=shardKzMul(); o.maxHp=Math.round(o.maxHp*m); o.hp=o.maxHp; o.atk*=m; o.ar*=m; } // 운명의 편린 누적 강화 // 카제로스 체력: 이지 3배, 하드 ⓐ 54배(3.6×15)·ⓑⓒ 41.4배(3.6×11.5)
   if(b.hpMul){o.maxHp=o.hp=Math.round(U[b.key].hp*STAR[b.star-1]*b.hpMul);} o.legion=!!b.legion; o.noGim=!!b.noGim; o.passive=!!U[b.key].passive;
   if(o.eq&&o.eq.star>=2){ const st=o.eq.star; // 전용 아이템 2성 이상 특수 효과
@@ -1015,7 +1033,7 @@ function startCombat(){
 }
 function tick(){
   if(!C)return;
-  for(let i=0;i<speed;i++)step(.05);
+  C.acc=(C.acc||0)+speed; while(C.acc>=1){ C.acc--; step(.05); } // 소수 배속(×2.5) 지원
   drawUnits(C.units.filter(u=>u.alive));
 }
 const SZ=o=>o.sz||1, cx=o=>o.x+(SZ(o)-1)/2, cy=o=>o.y+(SZ(o)-1)/2, P=o=>({x:cx(o),y:cy(o)});
@@ -1066,7 +1084,7 @@ function step(dt){
     }else if(u.moveCd<=0&&!u.boss){ moveToward(u,t); u.moveCd=.32; }
   }
   const p=C.units.filter(u=>u.alive&&!u.team).length, e=C.units.filter(u=>u.alive&&u.team).length;
-  if(!p||!e||C.t>(S.mode==='hard'&&(KZ[S.round]||C.units.some(u=>u.legion&&u.key==='kamen'))?300:KZ[S.round]?100:C.legion?90:60)){ C.over=true; const win=e===0&&p>0; setTimeout(()=>endCombat(win,e),Math.max(300,900/speed)); }
+  if(!p||!e||C.t>(HARDLIKE()&&(KZ[S.round]||C.units.some(u=>u.legion&&u.key==='kamen'))?300:KZ[S.round]?100:C.legion?90:60)){ C.over=true; const win=e===0&&p>0; setTimeout(()=>endCombat(win,e),Math.max(300,900/speed)); }
 }
 function moveToward(u,t){
   const blocked=new Set(); for(const o of C.units)if(o.alive&&o!==u)for(let j=0;j<SZ(o);j++)for(let i=0;i<SZ(o);i++)blocked.add(o.x+i+(o.y+j)*COLS);
@@ -1114,7 +1132,7 @@ function hurt(src,t,raw,o){
     if(has('crit')&&C.kai.length){ C.kai=C.kai.filter(x=>C.t-x<4); d*=1+.02*Math.min(6,C.kai.length); }
   }
   if(t.team===0&&has('grudge'))d*=1.1;
-  if(t.team===0&&src.boss&&src.inSkill&&KZ_VULN&&S.mode==='hard'&&src.casts>=3){ d*=1+(t.kzVuln||0); t.kzVuln=(t.kzVuln||0)+KZ_VULN; } // 카제로스 3번째 스킬부터: 맞을수록 받는 피해 중첩
+  if(t.team===0&&src.boss&&src.inSkill&&KZ_VULN&&HARDLIKE()&&src.casts>=3){ d*=1+(t.kzVuln||0); t.kzVuln=(t.kzVuln||0)+KZ_VULN; } // 카제로스 3번째 스킬부터: 맞을수록 받는 피해 중첩
   if(src.ancient&&src.inSkill){ src.store=(src.store||0)+d*src.ancient; d*=1-src.ancient; }
   if(src.crit&&Math.random()<src.crit){d*=1+(src.critDmg||BASE_CRITDMG);crit=true;if(src.team===0&&has('crit'))C.kai.push(C.t);}
   const bdr=t.buffs&&t.buffs.length?Math.max(...t.buffs.map(b=>b.dr||0)):0;
@@ -1331,7 +1349,7 @@ const SHARD_KZ_PER=.005;
 let KZ_HARD_ATK=1, KZ_VULN=.03; // 하드 모드 카제로스: 공격력 배율 / 3번째 스킬부터 피격 시 받는 피해 중첩량
  // 편린 1개 획득마다 카제로스 체력·공격력·방어력 +0.5%
 const shardKzMul=()=>1+SHARD_KZ_PER*((S&&S.shardTotal)||0);
-const HARD_PLUS=()=>S&&(S.mode==='hard'||S.mode==='hell');
+const HARD_PLUS=()=>S&&S.mode==='hard'; // 헬 모드에는 편린이 나오지 않음
 function shardEligible(t){
   return C&&!C.retryFight&&HARD_PLUS()&&S.round>=15&&!KZ[S.round]&&!legionOf(S.round)&&t.team===1&&!t.passive&&!t.boss&&!t.legion&&t.star>=2&&Math.random()<SHARD_CHANCE;
 }
@@ -1391,8 +1409,9 @@ const AUGS=[
 const AUG_TIER={silver:'실버',gold:'골드',prism:'프리즘'};
 function has(id){ return !!(S&&S.augs&&S.augs.includes(id)); }
 function augTierFor(r){ return r<=15?'silver':r<=25?'gold':'prism'; }
-function offerAug(r,rerolled,exclude){
-  const tier=augTierFor(r); let cand=AUGS.filter(a=>a.t===tier&&!has(a.id));
+function hellTier(down){ const t=Math.random()<.6?'gold':'prism'; return down?(t==='gold'?'silver':'gold'):t; } // 헬: 골드 60% / 프리즘 40%, 재도전 클리어 시 한 등급 하락
+function offerAug(r,rerolled,exclude,tierOverride){
+  const tier=tierOverride||(HELL()?hellTier(false):augTierFor(r)); let cand=AUGS.filter(a=>a.t===tier&&!has(a.id));
   if(exclude){ const rest=cand.filter(a=>!exclude.includes(a.id)); if(rest.length>=3)cand=rest; }
   const pool=cand.sort(()=>Math.random()-.5).slice(0,3);
   if(!pool.length)return;
@@ -1402,12 +1421,24 @@ function offerAug(r,rerolled,exclude){
     b.onclick=()=>{ S.augs.push(a.id); if(a.id==='mass')S.massAtk=10+rnd(5); el.classList.remove('on');
       toast('각인 획득: '+a.n+(a.id==='mass'?' (공격력 +'+S.massAtk+'%)':'')); render(); }; box.append(b); }
   const rb=$('#augReroll'); rb.disabled=!!rerolled; rb.textContent=rerolled?'다시 뽑기 (사용함)':'다시 뽑기 (1회)';
-  rb.onclick=()=>{ if(!rerolled)offerAug(r,true,pool.map(a=>a.id)); };
+  rb.onclick=()=>{ if(!rerolled)offerAug(r,true,pool.map(a=>a.id),tier); };
   el.classList.add('on');
+}
+/* ───────── 헬 모드 점수 ───────── */
+function addScore(n,why){ if(!HELL())return; S.score=(S.score||0)+n; if(why)S.log.unshift((n>0?'+':'')+n+'점 · '+why); }
+function hellRecord(){
+  if(!HELL())return '';
+  let best=[]; try{ best=JSON.parse(localStorage.getItem('arcHellScores')||'[]'); }catch(e){}
+  best.push({s:S.score||0,r:S.round,d:new Date().toISOString().slice(0,10)}); best.sort((a,b)=>b.s-a.s); best=best.slice(0,5);
+  try{ localStorage.setItem('arcHellScores',JSON.stringify(best)); }catch(e){}
+  return '<div class="hellScore"><b>최종 점수 '+(S.score||0).toLocaleString()+'점</b><ol>'+best.map(x=>'<li>'+x.s.toLocaleString()+'점 · '+x.r+'라운드 · '+x.d+'</li>').join('')+'</ol></div>';
+}
+function gameOver(title,txt){
+  S.phase='over'; C=null; render(); $('#overTitle').textContent=title; $('#overTxt').innerHTML=txt+hellRecord(); $('#over').classList.add('on');
 }
 // 이지 모드 승리 보상 (노말: +1골드, 경험치 2)
 function winReward(r){
-  if(S.mode==='normal')return {g:1,xp:2};
+  if(S.mode==='normal'||S.mode==='hell')return {g:1,xp:2}; // 헬: 노말 방식
   if(r>=FINAL_ROUND)return {g:0,xp:2};
   if(KZ[r])return {g:50,xp:32};
   if(r>=16)return {g:33,xp:32};
@@ -1418,9 +1449,9 @@ function winReward(r){
 }
 function endRetry(win,eLeft){
   const r=S.retry; S.enemies=S.savedEnemies||genWave(S.round); S.savedEnemies=null; S.phase='plan'; C=null; bgmTrack(roundTrack(S.round));
-  if(win){ S.retry=null; banner('군단장 재도전 성공!'); S.log.unshift('군단장 재도전 성공 ('+r+'라운드)'); render(); offerAug(r); return; }
-  const dmg=dmgFor(eLeft,r); S.hp=Math.max(0,S.hp-dmg); banner('재도전 실패…'); S.log.unshift('군단장 재도전 실패 (체력 -'+dmg+')');
-  if(S.hp<=0){ S.phase='over'; render(); $('#overTitle').textContent='모험 종료'; $('#overTxt').textContent='군단장 재도전 중 쓰러졌습니다.'; $('#over').classList.add('on'); return; }
+  if(win){ S.retry=null; banner('군단장 재도전 성공!'); S.log.unshift('군단장 재도전 성공 ('+r+'라운드)'); addScore(2500,'군단장 재도전 클리어'); render(); offerAug(r,false,null,HELL()?hellTier(true):null); return; }
+  const dmg=dmgFor(eLeft,r); S.hp=Math.max(0,S.hp-dmg); addScore(-15000,'군단장 재도전 패배'); banner('재도전 실패…'); S.log.unshift('군단장 재도전 실패 (체력 -'+dmg+')');
+  if(S.hp<=0){ gameOver('모험 종료','군단장 재도전 중 쓰러졌습니다.'); return; }
   render();
 }
 function dmgFor(eLeft,r){
@@ -1443,16 +1474,22 @@ function endCombat(win,eLeft){
   let msg;
   const rw=win?winReward(S.round):{g:0,xp:2};
   if(win&&has('first'))rw.g+=1;
+  if(HELL()){ const lg0=legionOf(S.round);
+    if(win){ S.lossRun=0; addScore(KZ[S.round]?4500:lg0?2500:1000, KZ[S.round]?'카제로스 클리어':lg0?'군단장 클리어':'라운드 클리어'); }
+    else if(lg0) addScore(-15000,'군단장 패배');
+    else if(!KZ[S.round]){ addScore(-(350+50*(S.lossRun||0)),'라운드 패배'); S.lossRun=(S.lossRun||0)+1; } }
   if(win){ S.gold+=rw.g; msg='라운드 '+S.round+' 승리 (+'+rw.g+'골드, 경험치 +'+rw.xp+')'; banner('승리!'); }
   else{ const dmg=dmgFor(eLeft,S.round); S.hp=Math.max(0,S.hp-dmg); msg='라운드 '+S.round+' 패배 (체력 -'+dmg+')'; banner('패배…'); }
   const inc=5+interest(); S.gold+=inc; msg+=' · 수입 +'+inc;
   S.log.unshift(msg); S.log.length=Math.min(S.log.length,12);
   addXp(rw.xp);
-  if(S.hp<=0){ S.phase='over'; C=null; render(); $('#overTitle').textContent='모험 종료'; $('#overTxt').textContent='라운드 '+S.round+'에서 쓰러졌습니다. (레벨 '+S.level+')'; $('#over').classList.add('on'); return; }
-  if(S.round>=FINAL_ROUND){ S.phase='over'; C=null; render();
-    $('#overTitle').textContent=win?'카제로스 토벌 성공':'모험 종료';
-    $('#overTxt').textContent=win?'질서의 수호자 카제로스를 쓰러뜨렸습니다! (남은 체력 '+S.hp+')':'마지막 라운드에서 카제로스를 넘어서지 못했습니다. (남은 체력 '+S.hp+')';
-    $('#over').classList.add('on'); return; }
+  if(HELL()&&!win&&KZ[S.round]){ gameOver('모험 종료','헬 모드: 카제로스 라운드에서 패배하여 즉시 종료되었습니다.'); return; }
+  if(S.hp<=0){ gameOver('모험 종료','라운드 '+S.round+'에서 쓰러졌습니다. (레벨 '+S.level+')'); return; }
+  if(false){ S.phase='over'; C=null; render(); $('#overTitle').textContent='모험 종료'; $('#overTxt').textContent='라운드 '+S.round+'에서 쓰러졌습니다. (레벨 '+S.level+')'; $('#over').classList.add('on'); return; }
+  if(S.round>=FINAL_ROUND){
+    if(win&&S.mode==='hard'){ try{localStorage.setItem('arcHardClear','1');}catch(e){} }
+    if(win&&HELL())addScore(10000,'모든 라운드 클리어');
+    gameOver(win?'카제로스 토벌 성공':'모험 종료', win?'질서의 수호자 카제로스를 쓰러뜨렸습니다! (남은 체력 '+S.hp+')'+(S.mode==='hard'?'<br>헬 모드가 해금되었습니다.':''):'마지막 라운드에서 카제로스를 넘어서지 못했습니다. (남은 체력 '+S.hp+')'); return; }
   const lg=legionOf(S.round);
   if(lg){ if(win){ if(S.retry===S.round)S.retry=null; } else { S.retry=S.round; S.log.unshift('군단장 패배 — 재도전 버튼으로 다시 도전할 수 있습니다'); } }
   S.round++;
@@ -1870,7 +1907,8 @@ function drawUnits(list){
   for(const [id,e] of els)if(!seen.has(id)){e.remove();els.delete(id);}
 }
 function render(){
-  $('#vRound').textContent=S.round+'/'+FINAL_ROUND+(KZ[S.round]?' ('+U[KZ[S.round]].n+')':bossOfRound(S.round)?' (군단장 '+U[bossOfRound(S.round)].n+')':S.round%5===0&&S.mode!=='hard'?' (군단장)':'');
+  { const sc=$('#vScore'); sc.style.display=HELL()?'':'none'; if(HELL())sc.querySelector('b').textContent=(S.score||0).toLocaleString(); }
+  $('#vRound').textContent=S.round+'/'+FINAL_ROUND+(KZ[S.round]?' ('+U[KZ[S.round]].n+')':bossOfRound(S.round)?' (군단장 '+U[bossOfRound(S.round)].n+')':S.round%5===0&&!HARDLIKE()?' (군단장)':'');
   $('#vHp').textContent=S.hp; $('#hpFill').style.width=S.hp+'%';
   $('#vLv').textContent=S.level;
   $('#xpFill').style.width=(S.level>=MAXLV?100:S.xp/XPNEED[S.level]*100)+'%';
@@ -1981,6 +2019,12 @@ try{ if(localStorage.getItem('arcSynFold')==='1')setSynFold(true); }catch(e){}
 $('#retryBtn').onclick=startRetry;
 $('#easyBtn').onclick=()=>pickMode('easy');
 $('#hardBtn').onclick=()=>pickMode('hard');
+function hellUnlocked(){ try{ return localStorage.getItem('arcHardClear')==='1'; }catch(e){ return false; } }
+function refreshHell(){ const b=$('#hellBtn'), on=hellUnlocked(); b.classList.toggle('locked',!on);
+  let best=0; try{ best=(JSON.parse(localStorage.getItem('arcHellScores')||'[]')[0]||{}).s||0; }catch(e){}
+  $('#hellSub').textContent=on?(best?'최고 점수 '+best.toLocaleString()+'점':'점수 기록 · 40라운드'):'하드 모드 클리어 시 해금'; }
+$('#hellBtn').onclick=()=>pickMode('hell');
+refreshHell();
 const ARENAS={abyss:'심연',sea:'태만의 바다',totoike:'토토이크'};
 function setArena(a){ if(!ARENAS[a])a='abyss'; if(a==='abyss')document.documentElement.removeAttribute('data-arena'); else document.documentElement.setAttribute('data-arena',a);
   document.querySelectorAll('#arenaPick button').forEach(b=>b.classList.toggle('on',b.dataset.a===a));
@@ -1995,7 +2039,8 @@ $('#optVol').oninput=e=>{ bgmVol=e.target.value/100; if(bgmVol>0)bgmOn=true; bgm
 $('#exitBtn').onclick=()=>{ window.close(); setTimeout(()=>toast('브라우저 탭을 닫으면 게임이 종료됩니다'),150); };
 $('#normalBtn').onclick=()=>pickMode('normal');
 $('#bossIntro').onclick=()=>$('#bossIntro').classList.remove('on');
-$('#speedBtn').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('#speedBtn').textContent='배속 ×'+speed;};
+function setSpeed(v){ speed=v; $('#speedBtn').textContent='배속 ×'+v; }
+$('#speedBtn').onclick=()=>{ const L=HELL()?[1,2,2.5]:[1,2,4]; setSpeed(L[(L.indexOf(speed)+1)%L.length]||1); }; // 헬: ×1·×2·×2.5만
 $('#shop').addEventListener('dragover',ev=>ev.preventDefault());
 $('#shop').addEventListener('drop',ev=>{ev.preventDefault();sell();});
 document.addEventListener('dragend',()=>{ if(S.sel){S.sel=null;render();} });
