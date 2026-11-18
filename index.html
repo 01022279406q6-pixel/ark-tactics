@@ -922,6 +922,7 @@ function mkCU(b,team,mul){
     o.as*=1+(fx.as||0)*k; o.crit+=(fx.crit||0)*k; o.critDmg+=(fx.critDmg||0)*k; o.skillMul*=1+(fx.skill||0)*k; o.healMul*=1+(fx.heal||0)*k;
     o.dr=1-(1-o.dr)*(1-Math.min(.5,(fx.dr||0)*k)); o.mana=Math.min(o.maxMana-1,(fx.mana||0)*k); }
   if(o.boss&&S.mode!=='normal'){o.maxHp*=S.mode==='hard'?(o.key==='kz1'?54:41.4):3;o.hp=o.maxHp;}
+  if(o.boss&&S.mode==='hard')o.atk*=KZ_HARD_ATK;
   if(o.boss&&S.shardTotal){ const m=shardKzMul(); o.maxHp=Math.round(o.maxHp*m); o.hp=o.maxHp; o.atk*=m; o.ar*=m; } // 운명의 편린 누적 강화 // 카제로스 체력: 이지 3배, 하드 ⓐ 54배(3.6×15)·ⓑⓒ 41.4배(3.6×11.5)
   if(b.hpMul){o.maxHp=o.hp=Math.round(U[b.key].hp*STAR[b.star-1]*b.hpMul);} o.legion=!!b.legion; o.noGim=!!b.noGim; o.passive=!!U[b.key].passive;
   if(o.eq&&o.eq.star>=2){ const st=o.eq.star; // 전용 아이템 2성 이상 특수 효과
@@ -1113,6 +1114,7 @@ function hurt(src,t,raw,o){
     if(has('crit')&&C.kai.length){ C.kai=C.kai.filter(x=>C.t-x<4); d*=1+.02*Math.min(6,C.kai.length); }
   }
   if(t.team===0&&has('grudge'))d*=1.1;
+  if(t.team===0&&src.boss&&src.inSkill&&KZ_VULN&&S.mode==='hard'&&src.casts>=3){ d*=1+(t.kzVuln||0); t.kzVuln=(t.kzVuln||0)+KZ_VULN; } // 카제로스 3번째 스킬부터: 맞을수록 받는 피해 중첩
   if(src.ancient&&src.inSkill){ src.store=(src.store||0)+d*src.ancient; d*=1-src.ancient; }
   if(src.crit&&Math.random()<src.crit){d*=1+(src.critDmg||BASE_CRITDMG);crit=true;if(src.team===0&&has('crit'))C.kai.push(C.t);}
   const bdr=t.buffs&&t.buffs.length?Math.max(...t.buffs.map(b=>b.dr||0)):0;
@@ -1325,7 +1327,9 @@ function castImpl(u,t){
 }
 /* ───────── 운명의 편린 (하드 이상 · 15라운드 이상 · 일반 라운드 · 2성 이상 적 처치 시 10%) ───────── */
 let SHARD_CHANCE=.085; // 10% → 8.5%
-const SHARD_KZ_PER=.005; // 편린 1개 획득마다 카제로스 체력·공격력·방어력 +0.5%
+const SHARD_KZ_PER=.005;
+let KZ_HARD_ATK=1, KZ_VULN=.05; // 하드 모드 카제로스: 공격력 배율 / 3번째 스킬부터 피격 시 받는 피해 중첩량
+ // 편린 1개 획득마다 카제로스 체력·공격력·방어력 +0.5%
 const shardKzMul=()=>1+SHARD_KZ_PER*((S&&S.shardTotal)||0);
 const HARD_PLUS=()=>S&&(S.mode==='hard'||S.mode==='hell');
 function shardEligible(t){
@@ -2030,7 +2034,7 @@ bgmApply();
 window.__bgmReady=true;
 try{ setArena(localStorage.getItem('arcArena')||'abyss'); }catch(e){ setArena('abyss'); }
 window.__startPlan=startPlan; window.__rollShop=rollShop;
-window.__g={shardChance:v=>SHARD_CHANCE=v,openShardPick,get S(){return S},get C(){return C},clickCell,clickBench,buy,startCombat,setSpeed:n=>speed=n};
+window.__g={kzCfg:(a,v)=>{KZ_HARD_ATK=a;KZ_VULN=v;},shardChance:v=>SHARD_CHANCE=v,openShardPick,get S(){return S},get C(){return C},clickCell,clickBench,buy,startCombat,setSpeed:n=>speed=n};
 newGame();
 </script>
 </body>
