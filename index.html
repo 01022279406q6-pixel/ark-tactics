@@ -793,7 +793,8 @@ function clickCell(x,y){
 /* ───────── 적 웨이브 ───────── */
 function legionWave(r,key){
   key=key||LEGION[r]; const st=LEGION_STAT[key], L=[{id:uid++,key,star:3,x:3,y:1,team:1,mul:st.atk,hpMul:st.hp,legion:true}];
-  if(key==='biakiss')for(const x of [0,1,2,4,5,6])L.push({id:uid++,key:'tentacle',star:1,x,y:x===2||x===4?0:1,team:1,mul:1});
+  // 촉수 6개를 비아키스 주변 중앙에 배치 (앞줄 3·양옆 2·뒤 1) — 가장자리에 있으면 아군이 닿지 못해 클리어가 막히던 문제
+  if(key==='biakiss')for(const [x,y] of [[2,2],[3,2],[4,2],[2,1],[4,1],[3,0]])L.push({id:uid++,key:'tentacle',star:1,x,y,team:1,mul:1});
   if(key==='abrel')for(const x of [2,4])L.push({id:uid++,key:'horn',star:1,x,y:1,team:1,mul:1});
   return L;
 }
