@@ -306,6 +306,7 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 #augPick{position:fixed;inset:0;z-index:75;display:none;place-items:center;background:rgba(5,6,10,.82);padding:16px}
 #augPick.on{display:grid}
 #augPick .ap{background:linear-gradient(180deg,#20263b,#10131f);border:1px solid var(--gold2);border-radius:16px;padding:22px;text-align:center;max-width:820px}
+#augReroll{margin-top:14px;padding:7px 18px;font-weight:700}
 #augPick h2{margin:0 0 4px;color:var(--gold)} #augPick p{margin:0 0 14px;color:var(--mute);font-size:13px}
 .augRow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .augCard{width:230px;min-height:170px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;padding:16px 12px;text-align:center;line-height:1.45}
@@ -430,7 +431,7 @@ main{grid-template-rows:100%}
   </footer>
 </div>
 <div id="toast"></div>
-<div id="augPick"><div class="ap"><h2>각인 선택</h2><p>군단장을 쓰러뜨렸습니다. 각인 하나를 선택하세요.</p><div class="augRow"></div></div></div>
+<div id="augPick"><div class="ap"><h2>각인 선택</h2><p>군단장을 쓰러뜨렸습니다. 각인 하나를 선택하세요.</p><div class="augRow"></div><button id="augReroll">다시 뽑기 (1회)</button></div></div>
 <div id="modePick" class="on"><div class="tbox">
   <button id="easyBtn" class="hot hEasy" aria-label="쉬운 모드 (이지 모드) 시작"></button>
   <button id="normalBtn" class="hot hNormal" aria-label="노말 모드 시작"></button>
@@ -857,7 +858,7 @@ function tiers(){ const c=synCounts(), t={}; for(const s of SYN)t[s.k]=tierOf(s,
 /* ───────── 전투 ───────── */
 function mkCU(b,team,mul){
   const d=U[b.key], m=STAR[b.star-1]*(mul||1);
-  const o={eq:b.eq||null,sz:d.sz||1,boss:!!d.boss,aoe:d.aoe||0,id:b.id,key:b.key,star:b.star,team,x:b.x,y:b.y,maxHp:Math.round(d.hp*m),hp:Math.round(d.hp*m),atk:d.atk*m,as:d.as,rg:d.rg,ar:d.ar,
+  const o={eq:b.eq||null,sz:d.sz||1,boss:!!d.boss,aoe:d.aoe||0,id:b.id,key:b.key,star:b.star,team,x:b.x,y:b.y,maxHp:Math.round(d.hp*m),hp:Math.round(d.hp*m),atk:d.atk*m,atkBase:d.atk*m,as:d.as,rg:d.rg,ar:d.ar,
     maxMana:d.mp,mana:0,shield:0,atkCd:Math.random()*.5,moveCd:.3,stun:0,alive:true,ghost:false,ghostT:0,dmgMul:1,crit:BASE_CRIT,critDmg:BASE_CRITDMG,hits:0,eu:false,skillMul:1,healMul:1,dr:0,tankMana:0,derenAs:0,derenLs:0,inSkill:false,manaGain:10,haste:0,sm:m,tgt:null,live:true};
   if(o.eq){ const it=ITEMS[o.eq.k], si=o.eq.star-1, fx=it.fx, k=ITEM_FX[si];
     o.maxHp=o.hp=Math.round(o.maxHp*ITEM_HP[si]*(1+(fx.hp||0)*k)); o.atk*=ITEM_ATK[si];
@@ -908,6 +909,8 @@ function startCombat(){
     if(has('doll'))u.atk*=1.3;
     if(has('crit'))u.crit+=.15;
     if(has('sage')&&J.includes('서포터')){u.healMul*=1.3;u.shMul=1.3;}
+    if(has('mass')){u.as*=.9;u.maxMana=Math.round(u.maxMana*1.1);u.atk*=1+(S.massAtk||12)/100;u.skillMul*=1.05;}
+    if(has('heavy')&&J.includes('탱커'))u.heavy=true;
     if(has('awaken')&&d.c>=4)u.mana=Math.max(u.mana,u.maxMana*.5);
     if(has('ambush')&&J.includes('사냥꾼'))u.dmgMul*=1.2;
     if(F.includes('실린')&&T['실린'])u.skillMul*=[1,1.1,1.18,1.22][T['실린']];
@@ -941,6 +944,12 @@ function startCombat(){
   if(bond){ const es=allies.filter(u=>facs(U[u.key]).includes('에스더'));
     for(const u of es){u.maxHp+=bond.hp;u.hp+=bond.hp;u.crit+=bond.cr;u.critDmg+=bond.cd;}
     setTimeout(()=>{for(const u of es){FX.ring(u,.1,.9,'#ffd76a',.08,.6);FX.rise(u,8,'#ffe9a8');}},60); }
+  // 승부사: 적이 아군보다 적으면 차이 n마다 공격력·방어력 +2.2%
+  if(has('gambler')){ const na=allies.length, ne=C.units.filter(e=>e.team&&!e.passive).length, n=na-ne;
+    if(n>0){ for(const u of allies){u.atk*=1+.022*n;u.ar*=1+.022*n;} setTimeout(()=>toast('승부사: 공격력·방어력 +'+(2.2*n).toFixed(1)+'%'),300); } }
+  // 돌격대장: 공격 속도 +15%, 다른 효과로 오른 공격력의 절반만큼 추가 (최대 +40%)
+  if(has('charge'))for(const u of allies){ const bonus=Math.max(0,u.atk/u.atkBase-1); u.as*=1.15*(1+Math.min(.4,bonus*.5)); }
+  for(const u of C.units)if(!u.team)u.atk0=u.atk; // 돌격대장·승부사 반영 후 기준 공격력 갱신 (달의 창)
   banner(bond?(bt>=4?'에스더 전원 집결! 결속 Ⅲ · 고유 효과 강화':'에스더 결속 '+['Ⅰ','Ⅱ','Ⅲ'][bt-1]+' 발동!'):'전투 시작!');
   render();
   clearInterval(timer); timer=setInterval(tick,50);
@@ -987,7 +996,8 @@ function step(dt){
       if(u.atkCd<=0&&u.boss){ bossAttack(u,t); u.mana=Math.min(u.maxMana,u.mana+u.manaGain); u.atkCd=1/u.as; }
       else if(u.atkCd<=0){
         if(u.rg>1)fxShot(u,t,u.team?'#ff7a6e':u.key==='solas'?'#b48cff':'#7ec0ff');
-        hurt(u,t,u.atk); if(u.eu&&u.key==='wei'&&++u.hits%3===0&&t.alive){hurt(u,t,u.atk*.8*(C.euMul||1));FX.sky(t,'#fff2b0',.05);} FX.burst(t,4,u.team?'#ff8a7a':'#bfe0ff',2.4,.07);
+        hurt(u,t,u.atk); if(u.heavy){ const e2=C.units.filter(e=>e.alive&&e.team!==u.team&&e!==t&&dist(u,e)<=u.rg+1).sort((a,b)=>dist(u,a)-dist(u,b))[0]; if(e2){hurt(u,e2,u.atk);FX.burst(e2,4,'#c9ced8',2.4,.07);} }
+        if(u.eu&&u.key==='wei'&&++u.hits%3===0&&t.alive){hurt(u,t,u.atk*.8*(C.euMul||1));FX.sky(t,'#fff2b0',.05);} FX.burst(t,4,u.team?'#ff8a7a':'#bfe0ff',2.4,.07);
         u.mana=Math.min(u.maxMana,u.mana+u.manaGain);
         if(u.lance){ const amt=u.maxHp*u.lance; addShield(u,amt); (u.ltok=u.ltok||[]).push({t:3,amt,rem:amt}); }
         if(u.moonSp)u.atk+=u.atk0*u.moonSp;
@@ -1048,6 +1058,7 @@ function hurt(src,t,raw,o){
   if(src.ancient&&src.inSkill){ src.store=(src.store||0)+d*src.ancient; d*=1-src.ancient; }
   if(src.crit&&Math.random()<src.crit){d*=1+(src.critDmg||BASE_CRITDMG);crit=true;if(src.team===0&&has('crit'))C.kai.push(C.t);}
   const bdr=t.buffs&&t.buffs.length?Math.max(...t.buffs.map(b=>b.dr||0)):0;
+  if(t.team===0&&src.team===1&&src.inSkill&&has('heavy')&&jobs(U[t.key]).includes('탱커')&&Math.max(bdr,t.dr||0)<.05)d*=.95;
   d=Math.max(1,Math.round(d*100/(100+t.ar)*(1-(t.dr||0))*(1-bdr)));
   // 군단장 기믹
   if(t.legion&&!t.noGim&&src.team===0){
@@ -1077,6 +1088,9 @@ function kill(t){
     t.ghost=true;t.ghostT=6;t.hp=Math.round(t.maxHp*.5);t.atk*=1.3;t.shield=0;t.stun=0;
     fxText(cx(t),cy(t),'찢겨진 마수의 군주','sk'); FX.magic(t,1.3,'#7ddfff',1.2); FX.pillar(t,'#7ddfff',1,3.4,.9); FX.rise(t,24,'#bff4ff'); FX.ring(t,.2,1.8,'#7ddfff',.14); FX.shake(1.5); return;
   }
+  if(t.team===0&&!t.passive&&C&&has('necro')){ const tg=C.units.filter(e=>e.alive&&e.team===1&&!e.passive).sort((a,b)=>b.hp-a.hp)[0];
+    if(tg){ const from={x:t.x,y:t.y}, dmg=t.maxHp*.08; FX.beam(from,tg,'#b48cff',.12,.5); FX.burst(from,12,'#c9a0ff',3,.09);
+      later(250,()=>{ if(!C||!tg.alive)return; FX.ring(tg,0,1,'#b48cff',.14); FX.burst(tg,18,'#9a6cff',5,.11); fxText(cx(tg),cy(tg)-.4,'강령술','mag'); hurt({team:0},tg,dmg*(100+tg.ar)/100,{mag:1}); }); } }
   t.alive=false; if(t.legion)for(const m of C.units)if(m.alive&&m.passive&&m.team===t.team){m.alive=false;FX.burst(m,10,'#c87aff',3,.09);}
   FX.burst(t,16,t.team?'#ff6b5e':'#6fb8ff',3.6,.1); FX.ring(t,0,.8,t.team?'#ff6b5e':'#6fb8ff',.08);
 }
@@ -1267,17 +1281,27 @@ const AUGS=[
   {id:'crit',t:'prism',n:'엘릭서: 회심',d:'아군 치명타 확률 +15%. 아군이 치명타를 낼 때마다 4초간 아군 전체 피해 +2% (최대 12%)'},
   {id:'sage',t:'prism',n:'엘릭서: 선각자',d:'서포터 시너지 인원 +1. 서포터의 회복·보호막 +30%'},
   {id:'awaken',t:'prism',n:'각성',d:'4·5코스트 아군이 마나 50%를 채운 채 전투를 시작합니다'},
+  {id:'mass',t:'gold',n:'질량 증가',d:'아군 공격 속도 -10%, 스킬 마나 소모 +10%. 대신 공격력 +10~14%(획득 시 결정), 스킬 피해 +5%'},
+  {id:'heavy',t:'gold',n:'중갑 착용',d:'아군 탱커의 기본 공격이 주변 적 1명을 더 공격합니다. 탱커를 노린 적 스킬 피해 -5% (이미 더 큰 피해 감소 효과가 있으면 적용 안 함)'},
+  {id:'necro',t:'silver',n:'강령술',d:'아군이 쓰러지면 환영이 나타나 체력이 가장 높은 적에게 돌진, 쓰러진 아군 최대 체력의 8% 피해를 주고 자폭합니다'},
+  {id:'gambler',t:'silver',n:'승부사',d:'전투 시작 시 적이 아군보다 적으면, 아군이 더 많은 수 n마다 아군 공격력·방어력 +2.2%×n (그 라운드 한정)'},
+  {id:'charge',t:'prism',n:'돌격대장',d:'아군 공격 속도 +15%. 다른 효과로 오른 공격력의 절반만큼 공격 속도가 추가로 증가합니다 (최대 +40%)'},
 ];
 const AUG_TIER={silver:'실버',gold:'골드',prism:'프리즘'};
 function has(id){ return !!(S&&S.augs&&S.augs.includes(id)); }
 function augTierFor(r){ return r<=15?'silver':r<=25?'gold':'prism'; }
-function offerAug(r){
-  const tier=augTierFor(r), pool=AUGS.filter(a=>a.t===tier&&!has(a.id)).sort(()=>Math.random()-.5).slice(0,3);
+function offerAug(r,rerolled,exclude){
+  const tier=augTierFor(r); let cand=AUGS.filter(a=>a.t===tier&&!has(a.id));
+  if(exclude){ const rest=cand.filter(a=>!exclude.includes(a.id)); if(rest.length>=3)cand=rest; }
+  const pool=cand.sort(()=>Math.random()-.5).slice(0,3);
   if(!pool.length)return;
   const el=$('#augPick'); el.querySelector('h2').textContent='각인 선택 — '+AUG_TIER[tier]+' 등급';
   const box=el.querySelector('.augRow'); box.innerHTML='';
   for(const a of pool){ const b=document.createElement('button'); b.className='augCard '+a.t; b.innerHTML='<small>'+AUG_TIER[a.t]+'</small><b>'+a.n+'</b><span>'+a.d+'</span>';
-    b.onclick=()=>{ S.augs.push(a.id); el.classList.remove('on'); toast('각인 획득: '+a.n); render(); }; box.append(b); }
+    b.onclick=()=>{ S.augs.push(a.id); if(a.id==='mass')S.massAtk=10+rnd(5); el.classList.remove('on');
+      toast('각인 획득: '+a.n+(a.id==='mass'?' (공격력 +'+S.massAtk+'%)':'')); render(); }; box.append(b); }
+  const rb=$('#augReroll'); rb.disabled=!!rerolled; rb.textContent=rerolled?'다시 뽑기 (사용함)':'다시 뽑기 (1회)';
+  rb.onclick=()=>{ if(!rerolled)offerAug(r,true,pool.map(a=>a.id)); };
   el.classList.add('on');
 }
 // 이지 모드 승리 보상 (노말: +1골드, 경험치 2)
@@ -1790,7 +1814,7 @@ function render(){
   { const rb=$('#retryBtn'); const show=!!S.retry&&S.phase!=='over'; rb.style.display=show?'':'none'; rb.disabled=S.phase!=='plan';
     if(show)rb.textContent='군단장 재도전 ('+S.retry+'R · '+U[LEGION[S.retry]].n+')'; }
   $('#augBox').style.display=S.augs&&S.augs.length?'':'none';
-  if(S.augs)$('#augList').innerHTML=S.augs.map(id=>{const a=AUGS.find(x=>x.id===id);return '<div class="augTag '+a.t+'" title="'+a.d+'">'+a.n+'</div>';}).join('');
+  if(S.augs)$('#augList').innerHTML=S.augs.map(id=>{const a=AUGS.find(x=>x.id===id);return '<div class="augTag '+a.t+'" title="'+a.d+'">'+a.n+(id==='mass'&&S.massAtk?' +'+S.massAtk+'%':'')+'</div>';}).join('');
   const st=$('#startBtn'); st.disabled=S.phase!=='plan'; st.textContent=S.phase==='combat'?'전투 중…':'전투 시작';
   renderSyn();
   $('#log').innerHTML=S.log.map(l=>'<div>'+l+'</div>').join('')||'<div style="color:var(--mute)">아직 기록이 없습니다.</div>';
