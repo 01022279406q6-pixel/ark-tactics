@@ -489,6 +489,7 @@ main{grid-template-rows:100%}
 <div id="bossIntro"><img alt=""><div class="bfig" style="display:none"></div><div class="bi"><small>최종 보스</small><b></b><span></span></div></div>
 <div id="over"><div><h2 id="overTitle">모험 종료</h2><p id="overTxt"></p><button id="restartBtn">다시 시작</button></div></div>
 
+<audio id="bgm_abyss" loop preload="auto" src="audio/abyss.mp3"></audio>
 <audio id="bgm_totoike" loop preload="none" src="audio/totoike.mp3"></audio>
 <audio id="bgm_valtan" loop preload="none" src="audio/valtan.mp3"></audio>
 <audio id="bgm_biakiss" loop preload="none" src="audio/biakiss.mp3"></audio>
@@ -499,7 +500,7 @@ main{grid-template-rows:100%}
 <audio id="bgmKz2" loop preload="none" src="audio/kz2.mp3"></audio>
 <audio id="bgmKz3" loop preload="none" src="audio/kz3.mp3"></audio>
 <audio id="bgmKz" loop preload="none" src="audio/kz1.mp3"></audio>
-<audio id="bgm" loop preload="auto" src="audio/main.mp3"></audio>
+<audio id="bgm" loop preload="none" src="audio/main.mp3"></audio>
 <script>
 'use strict';
 /* ───────── 데이터 ───────── */
@@ -644,8 +645,8 @@ function roundTrack(r){
   const lg=bossOfRound(r);
   return KZ[r]||(lg&&BGM[lg]?lg:arenaTrack()); }
 // 결투장 테마별 기본 BGM (보스 라운드는 보스 곡 우선). 태만의 바다 곡을 받으면 sea 항목을 추가
-const ARENA_BGM={totoike:'totoike'};
-function arenaTrack(){ const a=document.documentElement.getAttribute('data-arena'); return (a&&ARENA_BGM[a]&&BGM[ARENA_BGM[a]])?ARENA_BGM[a]:'main'; }
+const ARENA_BGM={abyss:'abyss',sea:'main',totoike:'totoike'}; // 심연: Elnead Reclamation War / 태만의 바다: Sanctuary of Arcadia / 토토이크: Twinkling Winds
+function arenaTrack(){ const a=document.documentElement.getAttribute('data-arena')||'abyss'; return (a&&ARENA_BGM[a]&&BGM[ARENA_BGM[a]])?ARENA_BGM[a]:'main'; }
 function bossIntro(k,hint){
   const el=$('#bossIntro'), d=U[k];
   const img=el.querySelector('img'), bf=el.querySelector('.bfig'); const lg=LEGION_HINT[k]&&!d.boss;
@@ -1987,7 +1988,7 @@ document.addEventListener('keydown',ev=>{
   else if(k===' '){ev.preventDefault(); if(S.phase==='plan')startCombat();}
 });
 /* ───────── 배경음악 ───────── */
-const BGM={totoike:$('#bgm_totoike'),main:$('#bgm'),kz1:$('#bgmKz'),kz2:$('#bgmKz2'),kz3:$('#bgmKz3'),valtan:$('#bgm_valtan'),biakiss:$('#bgm_biakiss'),kouku:$('#bgm_kouku'),abrel:$('#bgm_abrel'),illiakan:$('#bgm_illiakan'),kamen:$('#bgm_kamen')}; let bgm=BGM.main, bgmOn=true, bgmVol=.4;
+const BGM={abyss:$('#bgm_abyss'),totoike:$('#bgm_totoike'),main:$('#bgm'),kz1:$('#bgmKz'),kz2:$('#bgmKz2'),kz3:$('#bgmKz3'),valtan:$('#bgm_valtan'),biakiss:$('#bgm_biakiss'),kouku:$('#bgm_kouku'),abrel:$('#bgm_abrel'),illiakan:$('#bgm_illiakan'),kamen:$('#bgm_kamen')}; let bgm=BGM.abyss, bgmOn=true, bgmVol=.4;
 function bgmTrack(k){ const n=BGM[k]; if(n===bgm)return; bgm.pause(); bgm=n; bgm.currentTime=0; bgmApply(); }
 try{ const v=JSON.parse(localStorage.getItem('arcTacticsBgm')||'null'); if(v){bgmOn=!!v.on; bgmVol=Math.min(1,Math.max(0,+v.vol||0));} }catch(e){}
 function bgmApply(){
