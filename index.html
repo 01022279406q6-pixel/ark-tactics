@@ -306,6 +306,25 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 #augPick{position:fixed;inset:0;z-index:75;display:none;place-items:center;background:rgba(5,6,10,.82);padding:16px}
 #augPick.on{display:grid}
 #augPick .ap{background:linear-gradient(180deg,#20263b,#10131f);border:1px solid var(--gold2);border-radius:16px;padding:22px;text-align:center;max-width:820px}
+/* 운명의 편린 */
+#drops{position:absolute;inset:0;pointer-events:none;z-index:6}
+.shard{position:absolute;width:5%;aspect-ratio:1;transform:translate(-50%,-50%)}
+.shard i{position:absolute;inset:0;background:linear-gradient(135deg,#fffbe8,#ffd76a 45%,#c87aff);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);filter:drop-shadow(0 0 8px #ffe9a8) drop-shadow(0 0 16px #ffd76a);animation:shardSpin 1.2s ease-in-out infinite}
+.shard::before{content:'';position:absolute;left:50%;bottom:50%;width:40%;height:520%;transform:translateX(-50%);background:linear-gradient(0deg,rgba(255,240,180,.95),rgba(255,215,106,0));filter:blur(1px);animation:shardBeam .8s ease-in-out infinite alternate}
+.shard.got{transition:transform .45s,opacity .45s!important;transform:translate(-50%,-160%) scale(1.6);opacity:0}
+@keyframes shardSpin{50%{transform:scale(1.25) rotate(8deg);filter:drop-shadow(0 0 14px #fff) drop-shadow(0 0 26px #ffd76a)}}
+@keyframes shardBeam{from{opacity:.55}to{opacity:1}}
+#shardPick{position:fixed;inset:0;z-index:76;display:none;place-items:center;background:rgba(5,6,10,.82);padding:16px}
+#shardPick.on{display:grid}
+#shardPick .ap{background:linear-gradient(180deg,#2a2412,#10131f);border:1px solid var(--gold);border-radius:16px;padding:22px;text-align:center;max-width:960px;box-shadow:0 0 40px rgba(255,215,106,.25)}
+#shardPick h2{margin:0 0 4px;color:var(--gold)} #shardPick p{margin:0 0 14px;color:var(--mute);font-size:13px}
+.shRow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.shCard{width:150px;min-height:150px;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;padding:12px 8px;border-color:var(--cc)}
+.shCard .si{width:64px;height:64px;border-radius:12px;border:2px solid var(--cc);background:#0a0c14;display:grid;place-items:center}
+.shCard .si svg{width:80%;height:80%}
+.shCard b{font-size:15px} .shCard small{color:var(--mute);font-size:11px} .shCard em{font-style:normal;font-size:11px;color:#ff8a7a}
+.shCard.gold{--cc:var(--gold);background:linear-gradient(180deg,#5a4512,#221a08)}
+.shCard .si.coin{border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,#e8c170 45%,#8a5f1e)}
 #augReroll{margin-top:14px;padding:7px 18px;font-weight:700}
 #augPick h2{margin:0 0 4px;color:var(--gold)} #augPick p{margin:0 0 14px;color:var(--mute);font-size:13px}
 .augRow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
@@ -392,6 +411,7 @@ main{grid-template-rows:100%}
         <div id="units"></div>
         <div id="fx"></div>
         <div id="dread"></div>
+        <div id="drops"></div>
         <div id="banner"></div>
       </div></div>
     </section>
@@ -431,6 +451,7 @@ main{grid-template-rows:100%}
   </footer>
 </div>
 <div id="toast"></div>
+<div id="shardPick"><div class="ap"><h2>운명의 편린</h2><p></p><div class="shRow"></div></div></div>
 <div id="augPick"><div class="ap"><h2>각인 선택</h2><p>군단장을 쓰러뜨렸습니다. 각인 하나를 선택하세요.</p><div class="augRow"></div><button id="augReroll">다시 뽑기 (1회)</button></div></div>
 <div id="modePick" class="on"><div class="tbox">
   <button id="easyBtn" class="hot hEasy" aria-label="쉬운 모드 (이지 모드) 시작"></button>
@@ -1091,6 +1112,7 @@ function kill(t){
   if(t.team===0&&!t.passive&&C&&has('necro')){ const tg=C.units.filter(e=>e.alive&&e.team===1&&!e.passive).sort((a,b)=>b.hp-a.hp)[0];
     if(tg){ const from={x:t.x,y:t.y}, dmg=t.maxHp*.08; FX.beam(from,tg,'#b48cff',.12,.5); FX.burst(from,12,'#c9a0ff',3,.09);
       later(250,()=>{ if(!C||!tg.alive)return; FX.ring(tg,0,1,'#b48cff',.14); FX.burst(tg,18,'#9a6cff',5,.11); fxText(cx(tg),cy(tg)-.4,'강령술','mag'); hurt({team:0},tg,dmg*(100+tg.ar)/100,{mag:1}); }); } }
+  if(shardEligible(t)){ (C.drops=C.drops||[]).push(dropShard(t)); }
   t.alive=false; if(t.legion)for(const m of C.units)if(m.alive&&m.passive&&m.team===t.team){m.alive=false;FX.burst(m,10,'#c87aff',3,.09);}
   FX.burst(t,16,t.team?'#ff6b5e':'#6fb8ff',3.6,.1); FX.ring(t,0,.8,t.team?'#ff6b5e':'#6fb8ff',.08);
 }
@@ -1264,6 +1286,42 @@ function castImpl(u,t){
     default: FX.ring(t,0,1,col,.13); FX.burst(t,16,col,4.5,.12); FX.debris(t,8,'#ffb0a0'); FX.shake(.6); hurt(u,t,u.atk*2.2);
   }
 }
+/* ───────── 운명의 편린 (하드 이상 · 15라운드 이상 · 일반 라운드 · 2성 이상 적 처치 시 10%) ───────── */
+let SHARD_CHANCE=.1;
+const HARD_PLUS=()=>S&&(S.mode==='hard'||S.mode==='hell');
+function shardEligible(t){
+  return C&&!C.retryFight&&HARD_PLUS()&&S.round>=15&&!KZ[S.round]&&!legionOf(S.round)&&t.team===1&&!t.passive&&!t.boss&&!t.legion&&t.star>=2&&Math.random()<SHARD_CHANCE;
+}
+function dropShard(t){
+  const el=document.createElement('div'); el.className='shard'; el.innerHTML='<i></i>';
+  el.style.left=PX(cx(t)+.5)+'%'; el.style.top=PY(cy(t)+.5)+'%'; $('#drops').append(el);
+  FX.pillar(t,'#ffe9a8',1.2,4.5,1.2); FX.ring(t,0,1.4,'#fff6c8',.16,.8); FX.burst(t,26,'#ffd76a',5,.12); fxText(cx(t),cy(t)-.5,'운명의 편린!','sk');
+  return el;
+}
+const shardGold=r=>Math.round(15+30*Math.min(1,Math.max(0,(r-15)/22))); // 15라운드 15골드 → 37라운드 45골드
+function collectShards(els,r){
+  // 적군·아군 진영 사이로 모였다가 자동 획득
+  els.forEach((el,i)=>{ el.style.transition='left .9s ease-in-out, top .9s ease-in-out'; el.style.left=(50+(i-(els.length-1)/2)*8)+'%'; el.style.top='50%'; });
+  setTimeout(()=>{ els.forEach(el=>{el.classList.add('got'); setTimeout(()=>el.remove(),500);}); S.shards=(S.shards||0)+els.length; toast('운명의 편린 '+els.length+'개 획득!'); openShardPick(r); },1300);
+}
+function openShardPick(r){
+  if(!(S.shards>0))return;
+  if($('#augPick').classList.contains('on')){ setTimeout(()=>openShardPick(r),500); return; } // 각인 선택이 먼저
+  const el=$('#shardPick'), box=el.querySelector('.shRow'); box.innerHTML='';
+  const owned=[...new Set([...S.board,...S.bench].filter(u=>u&&u.key&&U[u.key].c>=3).map(u=>u.key))];
+  const max3=new Set(allItems().filter(x=>x.star>=3).map(x=>x.k));
+  const opts=Object.keys(ITEMS).filter(k=>owned.includes(ITEMS[k].u)&&!max3.has(k));
+  const full=S.bench.indexOf(null)<0;
+  for(const k of opts){ const it=ITEMS[k], b=document.createElement('button'); b.className='shCard c'+it.c; b.disabled=full;
+    b.innerHTML='<div class="si">'+itemSVG(k)+'</div><b>'+it.n+'</b><small>'+U[it.u].n+' 전용</small>'+(full?'<em>대기석 가득 참</em>':'');
+    b.onclick=()=>{ const slot=S.bench.indexOf(null); if(slot<0)return; S.bench[slot]={id:uid++,item:k,star:1}; tryMerge(); toast(it.n+' 획득!'); done(); }; box.append(b); }
+  const g=shardGold(r), gb=document.createElement('button'); gb.className='shCard gold';
+  gb.innerHTML='<div class="si coin"></div><b>'+g+' 골드</b><small>원하는 무기가 없을 때</small>';
+  gb.onclick=()=>{ S.gold+=g; toast(g+'골드 획득!'); done(); }; box.append(gb);
+  function done(){ S.shards--; el.classList.remove('on'); render(); if(S.shards>0)setTimeout(()=>openShardPick(r),250); }
+  el.querySelector('p').textContent='보유한 3코스트 이상 기물의 전용 무기 중 하나를 고르세요.'+(S.shards>1?' (남은 편린 '+S.shards+'개)':'');
+  el.classList.add('on');
+}
 /* ───────── 각인 (하드 모드 군단장 처치 보상, 3중택1) ───────── */
 const AUGS=[
   {id:'grudge',t:'silver',n:'원한',d:'4·5코스트 기물·보스·군단장에게 주는 피해 +20%, 아군이 받는 피해 +10%'},
@@ -1337,6 +1395,7 @@ function endCombat(win,eLeft){
   clearInterval(timer); timer=null;
   if(has('adren'))S.adren=0;
   if(C&&C.retryFight)return endRetry(win,eLeft);
+  const drops=(C&&C.drops)||[];
   S.streak=win?(S.streak||0)+1:0;
   let msg;
   const rw=win?winReward(S.round):{g:0,xp:2};
@@ -1356,6 +1415,7 @@ function endCombat(win,eLeft){
   S.round++;
   startPlan();
   if(lg&&win)offerAug(S.round-1);
+  if(drops.length)collectShards(drops,S.round-1);
 }
 
 /* ───────── 이펙트 ───────── */
@@ -1891,7 +1951,7 @@ $('#shop').addEventListener('dragover',ev=>ev.preventDefault());
 $('#shop').addEventListener('drop',ev=>{ev.preventDefault();sell();});
 document.addEventListener('dragend',()=>{ if(S.sel){S.sel=null;render();} });
 document.addEventListener('keydown',ev=>{
-  if(ev.repeat||ev.target.tagName==='INPUT'||S.phase==='mode'||$('#augPick').classList.contains('on'))return; const k=ev.key.toLowerCase();
+  if(ev.repeat||ev.target.tagName==='INPUT'||S.phase==='mode'||$('#augPick').classList.contains('on')||$('#shardPick').classList.contains('on'))return; const k=ev.key.toLowerCase();
   if(k==='d')reroll(); else if(k==='f')buyXp(); else if(k==='e')sell();
   else if(k===' '){ev.preventDefault(); if(S.phase==='plan')startCombat();}
 });
@@ -1923,7 +1983,7 @@ const bgmKick=()=>{ ac(); if(bgmOn&&bgm.paused)bgm.play().catch(()=>{}); };
 document.addEventListener('pointerdown',bgmKick); document.addEventListener('keydown',bgmKick);
 bgmApply();
 window.__startPlan=startPlan; window.__rollShop=rollShop;
-window.__g={get S(){return S},get C(){return C},clickCell,clickBench,buy,startCombat,setSpeed:n=>speed=n};
+window.__g={shardChance:v=>SHARD_CHANCE=v,openShardPick,get S(){return S},get C(){return C},clickCell,clickBench,buy,startCombat,setSpeed:n=>speed=n};
 newGame();
 </script>
 </body>
