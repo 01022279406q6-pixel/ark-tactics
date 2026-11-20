@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>아크 택틱스 — 전투 시뮬레이터 프로토타입</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --arena:var(--arena-abyss);
@@ -418,6 +419,70 @@ main{grid-template-rows:100%}
   #bench{gap:3px}
   .slot{height:auto;aspect-ratio:1}
 }
+
+/* ═════════ 게임 화면 리워크: 고딕 석재 · 청동 테두리 스타일 ═════════ */
+:root{--g-bg:#0b0a09;--g-panel:#16130f;--g-panel2:#0e0c0a;--g-line:#5e4b2e;--g-line2:#8a7048;--g-gold:#d4ad62;--g-text:#e9dfca;--g-mute:#9a8e78;
+  --g-serif:"Noto Serif KR","Nanum Myeongjo",serif}
+body{background:
+  radial-gradient(ellipse at 50% 35%,rgba(120,70,30,.10),transparent 55%),
+  radial-gradient(ellipse at 8% 30%,rgba(255,140,50,.10),transparent 22%),radial-gradient(ellipse at 92% 30%,rgba(255,140,50,.10),transparent 22%),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 2px,transparent 2px 46px),repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 92px),
+  radial-gradient(ellipse at 50% 50%,#1a1612 0%,#0b0a09 70%,#050404 100%)!important;color:var(--g-text)}
+/* 판넬 공통: 어두운 석재 + 청동 이중 테두리 + 모서리 장식 */
+#top,aside,#bottom{position:relative;background:linear-gradient(180deg,#1b1713 0%,#13110d 60%,#0d0b09 100%)!important;border:1px solid var(--g-line)!important;border-radius:6px!important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.8),inset 0 0 0 3px rgba(138,112,72,.18),inset 0 1px 0 rgba(255,230,180,.08),0 6px 18px rgba(0,0,0,.7)!important}
+#top::before,aside::before,#bottom::before,#top::after,aside::after,#bottom::after{content:'';position:absolute;width:14px;height:14px;border:2px solid var(--g-line2);pointer-events:none;z-index:2}
+#top::before,aside::before,#bottom::before{left:-3px;top:-3px;border-right:0;border-bottom:0;border-radius:4px 0 0 0;box-shadow:-1px -1px 4px rgba(212,173,98,.25)}
+#top::after,aside::after,#bottom::after{right:-3px;bottom:-3px;border-left:0;border-top:0;border-radius:0 0 4px 0;box-shadow:1px 1px 4px rgba(212,173,98,.25)}
+#top h1{font-family:var(--g-serif);color:var(--g-gold)!important;text-shadow:0 1px 0 #000,0 0 10px rgba(212,173,98,.25)!important}
+aside h2,.lhead h2,#benchHead>span:first-child{font-family:var(--g-serif);color:var(--g-gold)!important;letter-spacing:.12em}
+.stat .lab,#info .itr,.syn .td{color:var(--g-mute)!important}
+/* 전장 프레임 */
+#center{border:1px solid var(--g-line)!important;border-radius:6px!important;box-shadow:inset 0 0 60px rgba(0,0,0,.9),inset 0 0 0 3px rgba(138,112,72,.2),0 6px 18px rgba(0,0,0,.7)!important}
+#board{border-color:var(--g-line2)}
+/* 버튼: 거친 철제 + 청동 테두리, 금빛 강조 */
+#app button:not(.card){font-family:var(--g-serif);background:linear-gradient(180deg,#2a241c 0%,#1a1611 55%,#120f0c 100%)!important;color:var(--g-text);border:1px solid var(--g-line)!important;border-radius:3px!important;
+  box-shadow:inset 0 1px 0 rgba(255,230,180,.12),inset 0 0 0 1px rgba(0,0,0,.6),0 3px 0 #050403,0 5px 10px rgba(0,0,0,.55)!important;text-shadow:0 1px 1px #000}
+#app button:not(.card):hover:not(:disabled){border-color:var(--g-gold)!important;filter:brightness(1.18)}
+#startBtn{background:linear-gradient(180deg,#5a4520 0%,#3a2c14 55%,#241a0b 100%)!important;border-color:var(--g-gold)!important;color:#fff0cc!important;letter-spacing:.1em;
+  box-shadow:inset 0 1px 0 rgba(255,235,180,.45),inset 0 0 0 1px rgba(0,0,0,.6),0 3px 0 #120d04,0 0 16px rgba(212,173,98,.25)!important}
+#retryBtn{background:linear-gradient(180deg,#5a1a14,#2a0a08)!important;border-color:#b0402a!important}
+#ctrl button b{font-size:15px}
+/* 시너지 */
+.syn{background:linear-gradient(180deg,#1a1611,#100e0b)!important;border:1px solid #3a3020!important;box-shadow:inset 0 1px 0 rgba(255,230,180,.05)!important;border-radius:3px!important}
+.syn.on{background:linear-gradient(180deg,#3a2c14,#1c150a)!important;border-color:var(--g-line2)!important;box-shadow:inset 0 1px 0 rgba(255,230,180,.22),0 0 10px rgba(212,173,98,.15)!important}
+.syn .cnt{border-radius:3px;background:#0a0908;border-color:#3a3020}
+.syn.on .cnt{background:linear-gradient(180deg,#f0d28e,#a07a32)!important;color:#1a1206}
+.syn .tn{font-family:var(--g-serif)}
+/* 대기석: 룬이 새겨진 석판 */
+.slot{background:radial-gradient(ellipse at 50% 60%,#1c1813,#0b0a08 75%)!important;border:1px solid #3a3020!important;border-radius:3px!important;
+  box-shadow:inset 0 0 0 3px #0a0908,inset 0 0 0 4px rgba(138,112,72,.35),inset 0 8px 14px rgba(0,0,0,.85)!important;position:relative}
+.slot:empty::before{content:'ᚱ';position:absolute;inset:0;display:grid;place-items:center;font-size:22px;color:rgba(138,112,72,.22);font-family:serif}
+.slot:nth-child(3n+2):empty::before{content:'ᛟ'} .slot:nth-child(3n):empty::before{content:'ᚦ'}
+.slot.drop{border-color:var(--g-gold)!important}
+/* 상점 카드: 고딕 프레임 초상화 */
+.card{border-radius:3px!important;border:1px solid var(--cc)!important;background:linear-gradient(180deg,#1c1813,#0e0c0a)!important;
+  box-shadow:inset 0 0 0 2px #0a0908,inset 0 0 0 3px color-mix(in srgb,var(--cc) 35%,transparent),0 4px 0 #050403,0 6px 12px rgba(0,0,0,.6)!important}
+.card .art{border-bottom:1px solid var(--cc)!important}
+.card .ch b{font-family:var(--g-serif)}
+.card.empty{background:repeating-linear-gradient(45deg,#0d0b09 0 6px,#110f0c 6px 12px)!important;box-shadow:inset 0 0 0 1px #2a2218,inset 0 6px 12px rgba(0,0,0,.8)!important}
+.card.item{background:linear-gradient(180deg,#2a2010,#0e0c0a)!important}
+/* 골드 · 확률 · 막대 */
+#goldBar{background:linear-gradient(180deg,#2a2010,#0f0b05)!important;border:1px solid var(--g-line2)!important;border-radius:4px!important;box-shadow:inset 0 1px 0 rgba(255,230,180,.2),0 3px 0 #050403!important}
+#goldBar b{font-family:var(--g-serif)}
+#odds b{background:#0a0908!important;border-radius:3px!important}
+.bar{background:#0a0908!important;border:1px solid #3a3020!important;border-radius:2px!important}
+#vMode{border-radius:3px!important}
+/* 기물 정보 · 기록 */
+#info{font-size:12.5px} #info .inm{font-family:var(--g-serif);color:var(--g-text)}
+.iport{border-radius:3px!important}
+#log div{color:var(--g-mute)} #log div:first-child{color:var(--g-text)}
+/* 오버레이 창들 */
+#over>div,#augPick .ap,#shardPick .ap,#optPanel{background:linear-gradient(180deg,#1b1713,#0d0b09)!important;border:1px solid var(--g-line2)!important;border-radius:6px!important;box-shadow:inset 0 0 0 3px rgba(138,112,72,.18),0 10px 40px rgba(0,0,0,.8)!important}
+#over h2,#augPick h2,#shardPick h2{font-family:var(--g-serif)}
+/* 스크롤바 */
+*{scrollbar-color:#5e4b2e #0d0b09}
+::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-track{background:#0d0b09} ::-webkit-scrollbar-thumb{background:#5e4b2e;border-radius:4px}
 </style>
 </head>
 <body>
