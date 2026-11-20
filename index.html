@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>아크 택틱스 — 전투 시뮬레이터 프로토타입</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -483,10 +483,79 @@ aside h2,.lhead h2,#benchHead>span:first-child{font-family:var(--g-serif);color:
 /* 스크롤바 */
 *{scrollbar-color:#5e4b2e #0d0b09}
 ::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-track{background:#0d0b09} ::-webkit-scrollbar-thumb{background:#5e4b2e;border-radius:4px}
+
+/* ═════════ 모바일 버전 (가로 모드 최적화) ═════════ */
+#mrail,.mClose,#rotateMsg{display:none}
+#mobBtn{padding:4px 10px;font-size:12px}
+body.mobile{font-size:12px;overflow:hidden;touch-action:manipulation;-webkit-text-size-adjust:100%}
+body.mobile #app{max-width:none;height:100dvh;padding:4px 6px;gap:4px;display:grid;
+  grid-template-columns:40px auto minmax(0,1fr);grid-template-rows:30px auto auto auto auto minmax(0,1fr);
+  grid-template-areas:"top top top" "rail board right" "rail board bhead" "rail board bench" "rail board gold" "rail board shop"}
+body.mobile main,body.mobile #bottom{display:contents}
+body.mobile #bottom::before,body.mobile #bottom::after{display:none}
+/* 상단 바 */
+body.mobile #top{grid-area:top;padding:2px 8px!important;gap:4px 10px;flex-wrap:nowrap;overflow:hidden;font-size:11px}
+body.mobile #top h1{font-size:13px} body.mobile #top h1 small{display:none}
+body.mobile #top .bar{width:44px;height:7px} body.mobile #vXp,body.mobile #bgmPct{display:none}
+body.mobile #bgmBtn{padding:2px 6px;font-size:10px} body.mobile #bgmVol{width:56px}
+body.mobile #mobBtn{padding:2px 7px;font-size:10px}
+body.mobile .stat b{font-size:12px}
+/* 왼쪽 레일 */
+body.mobile #mrail{grid-area:rail;display:flex;flex-direction:column;gap:6px}
+body.mobile #mrail button{padding:8px 0;font-size:11px;writing-mode:vertical-rl;letter-spacing:.1em;line-height:1}
+/* 전장 */
+body.mobile #center{grid-area:board;height:auto!important;padding:4px!important;overflow:hidden}
+body.mobile #board{width:calc((100dvh - 56px) * .86)!important;min-width:0}
+body.mobile #board .unit>.nm{display:none}
+/* 시너지 서랍 */
+body.mobile #left{display:none;position:fixed;left:50px;top:40px;width:250px;max-height:calc(100dvh - 50px);overflow:auto;z-index:60}
+body.mobile.synOpen #left{display:block}
+body.mobile .lhead #synToggle{display:none}
+/* 오른쪽: 전투 시작·배속 */
+body.mobile #right{grid-area:right;display:flex;gap:6px;align-items:stretch;padding:4px!important;overflow:visible}
+body.mobile #right::before,body.mobile #right::after{display:none}
+body.mobile #startBtn{flex:2;padding:6px!important;font-size:14px} body.mobile #retryBtn{flex:2;margin:0;padding:6px;font-size:11px}
+body.mobile #right>.row{flex:1;margin:0!important} body.mobile #speedBtn{padding:6px;font-size:12px}
+/* 정보 서랍 */
+body.mobile #rDetail{display:none;position:fixed;left:50px;top:40px;width:280px;max-height:calc(100dvh - 50px);overflow:auto;z-index:60;padding:10px;
+  background:linear-gradient(180deg,#1b1713,#0d0b09);border:1px solid var(--g-line2,#8a7048);border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.8)}
+body.mobile.infoOpen #rDetail{display:block}
+body.mobile .mClose{display:block;margin:0 0 6px auto;padding:3px 10px;font-size:11px}
+body.mobile #info{min-height:0;font-size:11.5px}
+/* 대기석 머리줄: 판매 + 확률 (설명 숨김) */
+body.mobile #benchHead{grid-area:bhead;font-size:10px;gap:6px;flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
+body.mobile #benchHead>span:first-child,body.mobile #benchHead>span:nth-of-type(2){display:none}
+body.mobile #sellBtn{padding:3px 8px;font-size:11px} body.mobile #odds{font-size:10px} body.mobile #odds b{margin-left:3px;padding:0 4px}
+body.mobile #bench{grid-area:bench;gap:3px}
+body.mobile .slot{height:auto!important;aspect-ratio:1;max-height:56px}
+body.mobile .slot:empty::before{font-size:14px}
+body.mobile .itm .in{display:none}
+body.mobile #goldBar{grid-area:gold;margin:0!important;padding:1px 12px 1px 6px!important}
+body.mobile #goldBar b{font-size:15px} body.mobile #goldBar .gIco{width:16px;height:16px}
+/* 상점 */
+body.mobile #shopRow{grid-area:shop;display:grid;grid-template-columns:62px minmax(0,1fr)!important;gap:4px;min-height:0}
+body.mobile #ctrl{flex-direction:column!important;gap:4px}
+body.mobile #ctrl button{padding:4px!important;text-align:center} body.mobile #ctrl button b{font-size:11px!important} body.mobile #ctrl small{font-size:9px}
+body.mobile #shop{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px;min-height:0}
+body.mobile .card{min-height:0!important;display:grid!important;grid-template-rows:minmax(0,1fr) auto}
+body.mobile #ctrl button{white-space:nowrap;overflow:hidden} body.mobile #ctrl button b{display:block;font-size:10.5px!important}
+body.mobile .card .art{height:auto!important;flex:1;min-height:34px}
+body.mobile .card .cx{padding:3px 4px 4px!important} body.mobile .card .ch b{font-size:11px!important} body.mobile .card .co{font-size:11px}
+body.mobile .card .ct,body.mobile .card .itag{display:none}
+body.mobile .card.empty{min-height:0!important}
+/* 오버레이 창 축소 */
+body.mobile #augPick .ap,body.mobile #shardPick .ap{padding:10px;max-height:94dvh;overflow:auto}
+body.mobile .augCard{width:30vw;min-height:0;padding:8px} body.mobile .augCard b{font-size:14px} body.mobile .augCard span{font-size:10.5px}
+body.mobile .shCard{width:100px;min-height:0;padding:6px} body.mobile .shCard .si{width:40px;height:40px}
+body.mobile #bossIntro img{max-height:60dvh} body.mobile #bossIntro b{font-size:20px}
+body.mobile #toast{font-size:12px;bottom:8px}
+/* 세로 화면 안내 */
+@media (orientation:portrait){ body.mobile #rotateMsg{display:grid;position:fixed;inset:0;z-index:200;place-items:center;background:#0b0a09;color:var(--g-gold,#d4ad62);text-align:center;font-size:20px;line-height:1.6} }
 </style>
 </head>
 <body>
 <div id="app">
+  <div id="mrail"><button id="mSyn" title="시너지">시너지</button><button id="mInfo" title="기물 정보·각인·기록">정보</button></div>
   <header id="top">
     <h1>아크 택틱스<small>비공식 팬 프로토타입</small></h1>
     <span id="vMode" class="mode">-</span>
@@ -496,11 +565,13 @@ aside h2,.lhead h2,#benchHead>span:first-child{font-family:var(--g-serif);color:
     <div class="stat"><span class="lab">레벨</span><b id="vLv">2</b><div class="bar" id="xpBar"><i id="xpFill"></i></div><span class="lab" id="vXp"></span></div>
     <div class="stat"><span class="lab">배치</span><b id="vCap">0/2</b></div>
     <div class="spacer"></div>
+    <button id="mobBtn" title="모바일(가로) 화면으로 전환">📱 모바일</button>
     <div class="stat" id="bgmCtl"><button id="bgmBtn" title="배경음악 켜기/끄기">BGM 켜짐</button><input type="range" id="bgmVol" min="0" max="100" step="1" aria-label="배경음악 음량"><span class="lab" id="bgmPct"></span></div>
   </header>
 
   <main>
     <aside id="left">
+      <button class="mClose" data-close="synOpen">닫기 ✕</button>
       <div class="lhead"><h2>시너지</h2><button id="synToggle" title="시너지 패널 접기">&laquo;</button></div>
       <div id="syn"></div>
     </aside>
@@ -522,6 +593,7 @@ aside h2,.lhead h2,#benchHead>span:first-child{font-family:var(--g-serif);color:
       <div class="row" style="margin-top:6px">
         <button id="speedBtn">배속 ×1</button>
       </div>
+      <div id="rDetail"><button class="mClose" data-close="infoOpen">닫기 ✕</button>
       <div class="sep"></div>
       <div id="augBox" style="display:none"><h2>각인</h2><div id="augList"></div><div class="sep"></div></div>
       <h2>기물 정보</h2>
@@ -529,6 +601,7 @@ aside h2,.lhead h2,#benchHead>span:first-child{font-family:var(--g-serif);color:
       <div class="sep"></div>
       <h2>전투 기록</h2>
       <div id="log"></div>
+      </div>
     </aside>
   </main>
 
@@ -551,6 +624,7 @@ aside h2,.lhead h2,#benchHead>span:first-child{font-family:var(--g-serif);color:
   </footer>
 </div>
 <div id="toast"></div>
+<div id="rotateMsg"><div>📱↻<br>가로 모드로 돌려 주세요</div></div>
 <div id="shardPick"><div class="ap"><h2>운명의 편린</h2><p></p><div class="shRow"></div></div></div>
 <div id="augPick"><div class="ap"><h2>각인 선택</h2><p>군단장을 쓰러뜨렸습니다. 각인 하나를 선택하세요.</p><div class="augRow"></div><button id="augReroll">다시 뽑기 (1회)</button></div></div>
 <div id="modePick" class="on"><div class="tbox">
@@ -2080,6 +2154,17 @@ $('#rerollBtn').onclick=reroll;
 $('#xpBtn').onclick=buyXp;
 $('#sellBtn').onclick=sell;
 $('#restartBtn').onclick=newGame;
+/* 모바일 버전 전환 */
+function setMobile(on){ document.body.classList.toggle('mobile',on); document.body.classList.remove('synOpen','infoOpen');
+  $('#mobBtn').textContent=on?'🖥 PC':'📱 모바일'; $('#mobBtn').title=on?'PC 화면으로 전환':'모바일(가로) 화면으로 전환';
+  try{localStorage.setItem('arcMobile',on?'1':'0');}catch(e){} }
+$('#mobBtn').onclick=()=>setMobile(!document.body.classList.contains('mobile'));
+$('#mSyn').onclick=()=>{ document.body.classList.remove('infoOpen'); document.body.classList.toggle('synOpen'); };
+$('#mInfo').onclick=()=>{ document.body.classList.remove('synOpen'); document.body.classList.toggle('infoOpen'); };
+document.querySelectorAll('.mClose').forEach(b=>b.onclick=()=>document.body.classList.remove(b.dataset.close));
+{ let pref=null; try{pref=localStorage.getItem('arcMobile');}catch(e){}
+  const auto=pref===null&&matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<=600; // 처음 접속한 휴대폰은 자동 전환
+  if(pref==='1'||auto)setMobile(true); }
 function setSynFold(f){ document.body.classList.toggle('synFold',f); const b=$('#synToggle'); b.innerHTML=f?'&raquo;':'&laquo;'; b.title=f?'시너지 패널 펼치기':'시너지 패널 접기'; try{localStorage.setItem('arcSynFold',f?'1':'0');}catch(e){} }
 $('#synToggle').onclick=()=>setSynFold(!document.body.classList.contains('synFold'));
 try{ if(localStorage.getItem('arcSynFold')==='1')setSynFold(true); }catch(e){}
