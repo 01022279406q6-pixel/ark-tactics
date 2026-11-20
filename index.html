@@ -288,6 +288,16 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 #dread.s5{animation-duration:.9s}
 @keyframes dreadPulse{50%{filter:brightness(1.5)}}
 
+/* 헬 모드: 에버그레이스의 가호 */
+#graceBtn{position:relative;width:100%;margin-top:6px;padding:8px 6px;font-weight:800;font-size:12.5px;overflow:hidden;color:#fff4d0!important;border-color:#c9a24a!important;background:linear-gradient(180deg,#3a3020,#1c160c)!important}
+#graceBtn i{position:absolute;left:0;top:0;bottom:0;width:var(--g,0%);background:linear-gradient(90deg,rgba(255,214,110,.18),rgba(255,236,170,.42));transition:width .4s;pointer-events:none}
+#graceBtn span{position:relative}
+#graceBtn.ready{border-color:#ffe9a0!important;box-shadow:0 0 14px rgba(255,220,120,.6),inset 0 0 12px rgba(255,230,150,.35);animation:gracePulse 1.2s ease-in-out infinite}
+#graceBtn.ready i{background:linear-gradient(90deg,rgba(255,220,120,.45),rgba(255,248,210,.7))}
+@keyframes gracePulse{50%{filter:brightness(1.35)}}
+#graceBtn:disabled{opacity:1}
+#graceBtn:disabled:not(.ready) span{opacity:.85}
+body.mobile #graceBtn{flex:2;margin:0;padding:6px 4px;font-size:11px}
 /* 하드 모드: 각인·재도전·군단장 기믹 표시 */
 #retryBtn{width:100%;margin-top:6px;padding:9px;font-weight:800;background:linear-gradient(180deg,#9a2a5a,#5a1030);border-color:#e05a9a}
 #augList{display:flex;flex-wrap:wrap;gap:4px}
@@ -593,6 +603,7 @@ body.mobile #toast{font-size:12px;bottom:8px}
       <div class="row" style="margin-top:6px">
         <button id="speedBtn">배속 ×1</button>
       </div>
+      <button id="graceBtn" style="display:none" title="헬 모드 전용 · 카제로스 ⓑⓒ 전투 중 100%일 때 사용 (G)&#10;사망한 아군을 모두 되살리고 마나 90%로 시작, 카제로스의 다음 스킬 마나 2.5배 (1회)&#10;사용 시 점수 -2500&#10;충전: 라운드 승리 +2% (연승 시 +1%씩, 최대 +3%), 군단장 승리 +5%"><i></i><span></span></button>
       <div id="rDetail"><button class="mClose" data-close="infoOpen">닫기 ✕</button>
       <div class="sep"></div>
       <div id="augBox" style="display:none"><h2>각인</h2><div id="augList"></div><div class="sep"></div></div>
@@ -822,7 +833,7 @@ function newGame(){
   if(typeof refreshHell==='function')refreshHell();
   document.documentElement.removeAttribute('data-kz');
   $('#modePick').classList.add('on');
-  S={mode:null,augs:[],retry:null,streak:0,adren:0,ether:0,escUsed:false,immune:0,freeRolls:0,gold:8,level:2,xp:0,hp:100,round:1,phase:'plan',shop:[],bench:Array(9).fill(null),board:[],enemies:[],sel:null,log:[]};
+  S={mode:null,augs:[],retry:null,streak:0,grace:0,graceUsed:0,adren:0,ether:0,escUsed:false,immune:0,freeRolls:0,gold:8,level:2,xp:0,hp:100,round:1,phase:'plan',shop:[],bench:Array(9).fill(null),board:[],enemies:[],sel:null,log:[]};
   $('#over').classList.remove('on');
   startPlan(); S.phase='mode';
 }
@@ -1176,6 +1187,7 @@ function tick(){
   if(!C)return;
   C.acc=(C.acc||0)+speed; while(C.acc>=1){ C.acc--; step(.05); } // 소수 배속(×2.5) 지원
   drawUnits(C.units.filter(u=>u.alive));
+  if(HELL()){ const rd=graceReady(), gb=$('#graceBtn'); if(gb.classList.contains('ready')!==rd)render(); }
 }
 const SZ=o=>o.sz||1, cx=o=>o.x+(SZ(o)-1)/2, cy=o=>o.y+(SZ(o)-1)/2, P=o=>({x:cx(o),y:cy(o)});
 const covers=(u,x,y)=>x>=u.x&&x<u.x+SZ(u)&&y>=u.y&&y<u.y+SZ(u);
@@ -1209,7 +1221,7 @@ function step(dt){
     if(u.stun>0){u.stun-=dt;continue;}
     u.atkCd-=dt;u.moveCd-=dt;
     const t=pickTarget(u); if(!t)continue;
-    if(u.mana>=u.maxMana){u.mana=0;cast(u,t);u.atkCd=Math.max(u.atkCd,.45);continue;}
+    if(u.mana>=u.maxMana){u.mana=0;cast(u,t);u.atkCd=Math.max(u.atkCd,.45);if(u.graceBase){u.maxMana=u.graceBase;u.graceBase=0;}continue;}
     if(dist(u,t)<=u.rg){
       if(u.atkCd<=0&&u.boss){ bossAttack(u,t); u.mana=Math.min(u.maxMana,u.mana+u.manaGain); u.atkCd=1/u.as; }
       else if(u.atkCd<=0){
@@ -1566,6 +1578,23 @@ function offerAug(r,rerolled,exclude,tierOverride){
   el.classList.add('on');
 }
 /* ───────── 헬 모드 점수 ───────── */
+// 헬 모드 전용: 에버그레이스의 가호 (카제로스 ⓑⓒ 전투 중 100%일 때 사용)
+function addGrace(n){ if(!HELL()||n<=0)return; const b=S.grace||0; S.grace=Math.min(100,b+n); if(S.grace>b)S.log.unshift('에버그레이스의 가호 +'+(S.grace-b)+'% ('+S.grace+'%)'); if(b<100&&S.grace>=100)toast('에버그레이스의 가호 충전 완료! 카제로스 ⓑⓒ 전투에서 사용할 수 있습니다'); }
+function graceReady(){ return HELL()&&S.phase==='combat'&&C&&!C.over&&!C.retryFight&&(KZ[S.round]==='kz2'||KZ[S.round]==='kz3')&&(S.grace||0)>=100&&C.units.some(u=>!u.team&&!u.alive&&S.board.some(b=>b.id===u.id)); }
+function useGrace(){
+  if(!graceReady())return;
+  S.grace=0; S.graceUsed=(S.graceUsed||0)+1; addScore(-2500,'에버그레이스의 가호 사용');
+  let n=0;
+  for(const u of C.units){ if(u.team||u.alive||!S.board.some(b=>b.id===u.id))continue;
+    let sp=occ(u.x,u.y)?null:{x:u.x,y:u.y};
+    if(!sp)for(const y of [7,6,5,4,3,2,1,0]){ for(const x of [3,2,4,1,5,0,6]) if(!occ(x,y)){sp={x,y};break;} if(sp)break; }
+    if(!sp)continue;
+    Object.assign(u,{x:sp.x,y:sp.y,alive:true,hp:u.maxHp,mana:u.maxMana*.9,stun:0,ghost:false,disease:null,tgt:null,atkCd:.3,moveCd:.2}); n++;
+    FX.pillar(u,'#ffe9a0',1,3,.8); FX.rise(u,16,'#fff4c8'); FX.ring(u,0,1,'#ffd76a',.12); fxText(u.x,u.y,'가호','heal'); }
+  const bs=C.units.find(u=>u.boss&&u.alive);
+  if(bs&&!bs.graceBase){ bs.graceBase=bs.maxMana; bs.maxMana=Math.round(bs.maxMana*2.5); fxText(cx(bs),cy(bs),'스킬 지연','sk'); FX.ring(bs,0,1.6,'#ffe9a0',.14); }
+  FX.shake(1); banner('에버그레이스의 가호'); S.log.unshift('에버그레이스의 가호: 아군 '+n+'명 부활 (점수 -2500)'); render();
+}
 function addScore(n,why){ if(!HELL())return; S.score=(S.score||0)+n; if(why)S.log.unshift((n>0?'+':'')+n+'점 · '+why); }
 function hellRecord(){
   if(!HELL())return '';
@@ -1590,7 +1619,7 @@ function winReward(r){
 }
 function endRetry(win,eLeft){
   const r=S.retry; S.enemies=S.savedEnemies||genWave(S.round); S.savedEnemies=null; S.phase='plan'; C=null; bgmTrack(roundTrack(S.round));
-  if(win){ S.retry=null; banner('군단장 재도전 성공!'); S.log.unshift('군단장 재도전 성공 ('+r+'라운드)'); addScore(2500,'군단장 재도전 클리어'); render(); offerAug(r,false,null,HELL()?hellTier(true):null); return; }
+  if(win){ S.retry=null; banner('군단장 재도전 성공!'); S.log.unshift('군단장 재도전 성공 ('+r+'라운드)'); addScore(2500,'군단장 재도전 클리어'); addGrace(5); render(); offerAug(r,false,null,HELL()?hellTier(true):null); return; }
   const dmg=dmgFor(eLeft,r); S.hp=Math.max(0,S.hp-dmg); addScore(-15000,'군단장 재도전 패배'); banner('재도전 실패…'); S.log.unshift('군단장 재도전 실패 (체력 -'+dmg+')');
   if(S.hp<=0){ gameOver('모험 종료','군단장 재도전 중 쓰러졌습니다.'); return; }
   render();
@@ -1616,7 +1645,7 @@ function endCombat(win,eLeft){
   const rw=win?winReward(S.round):{g:0,xp:2};
   if(win&&has('first'))rw.g+=1;
   if(HELL()){ const lg0=legionOf(S.round);
-    if(win){ S.lossRun=0; addScore(KZ[S.round]?4500:lg0?2500:1000, KZ[S.round]?'카제로스 클리어':lg0?'군단장 클리어':'라운드 클리어'); }
+    if(win){ S.lossRun=0; addScore(KZ[S.round]?4500:lg0?2500:1000, KZ[S.round]?'카제로스 클리어':lg0?'군단장 클리어':'라운드 클리어'); addGrace(lg0?5:2+Math.min(3,S.streak-1)); }
     else if(lg0) addScore(-15000,'군단장 패배');
     else if(!KZ[S.round]){ addScore(-(350+50*(S.lossRun||0)),'라운드 패배'); S.lossRun=(S.lossRun||0)+1; } }
   if(win){ S.gold+=rw.g; msg='라운드 '+S.round+' 승리 (+'+rw.g+'골드, 경험치 +'+rw.xp+')'; banner('승리!'); }
@@ -2097,6 +2126,9 @@ function render(){
     if(show)rb.textContent='군단장 재도전 ('+S.retry+'R · '+U[LEGION[S.retry]].n+')'; }
   $('#augBox').style.display=S.augs&&S.augs.length?'':'none';
   if(S.augs)$('#augList').innerHTML=S.augs.map(id=>{const a=AUGS.find(x=>x.id===id);return '<div class="augTag '+a.t+'" title="'+a.d+'">'+a.n+(id==='mass'&&S.massAtk?' +'+S.massAtk+'%':'')+'</div>';}).join('');
+  { const gb=$('#graceBtn'); gb.style.display=HELL()&&S.phase!=='over'?'':'none';
+    if(HELL()){ const g=S.grace||0, rd=graceReady(); gb.style.setProperty('--g',g+'%'); gb.disabled=!rd; gb.classList.toggle('ready',rd);
+      gb.querySelector('span').textContent='에버그레이스의 가호 '+g+'%'+(rd?' — 사용!':''); } }
   const st=$('#startBtn'); st.disabled=S.phase!=='plan'; st.textContent=S.phase==='combat'?'전투 중…':'전투 시작';
   renderSyn();
   $('#log').innerHTML=S.log.map(l=>'<div>'+l+'</div>').join('')||'<div style="color:var(--mute)">아직 기록이 없습니다.</div>';
@@ -2168,7 +2200,7 @@ document.querySelectorAll('.mClose').forEach(b=>b.onclick=()=>document.body.clas
 function setSynFold(f){ document.body.classList.toggle('synFold',f); const b=$('#synToggle'); b.innerHTML=f?'&raquo;':'&laquo;'; b.title=f?'시너지 패널 펼치기':'시너지 패널 접기'; try{localStorage.setItem('arcSynFold',f?'1':'0');}catch(e){} }
 $('#synToggle').onclick=()=>setSynFold(!document.body.classList.contains('synFold'));
 try{ if(localStorage.getItem('arcSynFold')==='1')setSynFold(true); }catch(e){}
-$('#retryBtn').onclick=startRetry;
+$('#retryBtn').onclick=startRetry; $('#graceBtn').onclick=useGrace;
 $('#easyBtn').onclick=()=>pickMode('easy');
 $('#hardBtn').onclick=()=>pickMode('hard');
 function hellUnlocked(){ try{ return localStorage.getItem('arcHardClear')==='1'; }catch(e){ return false; } }
@@ -2200,6 +2232,7 @@ document.addEventListener('keydown',ev=>{
   if(ev.repeat||ev.target.tagName==='INPUT'||S.phase==='mode'||$('#augPick').classList.contains('on')||$('#shardPick').classList.contains('on'))return; const k=ev.key.toLowerCase();
   if(k==='d')reroll(); else if(k==='f')buyXp(); else if(k==='e')sell();
   else if(k===' '){ev.preventDefault(); if(S.phase==='plan')startCombat();}
+  else if(k==='g')useGrace();
 });
 /* ───────── 배경음악 ───────── */
 const BGM={abyss:$('#bgm_abyss'),totoike:$('#bgm_totoike'),main:$('#bgm'),kz1:$('#bgmKz'),kz2:$('#bgmKz2'),kz3:$('#bgmKz3'),valtan:$('#bgm_valtan'),biakiss:$('#bgm_biakiss'),kouku:$('#bgm_kouku'),abrel:$('#bgm_abrel'),illiakan:$('#bgm_illiakan'),kamen:$('#bgm_kamen')}; let bgm=BGM.abyss, bgmOn=true, bgmVol=.4;
@@ -2231,7 +2264,7 @@ bgmApply();
 window.__bgmReady=true;
 try{ setArena(localStorage.getItem('arcArena')||'abyss'); }catch(e){ setArena('abyss'); }
 window.__startPlan=startPlan; window.__rollShop=rollShop;
-window.__g={kzCfg:(a,v)=>{KZ_HARD_ATK=a;KZ_VULN=v;},shardChance:v=>SHARD_CHANCE=v,openShardPick,get S(){return S},get C(){return C},clickCell,clickBench,buy,startCombat,setSpeed:n=>speed=n};
+window.__g={kzCfg:(a,v)=>{KZ_HARD_ATK=a;KZ_VULN=v;},shardChance:v=>SHARD_CHANCE=v,openShardPick,get S(){return S},get C(){return C},clickCell,clickBench,buy,startCombat,setSpeed:n=>speed=n,useGrace,graceReady};
 newGame();
 </script>
 </body>
