@@ -255,6 +255,14 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 #optPanel{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:260px;background:linear-gradient(180deg,#20263b,#10131f);border:1px solid var(--gold2);border-radius:14px;padding:16px 18px;box-shadow:0 8px 0 #070910,0 20px 40px rgba(0,0,0,.6)}
 #optWrap{position:fixed;inset:0;z-index:96;display:none;background:rgba(3,3,6,.55)}
 #optWrap.on{display:block}
+#optQuit{background:linear-gradient(180deg,#5a1a14,#2a0a08)!important;border-color:#b0402a!important}
+#confirm{position:fixed;inset:0;z-index:98;display:none;place-items:center;background:rgba(3,3,6,.6)}
+#confirm.on{display:grid}
+#confirm .cbox{min-width:300px;max-width:92vw;background:linear-gradient(180deg,#1b1713,#0d0b09);border:1px solid #8a7048;border-radius:6px;box-shadow:inset 0 0 0 3px rgba(138,112,72,.18),0 10px 40px rgba(0,0,0,.8);padding:20px 24px;text-align:center;color:#e8dcc4}
+#confirm p{margin:0 0 16px;font-size:15px;line-height:1.6} #confirm p b{color:#ffd76a}
+#confirm .cbtn{display:flex;gap:12px;justify-content:center}
+#confirm .cbtn button{min-width:96px;padding:8px 14px;font-size:14px;font-weight:800}
+#cfYes{border-color:#e8c170!important;color:#fff4d0!important}
 #optPanel label small{color:var(--mute);font-size:11px;flex:1}
 #optPanel .optRow{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
 .topIco{min-width:30px;padding:4px 9px!important;font-weight:800;font-size:14px}
@@ -691,9 +699,10 @@ html #cells .cell.a.drop{outline:2px dashed var(--gold);outline-offset:-3px;back
     <label>음량 <input type="range" id="optVol" min="0" max="100" step="1"><span id="optPct"></span></label>
     <label>UI 간소화 <button id="optSimple"></button><small>설명 문구·이름표·전투 기록을 숨깁니다</small></label>
     <label>화면 <button id="optMobile"></button><small>모바일(가로) 레이아웃</small></label>
-    <div class="optRow"><button id="optHelp">? 도움말 보기</button><button id="optClose">닫기</button></div>
+    <div class="optRow"><button id="optQuit">⏻ 나가기</button><span style="flex:1"></span><button id="optHelp">? 도움말 보기</button><button id="optClose">닫기</button></div>
 </div></div>
 <div id="help"><div class="hbox" id="helpBox"></div></div>
+<div id="confirm"><div class="cbox"><p id="cfMsg"></p><div class="cbtn"><button id="cfYes">예</button><button id="cfNo">아니오</button></div></div></div>
 <div id="bossIntro"><img alt=""><div class="bfig" style="display:none"></div><div class="bi"><small>최종 보스</small><b></b><span></span></div></div>
 <div id="over"><div><h2 id="overTitle">모험 종료</h2><p id="overTxt"></p><button id="restartBtn">다시 시작</button></div></div>
 
@@ -2291,13 +2300,13 @@ function setSynFold(f){ document.body.classList.toggle('synFold',f); const b=$('
 $('#synToggle').onclick=()=>setSynFold(!document.body.classList.contains('synFold'));
 try{ if(localStorage.getItem('arcSynFold')==='1')setSynFold(true); }catch(e){}
 $('#retryBtn').onclick=startRetry; $('#graceBtn').onclick=useGrace;
-$('#easyBtn').onclick=()=>pickMode('easy');
-$('#hardBtn').onclick=()=>pickMode('hard');
+$('#easyBtn').onclick=()=>askMode('easy');
+$('#hardBtn').onclick=()=>askMode('hard');
 function hellUnlocked(){ try{ return localStorage.getItem('arcHardClear')==='1'; }catch(e){ return false; } }
 function refreshHell(){ const b=$('#hellBtn'), on=hellUnlocked(); b.classList.toggle('locked',!on);
   let best=0; try{ best=(JSON.parse(localStorage.getItem('arcHellScores')||'[]')[0]||{}).s||0; }catch(e){}
   $('#hellSub').textContent=on?(best?'최고 점수 '+best.toLocaleString()+'점':'점수 기록 · 40라운드'):'확장 모드 클리어 시 해금'; }
-$('#hellBtn').onclick=()=>pickMode('hell');
+$('#hellBtn').onclick=()=>askMode('hell');
 refreshHell();
 const ARENAS={abyss:'심연',sea:'태만의 바다',totoike:'토토이크'};
 function setArena(a){ if(!ARENAS[a])a='abyss'; if(a==='abyss')document.documentElement.removeAttribute('data-arena'); else document.documentElement.setAttribute('data-arena',a);
@@ -2309,11 +2318,21 @@ function optSync(){ $('#optBgm').textContent=bgmOn?'켜짐':'꺼짐'; $('#optVol
   $('#optSimple').textContent=document.body.classList.contains('simple')?'켜짐':'꺼짐'; $('#optMobile').textContent=document.body.classList.contains('mobile')?'모바일':'PC'; }
 function setSimple(on){ document.body.classList.toggle('simple',on); try{localStorage.setItem('arcSimple',on?'1':'0');}catch(e){} optSync(); }
 try{ if(localStorage.getItem('arcSimple')==='1')document.body.classList.add('simple'); }catch(e){}
-function openOpt(){ optSync(); $('#optWrap').classList.add('on'); }
+function openOpt(){ optSync(); $('#optQuit').style.display=S&&S.phase!=='mode'?'':'none'; $('#optWrap').classList.add('on'); }
 $('#optWrap').onclick=e=>{ if(e.target.id==='optWrap')$('#optWrap').classList.remove('on'); };
 $('#setBtn').onclick=openOpt; $('#helpBtn').onclick=()=>showHelp('main');
 $('#optSimple').onclick=()=>setSimple(!document.body.classList.contains('simple'));
 $('#optMobile').onclick=()=>{ setMobile(!document.body.classList.contains('mobile')); optSync(); };
+function askConfirm(html,yes){ $('#cfMsg').innerHTML=html; $('#confirm').classList.add('on');
+  $('#cfYes').onclick=()=>{ $('#confirm').classList.remove('on'); yes(); }; $('#cfNo').onclick=()=>$('#confirm').classList.remove('on'); }
+$('#confirm').onclick=e=>{ if(e.target.id==='confirm')$('#confirm').classList.remove('on'); };
+const MODE_NAME={easy:'이지',normal:'노말',hard:'확장',hell:'헬'};
+function askMode(m){ if(m==='hell'&&!hellUnlocked())return toast('확장(하드) 모드를 1회 이상 클리어하면 해금됩니다');
+  askConfirm('<b>'+MODE_NAME[m]+' 모드</b>로 게임을 시작하시겠습니까?',()=>pickMode(m)); }
+function quitToTitle(){ clearInterval(timer); timer=null; C=null;
+  ['#augPick','#shardPick','#bossIntro','#over','#optWrap'].forEach(q=>{const e=$(q); if(e)e.classList.remove('on');});
+  newGame(); bgmTrack(arenaTrack()); }
+$('#optQuit').onclick=()=>askConfirm('타이틀 화면으로 나가시겠습니까?<br><small style="color:#a89a80">진행 중인 게임은 저장되지 않습니다.</small>',quitToTitle);
 $('#optHelp').onclick=()=>{ $('#optWrap').classList.remove('on'); showHelp('main'); };
 /* ───────── 도움말 ───────── */
 const HELP={main:`<h2>아크 택틱스 도움말</h2>
@@ -2368,7 +2387,7 @@ $('#optClose').onclick=()=>$('#optWrap').classList.remove('on');
 $('#optBgm').onclick=()=>{ bgmOn=!bgmOn; bgmApply(); optSync(); };
 $('#optVol').oninput=e=>{ bgmVol=e.target.value/100; if(bgmVol>0)bgmOn=true; bgmApply(); optSync(); };
 $('#exitBtn').onclick=()=>{ window.close(); setTimeout(()=>toast('브라우저 탭을 닫으면 게임이 종료됩니다'),150); };
-$('#normalBtn').onclick=()=>pickMode('normal');
+$('#normalBtn').onclick=()=>askMode('normal');
 $('#bossIntro').onclick=()=>$('#bossIntro').classList.remove('on');
 function setSpeed(v){ speed=v; $('#speedBtn').textContent='배속 ×'+v; }
 $('#speedBtn').onclick=()=>{ const L=HELL()?[1,2,2.5]:[1,2,4]; setSpeed(L[(L.indexOf(speed)+1)%L.length]||1); }; // 헬: ×1·×2·×2.5만
@@ -2376,7 +2395,7 @@ $('#shop').addEventListener('dragover',ev=>ev.preventDefault());
 $('#shop').addEventListener('drop',ev=>{ev.preventDefault();sell();});
 document.addEventListener('dragend',()=>{ if(S.sel){S.sel=null;render();} });
 document.addEventListener('keydown',ev=>{
-  if(ev.repeat||ev.target.tagName==='INPUT'||S.phase==='mode'||$('#help').classList.contains('on')||$('#optWrap').classList.contains('on')||$('#augPick').classList.contains('on')||$('#shardPick').classList.contains('on'))return; const k=ev.key.toLowerCase();
+  if(ev.repeat||ev.target.tagName==='INPUT'||S.phase==='mode'||$('#help').classList.contains('on')||$('#optWrap').classList.contains('on')||$('#confirm').classList.contains('on')||$('#augPick').classList.contains('on')||$('#shardPick').classList.contains('on'))return; const k=ev.key.toLowerCase();
   if(k==='d')reroll(); else if(k==='f')buyXp(); else if(k==='e')sell();
   else if(k===' '){ev.preventDefault(); if(S.phase==='plan')startCombat();}
   else if(k==='g')useGrace();
