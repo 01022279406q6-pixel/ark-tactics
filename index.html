@@ -255,6 +255,7 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 #optPanel{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:260px;background:linear-gradient(180deg,#20263b,#10131f);border:1px solid var(--gold2);border-radius:14px;padding:16px 18px;box-shadow:0 8px 0 #070910,0 20px 40px rgba(0,0,0,.6)}
 #optWrap{position:fixed;inset:0;z-index:96;display:none;background:rgba(3,3,6,.55)}
 #optWrap.on{display:block}
+.itip{margin-top:6px;padding:6px 8px;border:1px solid rgba(232,193,112,.35);border-radius:5px;background:rgba(232,193,112,.08);font-size:12px;line-height:1.5;color:#f0e2c0}
 #optQuit{background:linear-gradient(180deg,#5a1a14,#2a0a08)!important;border-color:#b0402a!important}
 #confirm{position:fixed;inset:0;z-index:98;display:none;place-items:center;background:rgba(3,3,6,.6)}
 #confirm.on{display:grid}
@@ -601,6 +602,10 @@ html #cells .cell{border:2px solid rgba(var(--sl),.85);box-shadow:0 0 0 1px rgba
 html #cells .cell.a{background:rgba(var(--sa),.2)} html #cells .cell.a.alt{background:rgba(var(--sa),.28)}
 html #cells .cell.e{background:rgba(var(--se),.14)} html #cells .cell.e.alt{background:rgba(var(--se),.22)}
 html #cells .cell.e{border-color:rgba(var(--se),.8)}
+html #cells .cell.warn{background:rgba(255,60,40,.55)!important;border-color:#ff5a3a!important;animation:cellWarn .35s ease-in-out infinite alternate}
+@keyframes cellWarn{to{background:rgba(255,120,60,.25)}}
+html #cells .cell.broken{background:repeating-linear-gradient(135deg,rgba(10,6,18,.85) 0 6px,rgba(120,70,200,.45) 6px 8px)!important;border-color:#8a5cff!important}
+html #cells .cell.plague{background:rgba(90,255,60,.38)!important;border-color:#9aff6a!important;box-shadow:inset 0 0 14px rgba(120,255,80,.6)!important}
 html #cells .cell.a.drop{outline:2px dashed var(--gold);outline-offset:-3px;background:rgba(var(--sl),.32)}
 </style>
 </head>
@@ -736,12 +741,12 @@ const U={
   bastian:{n:'바스티안',ic:'🛰️',c:2,o:'아르데타인',j:'사냥꾼',hp:550,atk:55,as:.7,rg:3,ar:20,mp:70,sk:'드론 포격',sd:'대상과 인접한 적에게 공격력의 180% 피해를 줍니다.'},
   zaika:  {n:'사이카',ic:'🗡️',c:2,o:'데런',j:'사냥꾼',hp:600,atk:60,as:.85,rg:1,ar:25,mp:50,sk:'그림자 습격',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 250% 피해를 줍니다.'},
   wei:    {n:'웨이',eu:'기본 공격 3회마다 공격력의 80% 추가 피해를 줍니다.',ic:'🐉',c:2,o:'에스더',j:'탱커',hp:750,atk:55,as:.7,rg:1,ar:40,mp:70,sk:'현신 - 천룡의 일격',sd:'녹색 기운을 두른 주먹을 앞으로 내질러 공격력의 220% 피해를 주고, 잃은 체력의 10/15/20%(성급별)만큼 보호막을 얻습니다.'},
-  valtan: {n:'발탄',ic:'🐂',c:3,o:'군단',j:'탱커',hp:950,atk:65,as:.65,rg:1,ar:50,mp:90,sk:'마수의 분쇄',sd:'주변 1칸의 적에게 공격력의 200% 피해와 1초 기절. 사망 시 6초간 유령으로 부활해 계속 싸웁니다.'},
+  valtan: {n:'발탄',tr:['군단장의 권능'],ic:'🐂',c:3,o:'군단',j:'탱커',hp:950,atk:65,as:.65,rg:1,ar:50,mp:90,sk:'마수의 분쇄',sd:'주변 1칸의 적에게 공격력의 200% 피해와 1초 기절. [권능] 처음 쓰러지면 4초간 유령이 되어 계속 싸웁니다.'},
   aman:   {n:'아만',ic:'📿',c:3,o:'세이크리아·데런',os:['세이크리아','데런'],j:'마법사·서포터',js:['마법사','서포터'],hp:720,atk:54,as:.7,rg:3,ar:25,mp:75,sk:'빛과 어둠',sd:'아군 전체를 회복시키고 대상에게 마법 피해를 줍니다.'},
   ninav:  {n:'니나브',eu:'파르쿠나스에 맞은 적 1명당 마나를 10 회복합니다.',ic:'🏹',c:3,o:'에스더',j:'사냥꾼',hp:600,atk:70,as:.8,rg:4,ar:20,mp:70,sk:'파르쿠나스',sd:'대상 방향 직선상의 모든 적을 관통해 공격력의 260% 피해를 줍니다.'},
   silian: {n:'실리안',eu:'전투 시작 시 아군 전체의 공격력이 10% 증가합니다.',ic:'👑',tr:['지휘관'],c:4,o:'에스더',j:'전사',hp:1100,atk:58,as:.7,rg:1,ar:55,mp:90,sk:'왕의 일격',sd:'대상 방향 부채꼴(3칸) 범위의 적에게 공격력의 230% 피해를 주고 보호막을 얻습니다. 무작위 적 1/2/3명(성급별)에게 빛기둥을 떨어뜨려 공격력의 100% 피해를 줍니다.'},
-  biakiss:{n:'비아키스',ic:'💋',c:4,o:'군단',j:'마법사',hp:800,atk:60,as:.75,rg:3,ar:30,mp:80,sk:'욕망의 폭풍',sd:'적이 가장 밀집한 3×3 범위에 마법 피해를 주고 1.5초 매혹(행동 불가)시킵니다.'},
-  kamen:  {n:'카멘',ic:'🌑',c:5,o:'군단',j:'전사',hp:1300,atk:110,as:.8,rg:1,ar:55,mp:100,sk:'어둠의 검무',sd:'주변 2칸의 모든 적에게 공격력의 280% 피해를 주고 피해량의 30%만큼 회복합니다.'},
+  biakiss:{n:'비아키스',tr:['군단장의 권능'],ic:'💋',c:4,o:'군단',j:'마법사',hp:800,atk:60,as:.75,rg:3,ar:30,mp:80,sk:'욕망의 폭풍',sd:'적이 가장 밀집한 3×3 범위에 마법 피해를 주고 1.5초 매혹(행동 불가)시킵니다. [권능] 욕망의 촉수 2개를 소환합니다(자유 배치). 촉수 1개당 비아키스가 매초 최대 체력 1.5% 회복.'},
+  kamen:  {n:'카멘',tr:['군단장의 권능'],ic:'🌑',c:5,o:'군단',j:'전사',hp:1300,atk:110,as:.8,rg:1,ar:55,mp:100,sk:'어둠의 검무',sd:'주변 2칸의 모든 적에게 공격력의 280% 피해를 주고 피해량의 30%만큼 회복합니다. [권능] 체력 50% 이하에서 공격 속도 +30%, 받는 피해 -15%.'},
   bahun:  {n:'바훈투르',eu:'전투 시작 시 아군 전체에 보호막 150을 부여합니다.',ic:'🔨',c:4,o:'에스더',j:'탱커·서포터',js:['탱커','서포터'],hp:1150,atk:65,as:.65,rg:1,ar:60,mp:100,sk:'아크투르스의 숨결',sd:'3/3.5/4초(성급별) 동안 아군 전체가 받는 피해를 35/45/60% 줄이고, 아군 공격력을 8/12/18% 올립니다.'},
   shandi: {n:'샨디',w:.5,tr:['환영술사'],eu:'시간 왜곡으로 회복시키는 마나가 5%p 늘어납니다.',ic:'⏳',c:5,o:'에스더',j:'마법사',hp:780,atk:84,as:.75,rg:3,ar:25,mp:90,sk:'시간 왜곡',sd:'아군 전체의 마나를 최대 마나의 20/30/45%(성급별)만큼 즉시 회복시키고, 1.5/2.5/4.5초 동안 자신의 공격력이 20% 증가합니다.'},
   kadan:  {n:'카단',eu:'적을 처치하면 마나를 50 회복합니다.',ic:'⚔️',c:5,o:'에스더',j:'전사',hp:1100,atk:100,as:.9,rg:1,ar:45,mp:80,sk:'나히니르 - 일섬',sd:'체력이 가장 높은 적에게 순간이동해 공격력의 500% 피해를 줍니다.'},
@@ -758,11 +763,13 @@ const U={
   inanna: {n:'이난나',tr:['지휘관'],eu:'수호의 지속 시간이 1초 늘어납니다.',c:5,o:'실린·에스더',os:['실린','에스더'],j:'서포터',hp:950,atk:58,as:.65,rg:3,ar:35,mp:100,sk:'수호의 빛',sd:'[지휘관] 성급이 오를수록 지휘 범위 확대 (1성 상하좌우 1칸 · 2성 주위 8칸 · 3성 주위 2칸). 4초 동안 아군 전체가 받는 피해를 40% 줄이고 공격력을 8% 올리며, 아군 전체를 최대 체력의 15%만큼 회복시킵니다.'},
   ren:    {n:'렌',tr:['데스 사이드'],c:4,o:'데런',j:'사냥꾼',hp:880,atk:74,as:.8,rg:1,ar:35,mp:70,sk:'사신의 낫',sd:'주변 1칸의 적에게 공격력의 230% 피해를 주고, 준 피해의 30%만큼 회복합니다.'},
   reaper: {n:'리퍼',tr:['갈증'],c:5,o:'데런',j:'전사·사냥꾼',js:['전사','사냥꾼'],hp:1000,atk:115,as:.85,rg:1,ar:40,mp:80,sk:'그림자 처형',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 380% 피해를 줍니다.'},
-  kouku:  {n:'쿠크세이튼',tr:['카드'],c:4,o:'군단',j:'마법사·서포터',js:['마법사','서포터'],hp:800,atk:60,as:.75,rg:3,ar:25,mp:80,sk:'광기의 쇼타임',sd:'무작위 적 3명의 자리에 폭탄을 터뜨려 각각 공격력의 220% 마법 피해를 줍니다. [카드] 스킬마다 무작위 카드 1장 — 빨강: 아군 공격력 +10%(4초) / 파랑: 아군 마나 +15 / 검정: 무작위 적에게 공격력 150% 추가 피해'},
-  abrel:  {n:'아브렐슈드',tr:['아스텔지어'],c:5,o:'군단',j:'마법사',hp:880,atk:72,as:.7,rg:3,ar:30,mp:100,sk:'몽환의 운석',sd:'적이 가장 밀집한 곳에 운석을 떨어뜨려 3×3 범위에 공격력의 380% 마법 피해를 줍니다. [아스텔지어] 전투 시작 시 최대 체력 20%의 뿔 보호막을 얻고, 보호막이 남아 있는 동안 매초 마나 +5'},
-  illiakan:{n:'일리아칸',tr:['질병'],c:5,o:'군단',j:'마법사',hp:1000,atk:80,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상과 주변 1칸의 적에게 공격력의 260% 마법 피해를 주고 질병을 강화합니다(4초, 매초 공격력 30%). 이미 질병에 걸린 적은 피해 +60%. 준 피해의 25%만큼 회복합니다. [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
+  kouku:  {n:'쿠크세이튼',tr:['군단장의 권능'],c:4,o:'군단',j:'마법사·서포터',js:['마법사','서포터'],hp:800,atk:60,as:.75,rg:3,ar:25,mp:80,sk:'광기의 쇼타임',sd:'무작위 적 3명의 자리에 폭탄을 터뜨려 각각 공격력의 220% 마법 피해를 줍니다. [권능] 스킬마다 무작위 카드 1장 — 빨강: 아군 공격력 +10%(4초) / 파랑: 아군 마나 +15 / 검정: 무작위 적에게 공격력 150% 추가 피해'},
+  abrel:  {n:'아브렐슈드',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:880,atk:72,as:.7,rg:3,ar:30,mp:100,sk:'몽환의 운석',sd:'적이 가장 밀집한 곳에 운석을 떨어뜨려 3×3 범위에 공격력의 380% 마법 피해를 줍니다. [권능] 몽환의 뿔 1개를 소환합니다(아브렐슈드와 같은 열에만 배치). 뿔이 남아 있는 동안 아브렐슈드는 받는 피해 -20%, 매초 마나 +5.'},
+  illiakan:{n:'일리아칸',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:1000,atk:80,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상과 주변 1칸의 적에게 공격력의 260% 마법 피해를 주고 질병을 강화합니다(4초, 매초 공격력 30%). 이미 질병에 걸린 적은 피해 +60%. 준 피해의 25%만큼 회복합니다. [권능] 기본 공격에 맞은 적은 3초간 질병(받는 치유 -50%, 매초 피해). [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
   tentacle:{n:'욕망의 촉수',c:0,o:'군단',j:'촉수',g:1,passive:1,hp:1000,atk:0,as:.01,rg:0,ar:0,mp:9999,sk:'-',sd:'공격하지 않습니다. 살아 있는 동안 비아키스가 매초 체력 300을 회복합니다.'},
-  horn:   {n:'몽환의 뿔',c:0,o:'군단',j:'뿔',g:1,passive:1,hp:3000,atk:0,as:.01,rg:0,ar:40,mp:9999,sk:'-',sd:'공격하지 않습니다. 하나라도 남아 있으면 아브렐슈드가 받는 피해 80% 감소, 매초 마나 +10.'},
+  tentacleA:{n:'욕망의 촉수',c:0,o:'소환물',j:'촉수',g:1,hp:1,atk:1,as:.8,rg:1,ar:20,mp:9999,sk:'-',sd:'비아키스의 [권능]으로 소환됩니다. 자유롭게 배치할 수 있고, 움직이지 않으며 인접한 적을 공격합니다. 살아 있는 동안 비아키스가 매초 최대 체력 1.5% 회복.'},
+  hornA:  {n:'몽환의 뿔',c:0,o:'소환물',j:'뿔',g:1,passive:1,hp:1,atk:0,as:.01,rg:0,ar:40,mp:9999,sk:'-',sd:'아브렐슈드의 [권능]으로 소환됩니다. 아브렐슈드와 같은 열에만 놓을 수 있습니다. 남아 있는 동안 아브렐슈드 받는 피해 -20%, 매초 마나 +5.'},
+  horn:   {n:'몽환의 뿔',c:0,o:'군단',j:'뿔',g:1,passive:1,hp:3000,atk:0,as:.01,rg:0,ar:40,mp:9999,sk:'-',sd:'공격하지 않습니다. 하나라도 남아 있으면 아브렐슈드가 받는 피해 40% 감소·매초 마나 +5, 그리고 운석이 뿔 1개당 1개씩 더 떨어집니다.'},
   // 최종 보스: 카제로스 (마지막 3라운드)
   kz1:{n:'대악마 카제로스',c:0,o:'카제로스',j:'보스',sz:1,boss:1,g:1,hp:15500,atk:250,as:.6,rg:99,ar:60,mp:100,aoe:1,col:'#ff3a2a',
        sk:'대악마의 낙인',sd:'기본 공격: 대상 주변 3×3 범위 피해. 스킬: 무작위 위치 3곳에 3×3 폭발을 일으켜 공격력의 220% 피해.'},
@@ -823,12 +830,12 @@ const KZ=new Proxy({},{get:(_,r)=>(HARDLIKE()?KZ_H:KZ_N)[r]});
 let FINAL_ROUND=25;
 // 하드 모드 군단장 라운드 (3성 군단장 1기 + 기믹, 승리 시 각인 선택)
 const LEGION={10:'valtan',15:'biakiss',20:'kouku',25:'abrel',30:'illiakan',35:'kamen'};
-const LEGION_STAT={valtan:{hp:2,atk:1},biakiss:{hp:3,atk:1.2},kouku:{hp:4,atk:1.3},abrel:{hp:5,atk:1.4},illiakan:{hp:8.55,atk:1.69},kamen:{hp:128,atk:1.1}}; // 카멘: 하드 모드 후반 전용 무기 성장에 맞춰 체력 8배 상향
+const LEGION_STAT={valtan:{hp:2,atk:1},biakiss:{hp:3,atk:1.2},kouku:{hp:6.8,atk:1.44},abrel:{hp:5.75,atk:1.44},illiakan:{hp:14,atk:2},kamen:{hp:128,atk:1.1}}; // 카멘: 하드 모드 후반 전용 무기 성장에 맞춰 체력 8배 상향
 const LEGION_HINT={valtan:'특수 기믹 없음 · 쓰러지면 6초간 유령으로 부활합니다',
   biakiss:'양옆 촉수 6개(체력 1000)가 살아 있으면 촉수 1개당 매초 체력 300 회복',
-  kouku:'카드가 붉게 변해야 정상 피해 (평소 피해 95% 감소) · 스킬을 3번 맞히면 4초간 붉은 카드',
-  abrel:'몽환의 뿔이 하나라도 남아 있으면 받는 피해 80% 감소 · 매초 마나 +10',
-  illiakan:'일리아칸이 응시하는 기물은 피해를 줄 수 없음 · 4초마다 가장 위협적인 기물을 응시',
+  kouku:'받는 피해 30% 감소 · [광기] 쿠크에게 5번 맞은 아군은 2초 혼란(회복받으면 1중첩 해제) · [빙고] 체력 70%·40%에서 아군 진영 가로·세로 한 줄씩 폭탄 (넓게 배치!)',
+  abrel:'뿔이 남아 있으면 받는 피해 40% 감소 · 12초마다 운석(1+뿔 수)이 떨어져 칸이 15초간 부서짐 · 부서진 칸 4개 이상이면 공격력 +50%',
+  illiakan:'[역병] 응시·웅덩이·근접 시 역병 게이지 증가, 100이면 질병 (회복받으면 감소) · 응시는 4초마다 가장 가까운 아군에게 옮겨감 · 쓰러진 아군은 5초 뒤 망자로 되살아나 8초 뒤 자폭',
   kamen:'특수 기믹 없음 · 압도적인 능력치'};
 const legionOf=r=>HARDLIKE()?LEGION[r]:null;
 // 이지·노말 군단장 라운드: 군단장 1기만, 기믹 없음. 이지·노말 진행 속도에 맞춘 기준 스펙에서 이지 -20%, 노말 -10%
@@ -843,7 +850,7 @@ const JOBN=[1,2,3,4,5], JHP=[100,150,200,250,300], THP=[250,300,350,400,450];
 const JOB={전사:{pct:[2,4,7,11,15],lab:'공격력'},마법사:{pct:[3,6,9,12,15],lab:'스킬 피해'},사냥꾼:{pct:[6,12,16,20,24],lab:'공격 속도'},서포터:{pct:[6,10,14,20,25],lab:'체력 회복량'},탱커:{pct:[2,4,6,8,10],lab:'피해 감소'}};
 const SYN=[
   {k:'에스더',f:'o',th:[1,2,4,6,8],d:['에스더 고유 효과 활성','고유 효과 + 결속 Ⅰ: 에스더 체력 +50 · 치명타 확률 +5% · 치명타 피해 +5%','고유 효과 + 결속 Ⅱ: 에스더 체력 +150 · 치명타 확률 +10% · 치명타 피해 +10%','고유 효과 + 결속 Ⅲ: 에스더 체력 +300 · 치명타 확률 +15% · 치명타 피해 +15%','에스더 8명 전원: 결속 Ⅲ + 모든 에스더 고유 효과 1.25배']},
-  {k:'군단',f:'o',th:[2,4,6],d:['군단 체력 +300','군단 체력 +600 · 피해 +10%','군단 체력 +900 · 피해 +20%']},
+  {k:'군단',f:'o',th:[2,4,6],d:['군단 체력 +300 · 전투 시작 5초간 적 공격 속도 -10% · [군단장의 권능] 활성','군단 체력 +600 · 군단 피해 +15% · 군단 기물이 적을 처치하면 최대 체력 10% 회복','군단 전원 집결: 군단 체력 +900 · 피해 +30% · 권능 1.25배 · 처음 쓰러진 군단 기물 1회 체력 50%로 부활']},
   {k:'아르데타인',f:'o',th:[1,2,3,4],d:['아르데타인: 기본 공격 대상 +1명 · 공격 속도 +20% · 3번째 기본 공격마다 확정 치명타(치명타 피해 증가 효과 미적용)','아르데타인: 기본 공격 대상 +1명 · 공격 속도 +35% · 3번째 기본 공격 확정 치명타','아르데타인: 기본 공격 대상 +1명 · 공격 속도 +45% · 3번째 기본 공격 확정 치명타','아르데타인: 기본 공격 대상 +1명 · 공격 속도 +60% · 3번째 기본 공격 확정 치명타']},
   {k:'지휘관',f:'x',th:[1,2,3],d:['지휘관 체력 +5% · 공격력 +20 · 스킬 피해 +1.5% · 상하좌우 1칸 아군: 받는 피해 -10%·공격력 +5% · 상하좌우 1칸 적: 공격 속도 -5%','지휘관 체력 +10% · 공격력 +30 · 스킬 피해 +3% · 주위 아군 받는 피해 -10%·공격력 +5% · 주위 적 공격 속도 -10%','지휘관 체력 +16% · 공격력 +40 · 스킬 피해 +4.5% · 주위 아군 받는 피해 -10%·공격력 +5% · 주위 적 공격 속도 -15%'],note:'이난나·구스토는 성급에 따라 지휘 범위 확대: 1성 상하좌우 1칸 · 2성 주위 8칸 · 3성 주위 2칸(5×5)'},
   {k:'실버호크',f:'x',th:[1],d:['호크아이: 기본 공격마다 공격력 +1.5/2.5/4%(성급별)·치명타 확률 +4/8/10% 누적, 100%를 넘는 치명타 확률은 1/10만큼 치명타 피해로 전환']},
@@ -852,9 +859,8 @@ const SYN=[
   {k:'실린',f:'o',th:[2,4,6],d:['실린 스킬 피해 +10%','실린 스킬 피해 +18% · 아군 전체 평타마다 마나 +2','실린 스킬 피해 +22% · 아군 전체 평타마다 마나 +3 · 평타마다 공격 속도 +2% (최대 15중첩)']},
   {k:'갈증',f:'x',th:[1],d:['리퍼가 스킬을 쓸 때마다 필요 마나 -10% · 공격력 +6% (최대 3중첩)']},
   {k:'데스 사이드',f:'x',th:[1],d:['렌(데스 사이드 2성 이상 장착): 체력 50% 미만일 때 흡혈 +20%']},
-  {k:'카드',f:'x',th:[1],d:['쿠크세이튼 스킬마다 무작위 카드 — 빨강: 아군 공격력 +10%(4초) / 파랑: 아군 마나 +15 / 검정: 적에게 추가 피해']},
-  {k:'아스텔지어',f:'x',th:[1],d:['아브렐슈드: 전투 시작 시 최대 체력 20% 뿔 보호막, 남아 있는 동안 매초 마나 +5']},
-  {k:'질병',f:'x',th:[1],d:['일리아칸에게 맞은 적: 3초간 받는 치유 -50%, 매초 피해']},
+  {k:'군단장의 권능',f:'x',th:[1],d:['군단 2명 이상일 때 — 발탄: 첫 사망 시 4초 유령 · 비아키스: 촉수 2개 소환 · 쿠크세이튼: 스킬마다 카드 · 아브렐슈드: 몽환의 뿔 소환 · 일리아칸: 평타 질병 · 카멘: 체력 50% 이하 공격 속도 +30%·받는 피해 -15%']},
+  {k:'대립',f:'x',th:[1],d:['에스더 결속(2명 이상)과 군단(2명 이상)이 함께 켜져, 에스더 결속·고유 효과와 군단 효과·권능이 모두 10% 약해집니다']},
   {k:'환영술사',f:'x',th:[1],d:['샨디 2성 이상: 체력이 최대 체력의 15% 이하가 된 적을 즉사시킵니다']},
   {k:'데런',f:'o',th:[2,3],d:['체력 50% 이하인 데런: 공격 속도 +30%','체력 50% 이하인 데런: 공격 속도 +60% · 흡혈 15%']},
   ...['전사','마법사','사냥꾼','서포터','탱커'].map(k=>({k,f:'j',th:JOBN,d:JOBN.map((_,i)=>k+' 체력 +'+(k==='탱커'?THP:JHP)[i]+' · '+JOB[k].lab+' +'+JOB[k].pct[i]+'%'+(k==='탱커'?' · 피격 시 마나 +'+(i+1):''))})),
@@ -888,7 +894,7 @@ function newGame(){
   if(typeof refreshHell==='function')refreshHell();
   document.documentElement.removeAttribute('data-kz');
   $('#modePick').classList.add('on');
-  S={mode:null,augs:[],retry:null,streak:0,grace:0,graceUsed:0,adren:0,ether:0,escUsed:false,immune:0,freeRolls:0,gold:8,level:2,xp:0,hp:100,round:1,phase:'plan',shop:[],bench:Array(9).fill(null),board:[],enemies:[],sel:null,log:[]};
+  S={mode:null,sum:[],augs:[],retry:null,streak:0,grace:0,graceUsed:0,adren:0,ether:0,escUsed:false,immune:0,freeRolls:0,gold:8,level:2,xp:0,hp:100,round:1,phase:'plan',shop:[],bench:Array(9).fill(null),board:[],enemies:[],sel:null,log:[]};
   $('#over').classList.remove('on');
   startPlan(); S.phase='mode';
 }
@@ -899,7 +905,7 @@ function pickMode(m){
   if(m==='hell'){ try{ if(localStorage.getItem('arcHellHelp')!=='1'){ localStorage.setItem('arcHellHelp','1'); setTimeout(()=>showHelp('hell'),300); } }catch(e){} }
 }
 function startPlan(){
-  S.phase='plan'; C=null; S.sel=null; fxEl.querySelectorAll('.ft,.ring,.beam,.shot').forEach(e=>e.remove());
+  S.phase='plan'; C=null; S.sel=null; fxEl.querySelectorAll('.ft,.ring,.beam,.shot').forEach(e=>e.remove()); cellsEl.querySelectorAll('.cell.warn,.cell.broken,.cell.plague').forEach(e=>e.classList.remove('warn','broken','plague'));
   S.enemies=genWave(S.round);
   if(KZ[S.round])document.documentElement.setAttribute('data-kz',KZ[S.round]); else document.documentElement.removeAttribute('data-kz'); // 카제로스 라운드 전용 결투장
   if(KZ[S.round])bossIntro(KZ[S.round]);
@@ -969,6 +975,7 @@ function buy(i){
 function sellValue(u){ return u.item?itemPrice(u.item)*[1,3,9][u.star-1]:U[u.key].c*[1,3,9][u.star-1]; } // 장착 아이템은 판매 시 대기석으로 돌아옴
 function sell(){
   const f=findSel(); if(!f)return;
+  if(f.w==='sum')return toast('소환물은 판매할 수 없습니다');
   if(f.w==='board'&&S.phase!=='plan')return toast('전투 중인 기물은 판매할 수 없습니다');
   if(f.u.eq){ returnItem(f.u); }
   S.gold+=sellValue(f.u);
@@ -1026,11 +1033,26 @@ function tryMerge(){
 function findSel(){
   if(!S.sel)return null;
   const i=S.bench.findIndex(u=>u&&u.id===S.sel); if(i>=0)return{w:'bench',i,u:S.bench[i]};
-  const u=S.board.find(b=>b.id===S.sel); return u?{w:'board',u}:null;
+  const u=S.board.find(b=>b.id===S.sel); if(u)return{w:'board',u};
+  const sm=(S.sum||[]).find(b=>b.id===S.sel); return sm?{w:'sum',u:sm}:null;
+}
+/* ───────── 군단장의 권능 소환물 (비아키스 촉수 2·아브렐슈드 뿔 1) — 플레이어가 자유 배치, 뿔은 아브렐슈드와 같은 열만 ───────── */
+function cellBusy(x,y,ex){ return S.board.some(b=>b!==ex&&b.x===x&&b.y===y)||(S.sum||[]).some(z=>z!==ex&&z.x===x&&z.y===y); }
+function sumSpot(b,k){
+  if(k==='hornA'){ for(const y of [b.y+1,b.y-1,b.y+2,b.y-2,b.y+3,b.y-3]) if(y>=4&&y<ROWS&&!cellBusy(b.x,y))return{x:b.x,y}; return null; }
+  let best=null,bd=99; for(let y=4;y<ROWS;y++)for(let x=0;x<COLS;x++){ if(cellBusy(x,y))continue; const d=Math.max(Math.abs(x-b.x),Math.abs(y-b.y))+(y<b.y?.5:0); if(d<bd){bd=d;best={x,y};} } return best; }
+function syncSummons(){
+  if(!S.sum)S.sum=[]; const on=(synCounts()['군단']||0)>=2, want=[];
+  if(on)for(const b of S.board){ if(b.key==='biakiss')want.push([b,'tentacleA',2]); if(b.key==='abrel')want.push([b,'hornA',1]); }
+  S.sum=S.sum.filter(z=>want.some(([b,k])=>b.id===z.owner&&k===z.key));
+  for(const [b,k,n] of want){
+    for(const z of S.sum.filter(z=>z.owner===b.id&&k==='hornA'&&z.x!==b.x)){ const sp=sumSpot(b,k); if(sp){z.x=sp.x;z.y=sp.y;} else S.sum=S.sum.filter(q=>q!==z); }
+    for(let i=S.sum.filter(z=>z.owner===b.id).length;i<n;i++){ const sp=sumSpot(b,k); if(!sp)break; S.sum.push({id:uid++,key:k,star:1,x:sp.x,y:sp.y,owner:b.id,summon:true}); } }
 }
 function clickBench(i){
   const f=findSel(), t=S.bench[i];
   if(!f){ if(t){S.sel=t.id;showInfo(t);} return render(); }
+  if(f.w==='sum'){ S.sel=null; toast('소환물은 대기석으로 옮길 수 없습니다'); return render(); }
   if(t&&t.id===f.u.id){S.sel=null;return render();}
   if(f.u.item&&t&&t.key){ if(equip(f.i,t)){S.sel=null;tryMerge();} return render(); }       // 아이템 → 대기석 기물
   if(f.w==='board'&&t&&t.item){ if(S.phase!=='plan')return toast('전투 중에는 배치를 바꿀 수 없습니다'); if(equip(i,f.u)){S.sel=null;tryMerge();} return render(); } // 전장 기물 → 아이템 칸
@@ -1050,19 +1072,29 @@ function clickCell(x,y){
     return;
   }
   if(S.phase!=='plan')return;
-  const f=findSel(), occ=S.board.find(b=>b.x===x&&b.y===y);
+  const f=findSel(), occ=S.board.find(b=>b.x===x&&b.y===y), occS=(S.sum||[]).find(z=>z.x===x&&z.y===y);
   if(!f){
     if(occ){S.sel=occ.id;showInfo(occ);}
+    else if(occS){S.sel=occS.id;showInfo(occS);}
     else{const en=S.enemies.find(e=>covers(e,x,y)); if(en)showInfo(en);}
     return render();
   }
   if(f.u.item){ if(occ){ if(equip(f.i,occ)){S.sel=null;tryMerge();} } else toast('아이템은 해당 전용 기물 위에 놓아 장착하세요'); return render(); }
   if(y<4){ toast('아군 진영(하단 4줄)에만 배치할 수 있습니다'); return; }
-  if(occ&&occ.id===f.u.id){S.sel=null;return render();}
+  if((occ&&occ.id===f.u.id)||(occS&&occS.id===f.u.id)){S.sel=null;return render();}
+  const hornOk=(z,nx,ownerMoved,ownerX)=>{ if(z.key!=='hornA')return true; const ow=S.board.find(b=>b.id===z.owner); if(!ow)return true; return nx===(ownerMoved?ownerX:ow.x); };
+  if(f.w==='sum'){
+    if(!hornOk(f.u,x,occ&&occ.id===f.u.owner,f.u.x))return toast('몽환의 뿔은 아브렐슈드와 같은 열에만 놓을 수 있습니다');
+    if(occS&&!hornOk(occS,f.u.x))return toast('몽환의 뿔은 아브렐슈드와 같은 열에만 놓을 수 있습니다');
+    const ox=f.u.x, oy=f.u.y; if(occ){occ.x=ox;occ.y=oy;} if(occS){occS.x=ox;occS.y=oy;} f.u.x=x;f.u.y=y;
+    S.sel=null; return render();
+  }
   if(f.w==='board'){
+    if(occS){ if(!hornOk(occS,f.u.x,occS.owner===f.u.id,x))return toast('몽환의 뿔은 아브렐슈드와 같은 열에만 놓을 수 있습니다'); occS.x=f.u.x; occS.y=f.u.y; }
     if(occ){occ.x=f.u.x;occ.y=f.u.y;}
     f.u.x=x;f.u.y=y;
   }else{
+    if(occS)return toast('소환물이 있는 칸입니다. 소환물을 먼저 옮기세요');
     if(occ){ S.board[S.board.indexOf(occ)]=f.u; occ.x=occ.y=-1; S.bench[f.i]=occ; }
     else{
       if(S.board.length>=S.level)return toast('배치 한도('+S.level+')에 도달했습니다. 경험치를 구매해 레벨을 올리세요');
@@ -1126,15 +1158,14 @@ function synCounts(){
   const seen=new Set(), c={};
   for(const u of S.board){ if(seen.has(u.key))continue; seen.add(u.key); const d=U[u.key]; for(const o of facs(d))c[o]=(c[o]||0)+1; for(const j of jobs(d))c[j]=(c[j]||0)+1; }
   if(S.board.some(u=>u.key==='reaper'))c['갈증']=1;
-  if(S.board.some(u=>u.key==='kouku'))c['카드']=1;
-  if(S.board.some(u=>u.key==='abrel'))c['아스텔지어']=1;
-  if(S.board.some(u=>u.key==='illiakan'))c['질병']=1;
   { const cm=new Set(S.board.filter(u=>(U[u.key].tr||[]).includes('지휘관')).map(u=>u.key)).size; if(cm)c['지휘관']=cm; }
   if(S.board.some(u=>u.key==='hawkeye'))c['실버호크']=1;
   if(S.board.some(u=>u.key==='gunslinger'))c['사냥의 시간']=1;
   if(has('sage')&&c['서포터']>0)c['서포터']+=1; // 각인: 엘릭서 선각자
   if(S.board.some(u=>u.key==='ren'&&u.eq&&u.eq.k==='deathscythe'&&u.eq.star>=2))c['데스 사이드']=1;
   if(execTh()>0)c['환영술사']=1; // 샨디 고유 시너지 (2성부터)
+  if((c['군단']||0)>=2){ const n=new Set(S.board.filter(u=>(U[u.key].tr||[]).includes('군단장의 권능')).map(u=>u.key)).size; if(n)c['군단장의 권능']=n; }
+  if((c['에스더']||0)>=2&&(c['군단']||0)>=2)c['대립']=1;
   return c;
 }
 function tierOf(s,n){ let t=0; for(const th of s.th) if(n>=th)t++; return t; }
@@ -1166,7 +1197,7 @@ function autoFill(){
   while(S.board.length<S.level){
     const i=S.bench.findIndex(u=>u&&u.key); if(i<0)break;
     const u=S.bench[i], rows=U[u.key].rg<=1?[4,5,6,7]:[7,6,5,4]; let spot=null;
-    for(const y of rows){ for(const x of [3,2,4,1,5,0,6]) if(!S.board.some(b=>b.x===x&&b.y===y)){spot={x,y};break;} if(spot)break; }
+    for(const y of rows){ for(const x of [3,2,4,1,5,0,6]) if(!cellBusy(x,y)){spot={x,y};break;} if(spot)break; }
     if(!spot)break;
     S.bench[i]=null; u.x=spot.x; u.y=spot.y; S.board.push(u); n++;
   }
@@ -1182,11 +1213,14 @@ function startCombat(){
   C={units:[...S.board.map(b=>mkCU(b,0,1)),...S.enemies.map(e=>mkCU(e,1,e.mul))],t:0,over:false,slAs:T['실린']>=3,kai:[],gazeDmg:{}};
   { const ina=S.board.find(b=>b.key==='inanna'&&b.eq&&b.eq.k==='lunatic'&&b.eq.star>=2); C.lunatic=ina?[0,0,1.05,1.08][ina.eq.star]:0; }
   C.legion=C.units.some(u=>u.legion); C.cmdTier=T['지휘관']||0; C.cmdT=0;
-  for(const u of C.units){
-    if(u.team)continue; const d=U[u.key];
+  const LG=T['군단']||0, RIV=T['대립']?.9:1; C.riv=RIV; C.lgPow=(LG>=3?1.25:1)*RIV; C.lgRevive=LG>=3; C.fear=LG?.1*RIV:0; C.ev=[]; C.broken={}; C.pools=[];
+  C.illiLegion=C.units.some(u=>u.legion&&!u.noGim&&u.key==='illiakan');
+  if(LG)for(const e of C.units)if(e.team)e.fearT=5;  for(const u of C.units){
+    if(u.team||u.summon)continue; const d=U[u.key];
     const F=facs(d), J=jobs(d), addHp=n=>{u.maxHp+=n;u.hp+=n;};
     if(F.includes('에스더')&&T['에스더']>=1&&d.eu)u.eu=true;
-    if(F.includes('군단')){addHp([0,300,600,900][T['군단']]);u.dmgMul*=[1,1,1.1,1.2][T['군단']];}
+    if(F.includes('군단')&&LG){ addHp(Math.round([0,300,600,900][LG]*RIV)); u.dmgMul*=1+[0,0,.15,.3][LG]*RIV; u.lgM=true; if(LG>=2)u.lgHeal=.1*RIV; }
+    if(LG&&(d.tr||[]).includes('군단장의 권능'))u.lgPow=C.lgPow;
     if(F.includes('아르데타인')&&T['아르데타인']){u.as*=[1,1.2,1.35,1.45,1.6][T['아르데타인']];u.ard=true;u.ardN=0;}
     if((d.tr||[]).includes('지휘관')&&T['지휘관']){ const ct=T['지휘관']; u.cmd=true; u.maxHp=Math.round(u.maxHp*[1,1.05,1.1,1.16][ct]); u.hp=u.maxHp; u.atk+=[0,20,30,40][ct]; u.skillMul*=1+[0,.015,.03,.045][ct]; }
     if(u.key==='hawkeye'&&T['실버호크'])u.hawk=[.015,.025,.04][u.star-1], u.hawkCr=[.04,.08,.10][u.star-1];
@@ -1220,21 +1254,25 @@ function startCombat(){
     }
   }
   // 아스텔지어: 아브렐슈드 뿔 보호막 (군단장 아브렐은 뿔 기믹으로 대체)
-  for(const u of C.units)if(u.key==='abrel'&&!u.legion){ u.shield+=u.maxHp*.2; u.astel=true; }
+  // 군단장의 권능 소환물 (플레이어가 배치한 촉수·뿔)
+  for(const sm of (S.sum||[])){ const ow=C.units.find(x=>x.id===sm.owner&&!x.team); if(!ow||!ow.lgPow)continue; const o=mkCU(sm,0,1); o.summon=true; o.owner=sm.owner;
+    if(sm.key==='tentacleA'){ o.maxHp=o.hp=Math.round(ow.maxHp*.3); o.atk=o.atk0=ow.atk*.35*ow.lgPow; o.as=.8; o.rg=1; o.rooted=true; o.maxMana=1e9; }
+    else { o.maxHp=o.hp=Math.round(ow.maxHp*.35); }
+    C.units.push(o); }
   for(const u of C.units)if(u.legion){ u.gazeT=1.5; u.cardT=0; u.cardHits=0; }
   if(has('ambush'))for(const u of C.units.filter(u=>!u.team&&jobs(U[u.key]).includes('사냥꾼'))){ const far=C.units.filter(e=>e.team&&e.alive).sort((a,b)=>dist(u,b)-dist(u,a))[0]; if(far){const c=freeNear(far,0); if(c){u.x=c.x;u.y=c.y;}} }
   for(const u of C.units)if(!u.team)u.atk0=u.atk;
   if(T['세이크리아'])for(const u of C.units)if(!u.team)addShield(u,u.maxHp*[0,.1,.15,.2][T['세이크리아']]); // 세이크리아: 최대 체력 비례 보호막 (모든 체력 보정 후)
   // 에스더 고유 효과: 실리안 — 아군 전체 공격력 +10%
   const allies=C.units.filter(u=>!u.team);
-  C.euMul=T['에스더']>=5?1.25:1; const EM=C.euMul; // 에스더 전원 집결: 고유 효과 1.25배
+  C.euMul=(T['에스더']>=5?1.25:1)*(C.riv||1); const EM=C.euMul; // 에스더 전원 집결: 고유 효과 1.25배
   C.execute=T['환영술사']>=1; C.execTh=execTh();
   if(allies.some(u=>u.eu&&u.key==='bahun'))for(const u of allies)addShield(u,150*EM);
   if(allies.some(u=>u.eu&&u.key==='silian'))for(const u of allies)u.atk*=1+.1*EM;
   // 에스더 결속 (2/4/6명): 전투 시작 시 즉시 발동, 에스더 기물에만 적용
   const bt=T['에스더']-1, bond=BOND[bt]||null;
   if(bond){ const es=allies.filter(u=>facs(U[u.key]).includes('에스더'));
-    for(const u of es){u.maxHp+=bond.hp;u.hp+=bond.hp;u.crit+=bond.cr;u.critDmg+=bond.cd;}
+    const rv=C.riv||1; for(const u of es){u.maxHp+=Math.round(bond.hp*rv);u.hp+=Math.round(bond.hp*rv);u.crit+=bond.cr*rv;u.critDmg+=bond.cd*rv;}
     setTimeout(()=>{for(const u of es){FX.ring(u,.1,.9,'#ffd76a',.08,.6);FX.rise(u,8,'#ffe9a8');}},60); }
   // 승부사: 적이 아군보다 적으면 차이 n마다 공격력·방어력 +2.2%
   if(has('gambler')){ const na=allies.length, ne=C.units.filter(e=>e.team&&!e.passive).length, n=na-ne;
@@ -1257,7 +1295,7 @@ const covers=(u,x,y)=>x>=u.x&&x<u.x+SZ(u)&&y>=u.y&&y<u.y+SZ(u);
 const gap=(a0,a1,b0,b1)=>Math.max(0,b0-a1,a0-b1);
 const dist=(a,b)=>Math.max(gap(a.x,a.x+SZ(a)-1,b.x,b.x+SZ(b)-1),gap(a.y,a.y+SZ(a)-1,b.y,b.y+SZ(b)-1));
 const eu=(a,b)=>Math.hypot(cx(a)-cx(b),cy(a)-cy(b));
-const occ=(x,y)=>C.units.some(u=>u.alive&&covers(u,x,y));
+const occ=(x,y)=>C.units.some(u=>u.alive&&covers(u,x,y))||!!(C.broken&&C.broken[x+','+y]>C.t);
 const foes=u=>C.units.filter(e=>e.alive&&e.team!==u.team);
 const pals=u=>C.units.filter(e=>e.alive&&e.team===u.team);
 function pickTarget(u){
@@ -1278,10 +1316,16 @@ function step(dt){
   if(C.over)return;
   C.t+=dt;
   if(C.cmdTier){ C.cmdT-=dt; if(C.cmdT<=0){ C.cmdT=1; cmdUpdate(); } }
+  if(C.ev.length){ const due=C.ev.filter(e=>e.t<=C.t); if(due.length){ C.ev=C.ev.filter(e=>e.t>C.t); for(const e of due)e.fn(); } }
+  if(C.legion)legionField(dt);
   for(const u of C.units){
     if(!u.alive)continue;
     if(u.ghost){u.ghostT-=dt; if(u.ghostT<=0){u.alive=false;fxText(u.x,u.y,'소멸','sk');continue;}}
     if(u.haste>0)u.haste-=dt;
+    if(u.fearT>0)u.fearT-=dt;
+    if(u.undead){ u.bombT-=dt; if(u.bombT<=0){ u.alive=false; FX.burst(u,26,'#9aff6a',6,.12); FX.ring(u,0,1.4,'#6aff3a',.14); fxText(cx(u),cy(u),'자폭','sk'); for(const a of C.units)if(a.alive&&!a.team&&dist(a,u)<=1)dmgPct(a,.2); continue; } }
+    if(!u.team&&u.lgPow){ if(u.key==='biakiss'){ const n=C.units.filter(m=>m.alive&&m.summon&&m.owner===u.id).length; if(n&&u.hp<u.maxHp)u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.015*n*u.lgPow*dt); }
+      if(u.key==='abrel'&&C.units.some(m=>m.alive&&m.summon&&m.owner===u.id))u.mana=Math.min(u.maxMana,u.mana+5*u.lgPow*dt); }
     if(u.buffs&&u.buffs.length){ for(const b of u.buffs)b.t-=dt; for(const b of u.buffs.filter(b=>b.t<=0)){u.atk/=b.atk||1;u.as/=b.as||1;} u.buffs=u.buffs.filter(b=>b.t>0); }
     if(u.disease&&u.disease.t>0){ u.disease.t-=dt; u.hp-=u.disease.dps*dt; if(u.hp<=0){u.hp=0;kill(u);continue;} }
     if(u.ltok&&u.ltok.length){ for(const k of u.ltok)k.t-=dt; for(const k of u.ltok.filter(k=>k.t<=0)){ if(k.rem>0){u.shield=Math.max(0,u.shield-k.rem);heal(u,k.amt);} } u.ltok=u.ltok.filter(k=>k.t>0); }
@@ -1290,6 +1334,7 @@ function step(dt){
     if(u.legion&&!u.noGim)legionTick(u,dt);
     if(u.boss||u.legion)u.stun=0;
     if(u.stun>0){u.stun-=dt;continue;}
+    if(u.confuse>0){ u.confuse-=dt; u.atkCd-=dt; if(u.atkCd<=0){ const a=C.units.filter(m=>m.alive&&m.team===u.team&&m!==u&&!m.passive).sort((p,q)=>dist(u,p)-dist(u,q))[0]; if(a){ hurt({team:1,atk:u.atk},a,u.atk); FX.burst(a,6,'#ff7ad8',2.4,.07);} u.atkCd=1/u.as; } continue; }
     u.atkCd-=dt;u.moveCd-=dt;
     const t=pickTarget(u); if(!t)continue;
     if(u.mana>=u.maxMana){u.mana=0;cast(u,t);u.atkCd=Math.max(u.atkCd,.45);if(u.graceBase){u.maxMana=u.graceBase;u.graceBase=0;}continue;}
@@ -1306,11 +1351,11 @@ function step(dt){
         if(u.lance){ const amt=u.maxHp*u.lance; addShield(u,amt); (u.ltok=u.ltok||[]).push({t:3,amt,rem:amt}); }
         if(u.moonSp)u.atk+=u.atk0*u.moonSp;
         if(C.slAs&&!u.team&&(u.slSt||0)<15){u.slSt=(u.slSt||0)+1;u.as*=1.02;} // 실린 6: 평타마다 공속 +2%
-        u.atkCd=1/(u.as*(u.haste>0?1.4:1)*(u.derenAs&&u.hp<u.maxHp*.5?1+u.derenAs:1)*(1-(u.cmdSlow||0)));
+        u.atkCd=1/(u.as*(u.haste>0?1.4:1)*(u.derenAs&&u.hp<u.maxHp*.5?1+u.derenAs:1)*(1-(u.cmdSlow||0))*(u.fearT>0?1-C.fear:1)*(u.lgPow&&u.key==='kamen'&&u.hp<u.maxHp*.5?1+.3*u.lgPow:1));
       }
-    }else if(u.moveCd<=0&&!u.boss){ moveToward(u,t); u.moveCd=.32; }
+    }else if(u.moveCd<=0&&!u.boss&&!u.rooted){ moveToward(u,t); u.moveCd=.32; }
   }
-  const p=C.units.filter(u=>u.alive&&!u.team).length, e=C.units.filter(u=>u.alive&&u.team).length;
+  const p=C.units.filter(u=>u.alive&&!u.team&&!u.summon).length, e=C.units.filter(u=>u.alive&&u.team).length;
   if(!p||!e||C.t>(HARDLIKE()&&(KZ[S.round]||C.units.some(u=>u.legion&&u.key==='kamen'))?300:KZ[S.round]?100:C.legion?90:60)){ C.over=true; const win=e===0&&p>0; setTimeout(()=>endCombat(win,e),Math.max(300,900/speed)); }
 }
 function moveToward(u,t){
@@ -1341,13 +1386,45 @@ function moveToward(u,t){
 function legionTick(u,dt){
   if(u.key==='biakiss'){ const n=C.units.filter(m=>m.alive&&m.key==='tentacle').length;
     if(n&&u.hp<u.maxHp){ u.hp=Math.min(u.maxHp,u.hp+300*n*dt); u.rgT=(u.rgT||0)+dt; if(u.rgT>=1){u.rgT=0;fxText(cx(u),cy(u)+.2,'+'+(300*n),'heal');} } }
-  if(u.key==='kouku'&&u.cardT>0)u.cardT-=dt;
-  if(u.key==='abrel'&&C.units.some(m=>m.alive&&m.key==='horn'))u.mana=Math.min(u.maxMana,u.mana+10*dt);
-  if(u.key==='illiakan'){ u.gazeT-=dt; if(u.gazeT<=0){ u.gazeT=4;
-    const al=C.units.filter(a=>a.alive&&!a.team); let best=null,bv=-1; for(const a of al){const v=C.gazeDmg[a.id]||0; if(v>bv){bv=v;best=a;}}
-    if(!bv)best=al.slice().sort((a,b)=>dist(u,a)-dist(u,b))[0]; C.gazeDmg={};
-    if(best){u.gaze=best;u.tgt=best;fxText(cx(best),cy(best)-.4,'응시','mag');FX.beam(u,best,'#9aff6a',.12,.6);FX.ring(best,.1,.9,'#9aff6a',.1,.8);} } }
+  if(u.key==='kouku'){ // 빙고: 체력 70%·40%에서 아군 진영 가로줄 1개 + 세로줄 1개 폭탄
+    u.bingo=u.bingo||0; const th=[.7,.4];
+    if(u.bingo<2&&u.hp<u.maxHp*th[u.bingo]){ u.bingo++; const ry=4+rnd(4), rx=rnd(COLS), cells=[];
+      for(let x=0;x<COLS;x++)cells.push([x,ry]); for(let y=4;y<ROWS;y++)if(y!==ry)cells.push([rx,y]);
+      fxText(cx(u),cy(u)-.6,'빙고!','sk'); warnCells(cells,'warn',2,()=>{ for(const a of C.units)if(a.alive&&!a.team&&cells.some(([x,y])=>covers(a,x,y)))dmgPct(a,.25); for(const [x,y] of cells)FX.burst({x,y},8,'#ff5a3a',3.5,.1); FX.shake(1.4); }); } }
+  if(u.key==='abrel'){ const horns=C.units.filter(m=>m.alive&&m.key==='horn').length;
+    if(horns)u.mana=Math.min(u.maxMana,u.mana+5*dt);
+    u.metT=(u.metT===undefined?6:u.metT)-dt;
+    if(u.metT<=0){ u.metT=12; const n=Math.min(4,1+horns), pool=[]; for(let y=4;y<ROWS;y++)for(let x=0;x<COLS;x++)if(!(C.broken[x+','+y]>C.t))pool.push([x,y]);
+      const cells=[]; for(let k=0;k<n&&pool.length;k++)cells.push(pool.splice(rnd(pool.length),1)[0]);
+      fxText(cx(u),cy(u)-.6,'운석 낙하','sk'); warnCells(cells,'warn',1.5,()=>{ for(const [x,y] of cells){ FX.burst({x,y},20,'#b48cff',5,.12); FX.ring({x,y},0,1,'#c9a0ff',.12);
+          for(const a of C.units)if(a.alive&&!a.team&&covers(a,x,y)){ dmgPct(a,.3); if(a.alive&&!a.passive){ C.broken[x+','+y]=C.t+15; const sp=freeNear(a,0); if(sp){a.x=sp.x;a.y=sp.y;} } }
+          C.broken[x+','+y]=C.t+15; cellCls(x,y,'broken',true); C.ev.push({t:C.t+15,fn:()=>cellCls(x,y,'broken',false)}); } FX.shake(1.2); }); }
+    const nb=Object.values(C.broken).filter(t=>t>C.t).length, dream=nb>=4;
+    if(dream&&!u.dream){ u.dream=true; u.atk*=1.5; fxText(cx(u),cy(u)-.6,'몽환 — 공격력 +50%','sk'); FX.ring(u,.1,1.6,'#c87aff',.16); }
+    else if(!dream&&u.dream){ u.dream=false; u.atk/=1.5; } }
+  if(u.key==='illiakan'){ u.gazeT-=dt;
+    if(u.gazeT<=0){ u.gazeT=4; const al=C.units.filter(a=>a.alive&&!a.team&&!a.summon); let best=null;
+      if(u.gaze&&u.gaze.alive) best=al.filter(a=>a!==u.gaze).sort((a,b)=>dist(u.gaze,a)-dist(u.gaze,b))[0]||u.gaze; // 응시가 가장 가까운 아군에게 옮겨감
+      else { let bv=-1; for(const a of al){const v=C.gazeDmg[a.id]||0; if(v>bv){bv=v;best=a;}} if(!bv)best=al.slice().sort((a,b)=>dist(u,a)-dist(u,b))[0]; }
+      C.gazeDmg={}; if(best){u.gaze=best;u.tgt=best;fxText(cx(best),cy(best)-.4,'응시','mag');FX.beam(u,best,'#9aff6a',.12,.6);FX.ring(best,.1,.9,'#9aff6a',.1,.8);} }
+    u.poolT=(u.poolT===undefined?5:u.poolT)-dt;
+    if(u.poolT<=0){ u.poolT=10; const x=rnd(COLS-1), y=4+rnd(3), cells=[[x,y],[x+1,y],[x,y+1],[x+1,y+1]]; C.pools.push({cells,end:C.t+8});
+      for(const [a,b] of cells)cellCls(a,b,'plague',true); C.ev.push({t:C.t+8,fn:()=>{ for(const [a,b] of cells)if(!C.pools.some(p=>p.end>C.t&&p.cells.some(([px,py])=>px===a&&py===b)))cellCls(a,b,'plague',false); }}); fxText(cx(u),cy(u)-.6,'역병 웅덩이','mag'); } }
 }
+// 군단장전 필드 효과: 역병 게이지 누적 (응시 +20/초, 웅덩이 +30/초, 일리아칸 인접 +10/초)
+function legionField(dt){
+  const L=C.units.find(u=>u.legion&&!u.noGim&&u.alive&&u.key==='illiakan'); if(!L)return;
+  for(const a of C.units){ if(!a.alive||a.team||a.summon||a.passive)continue;
+    let r=(L.gaze===a?20:0)+(dist(a,L)<=1?10:0); if(C.pools.some(p=>p.end>C.t&&p.cells.some(([x,y])=>covers(a,x,y))))r+=30;
+    if(!r)continue; a.plague=(a.plague||0)+r*dt;
+    if(a.plague>=100){ a.plague=0; a.disease={t:5,dps:L.atk*.25}; fxText(cx(a),cy(a)-.3,'역병','mag'); FX.rise(a,10,'#9aff6a'); } }
+}
+function dmgPct(t,pct){ if(!t.alive)return; let d=Math.round(t.maxHp*pct); const a=Math.min(t.shield,d); t.shield-=a; d-=a; t.hp-=d; fxText(cx(t),cy(t),'-'+Math.round(d+a),'crit'); if(t.hp<=0){t.hp=0;kill(t);} }
+function cellCls(x,y,k,on){ const e=cellsEl.querySelector('.cell[data-x="'+x+'"][data-y="'+y+'"]'); if(e)e.classList.toggle(k,on); }
+function warnCells(cells,k,sec,fn){ for(const [x,y] of cells)cellCls(x,y,k,true); C.ev.push({t:C.t+sec,fn:()=>{ for(const [x,y] of cells)cellCls(x,y,k,false); fn(); }}); }
+function spawnUndead(k,st,x,y){ if(!C||C.over||!C.units.some(u=>u.legion&&u.key==='illiakan'&&u.alive))return;
+  const o=mkCU({id:uid++,key:k,star:st,x,y},1,.3); if(occ(x,y)){ const sp=freeNear({x,y},1); if(!sp)return; o.x=sp.x; o.y=sp.y; }
+  o.undead=true; o.bombT=8; C.units.push(o); fxText(cx(o),cy(o)-.4,'망자','mag'); FX.pillar(o,'#6aff3a',.8,3); FX.rise(o,14,'#9aff6a'); }
 function hurt(src,t,raw,o){
   if(!t.alive)return 0; o=o||{};
   let d=raw*(src.dmgMul||1)*(src.inSkill?src.skillMul||1:1), crit=false;
@@ -1362,6 +1439,7 @@ function hurt(src,t,raw,o){
   if(t.team===0&&src.boss&&src.inSkill&&KZ_VULN&&HARDLIKE()&&src.casts>=3){ d*=1+(t.kzVuln||0); t.kzVuln=(t.kzVuln||0)+KZ_VULN; } // 카제로스 3번째 스킬부터: 맞을수록 받는 피해 중첩
   if(src.ancient&&src.inSkill){ src.store=(src.store||0)+d*src.ancient; d*=1-src.ancient; }
   if(src.cmdAura)d*=1.05; if(t.cmdAura)d*=.9; // 지휘관 오라
+  if(t.lgPow&&!t.team){ if(t.key==='kamen'&&t.hp<t.maxHp*.5)d*=1-.15*t.lgPow; if(t.key==='abrel'&&C.units.some(m=>m.alive&&m.summon&&m.owner===t.id))d*=.8; }
   if(src.hunt&&src.inSkill)d*=1+Math.min(.1,.02*dist(src,t)); // 사냥의 시간
   if(o.fc){d*=1+BASE_CRITDMG;crit=true;} // 아르데타인 확정 치명타: 치명타 피해 증가 효과 미적용
   else if(src.crit&&Math.random()<src.crit){d*=1+(src.critDmg||BASE_CRITDMG);crit=true;if(src.team===0&&has('crit'))C.kai.push(C.t);}
@@ -1370,11 +1448,12 @@ function hurt(src,t,raw,o){
   d=Math.max(1,Math.round(d*100/(100+t.ar)*(1-(t.dr||0))*(1-bdr)));
   // 군단장 기믹
   if(t.legion&&!t.noGim&&src.team===0){
-    if(t.key==='kouku'){ if(!(t.cardT>0)){ d=Math.max(1,Math.round(d*.05)); if(src.inSkill&&++t.cardHits>=3){t.cardHits=0;t.cardT=4;fxText(cx(t),cy(t)-.5,'붉은 카드!','sk');FX.ring(t,.1,1.2,'#ff3a3a',.14);} } }
-    if(t.key==='abrel'&&C.units.some(m=>m.alive&&m.key==='horn'))d=Math.max(1,Math.round(d*.2));
-    if(t.key==='illiakan'){ C.gazeDmg[src.id]=(C.gazeDmg[src.id]||0)+d; if(t.gaze===src){ if(Math.random()<.15)fxText(cx(t),cy(t),'무효','mag'); return 0; } }
+    if(t.key==='kouku')d=Math.max(1,Math.round(d*.7));
+    if(t.key==='abrel'&&C.units.some(m=>m.alive&&m.key==='horn'))d=Math.max(1,Math.round(d*.6));
+    if(t.key==='illiakan')C.gazeDmg[src.id]=(C.gazeDmg[src.id]||0)+d;
   }
-  if(src.key==='illiakan'&&src.alive!==undefined&&t.alive)t.disease={t:3,dps:src.atk*.2};
+  if(src.key==='illiakan'&&(src.legion||src.lgPow)&&t.alive)t.disease={t:3,dps:src.atk*.2*(src.lgPow||1)};
+  if(src.legion&&!src.noGim&&src.key==='kouku'&&t.team===0&&!t.summon&&!t.passive&&t.alive){ t.mad=(t.mad||0)+1; if(t.mad>=5){ t.mad=0; t.confuse=2; fxText(cx(t),cy(t)-.4,'광기 — 혼란','sk'); FX.swirl(t,.8,12,'#ff7ad8'); } }
   let rest=d;
   if(t.shield>0){const a=Math.min(t.shield,rest);t.shield-=a;rest-=a; if(t.ltok){let x=a;for(const k of t.ltok){const y=Math.min(k.rem,x);k.rem-=y;x-=y;if(x<=0)break;}}}
   t.hp-=rest;
@@ -1388,24 +1467,28 @@ function hurt(src,t,raw,o){
     t.hp=0; fxText(cx(t),cy(t)-.3,'즉사','mag'); FX.magic(t,.9,'#b48cff',.7); FX.ring(t,0,1,'#e0d0ff',.12); FX.burst(t,16,'#9a6cff',4.5,.1); }
   if(src.ancient&&src.store>0&&t.alive&&t.hp>0&&t.hp<=t.maxHp*.5){ const sv=src.store, was=src.inSkill; src.store=0; src.inSkill=false; fxText(cx(t),cy(t)-.4,'고대의 창','sk'); FX.beam(src,t,'#ffb347',.16,.4); hurt(src,t,sv/(src.dmgMul||1)); src.inSkill=was; }
   if(t.hp<=0&&src.team===0&&t.team===1&&has('ether')&&Math.random()<.3){ const al=C.units.filter(a=>a.alive&&!a.team&&(a.eth||0)<10); const a=al[rnd(al.length)]; if(a){a.eth=(a.eth||0)+1;a.atk*=1.03;a.ar+=5;FX.rise(a,6,'#9fe8ff');S.ether=(S.ether||0)+1; if(S.ether%20===0){S.gold+=2;toast('에테르 20개: +2골드');}} }
-  if(t.hp<=0){ kill(t); if(!t.alive&&src.eu&&src.key==='kadan'){const mg=Math.round(50*(C.euMul||1));src.mana=Math.min(src.maxMana,src.mana+mg);fxText(src.x,src.y-.4,'마나 +'+mg,'sk');} }
+  if(t.hp<=0){ kill(t); if(!t.alive&&src.lgHeal&&src.alive)heal(src,src.maxHp*src.lgHeal); if(!t.alive&&src.eu&&src.key==='kadan'){const mg=Math.round(50*(C.euMul||1));src.mana=Math.min(src.maxMana,src.mana+mg);fxText(src.x,src.y-.4,'마나 +'+mg,'sk');} }
   return d;
 }
 function kill(t){
-  if(t.key==='valtan'&&!t.ghost){
-    t.ghost=true;t.ghostT=6;t.hp=Math.round(t.maxHp*.5);t.atk*=1.3;t.shield=0;t.stun=0;
+  if(t.team===0&&t.lgM&&C&&C.lgRevive&&!t.summon&&!t.ghost){ C.lgRevive=false; t.hp=Math.round(t.maxHp*.5); t.stun=0; t.disease=null;
+    fxText(cx(t),cy(t),'카제로스의 부름','sk'); FX.pillar(t,'#ff3a2a',.9,3.2); FX.ring(t,.1,1.2,'#ff5a3a',.14); return; }
+  if(t.key==='valtan'&&!t.ghost&&(t.team===1||t.lgPow)){
+    t.ghost=true;t.ghostT=t.team?6:4*t.lgPow;t.hp=Math.round(t.maxHp*.5);t.atk*=1.3;t.shield=0;t.stun=0;
     fxText(cx(t),cy(t),'찢겨진 마수의 군주','sk'); FX.magic(t,1.3,'#7ddfff',1.2); FX.pillar(t,'#7ddfff',1,3.4,.9); FX.rise(t,24,'#bff4ff'); FX.ring(t,.2,1.8,'#7ddfff',.14); FX.shake(1.5); return;
   }
   if(t.team===0&&!t.passive&&C&&has('necro')){ const tg=C.units.filter(e=>e.alive&&e.team===1&&!e.passive).sort((a,b)=>b.hp-a.hp)[0];
     if(tg){ const from={x:t.x,y:t.y}, dmg=t.maxHp*.08; FX.beam(from,tg,'#b48cff',.12,.5); FX.burst(from,12,'#c9a0ff',3,.09);
       later(250,()=>{ if(!C||!tg.alive)return; FX.ring(tg,0,1,'#b48cff',.14); FX.burst(tg,18,'#9a6cff',5,.11); fxText(cx(tg),cy(tg)-.4,'강령술','mag'); hurt({team:0},tg,dmg*(100+tg.ar)/100,{mag:1}); }); } }
   if(shardEligible(t)){ (C.drops=C.drops||[]).push(dropShard(t)); }
+  if(t.team===0&&!t.summon){ for(const m of C.units)if(m.alive&&m.summon&&m.owner===t.id){ m.alive=false; FX.burst(m,10,'#c87aff',3,.09); }
+    if(C.illiLegion&&!t.passive){ const k=t.key,st=t.star,x=t.x,y=t.y; C.ev.push({t:C.t+5,fn:()=>spawnUndead(k,st,x,y)}); } }
   t.alive=false; if(t.legion)for(const m of C.units)if(m.alive&&m.passive&&m.team===t.team){m.alive=false;FX.burst(m,10,'#c87aff',3,.09);}
   FX.burst(t,16,t.team?'#ff6b5e':'#6fb8ff',3.6,.1); FX.ring(t,0,.8,t.team?'#ff6b5e':'#6fb8ff',.08);
 }
 let castSrc=null;
 function addShield(t,a){ let m=1; if(castSrc&&castSrc.shMul)m*=castSrc.shMul; if(t.team===0&&C&&C.lunatic)m*=C.lunatic; t.shield+=a*m; return a*m; }
-function heal(t,n){ n*=castSrc?castSrc.healMul||1:1; if(t.team===0&&C&&C.lunatic)n*=C.lunatic; if(t.team===0&&has('doll'))n*=.6; if(t.disease&&t.disease.t>0)n*=.5;
+function heal(t,n){ if(t.mad>0)t.mad--; if(t.plague>0)t.plague=Math.max(0,t.plague-15); n*=castSrc?castSrc.healMul||1:1; if(t.team===0&&C&&C.lunatic)n*=C.lunatic; if(t.team===0&&has('doll'))n*=.6; if(t.disease&&t.disease.t>0)n*=.5;
   n=Math.round(Math.min(n,t.maxHp-t.hp)); if(n>0){t.hp+=n;fxText(cx(t),cy(t),'+'+n,'heal');} }
 function freeNear(t,team){
   const pref=team?1:-1, c=[];
@@ -1927,7 +2010,7 @@ const FIG={
   kouku:  {skin:'#f6f2f2',hair:'#c8202a',hs:'bald',top:'#b81a22',trim:'#ffd76a',pad:'#b81a22',cape:'#2a1a1a',w:'card',ex:['tophat','clownface','bowtie','epaulets']},
   abrel:  {skin:'#c8bcd8',hair:'#eceaf2',hs:'long',top:'#16131c',trim:'#9a7aff',cape:'#120f18',robe:1,w:'staff',ex:['spikehorns','abtiara']},
   illiakan:{skin:'#4a3a30',hair:'#1a1a14',hs:'bald',top:'#2a2620',trim:'#6aff3a',pad:'#2e2a22',cape:'#121a0e',robe:1,w:'staff',ex:['khorns','core','gloweye','pauldrons'],big:1},
-  tentacle:{obj:'tentacle'}, horn:{obj:'horn'},
+  tentacle:{obj:'tentacle'}, horn:{obj:'horn'}, tentacleA:{obj:'tentacle'}, hornA:{obj:'horn'},
   kadan:  {skin:'#ead2c2',hair:'#d6d0da',hs:'long',top:'#18181e',trim:'#8a6a4a',pad:'#23232a',cape:'#18181e',blade:'#2e2e36',w:'greatsword',ex:['spaulder','redcollar','belts']},
   kz1:    {skin:'#1c1816',hair:'#d8dccb',hs:'bald',top:'#221d1a',trim:'#ff3a2a',pad:'#2a2420',cape:'#120e0c',robe:1,w:'none',ex:['kzwings','tatter','kzcrown','gloweye','fronthair','redcracks','spikes'],big:1},
   kz2:    {skin:'#2a2622',hair:'#1a1714',hs:'bald',top:'#2c2724',trim:'#ffd76a',cape:'#1a1714',robe:1,w:'none',ex:['lightwings','tatter','kzcrown','gloweye','spikes'],big:1},
@@ -2170,7 +2253,6 @@ function drawUnits(list){
       e._mp.style.width=(u.mana/u.maxMana*100)+'%';
       e._sh.style.width=Math.min(100,u.shield/u.maxHp*100)+'%';
       e.classList.toggle('ghost',u.ghost); e.classList.toggle('stun',u.stun>0);
-      if(u.legion&&!u.noGim&&u.key==='kouku'){e.classList.add('kcard');e.classList.toggle('kred',u.cardT>0);}
       e.classList.toggle('cmdA',!!u.cmdAura); e.classList.toggle('cmdS',!!u.cmdSlow);
       e.classList.toggle('gazed',!!(C&&C.units.some(b=>b.gaze===u&&b.alive)));
       if(u.passive)e.classList.add('minion');
@@ -2180,6 +2262,7 @@ function drawUnits(list){
   for(const [id,e] of els)if(!seen.has(id)){e.remove();els.delete(id);}
 }
 function render(){
+  if(S.phase==='plan'&&S.mode)syncSummons();
   { const sc=$('#vScore'); sc.style.display=HELL()?'':'none'; if(HELL())sc.querySelector('b').textContent=(S.score||0).toLocaleString(); }
   $('#vRound').textContent=S.round+'/'+FINAL_ROUND+(KZ[S.round]?' ('+U[KZ[S.round]].n+')':bossOfRound(S.round)?' (군단장 '+U[bossOfRound(S.round)].n+')':S.round%5===0&&!HARDLIKE()?' (군단장)':'');
   $('#vHp').textContent=S.hp; $('#hpFill').style.width=S.hp+'%';
@@ -2190,7 +2273,7 @@ function render(){
   $('#vGold').textContent=S.gold; $('#vInt').textContent='(이자 +'+interest()+')';
   // 보드
   if(S.phase==='combat'&&C)drawUnits(C.units.filter(u=>u.alive));
-  else drawUnits([...S.board.map(b=>Object.assign(b,{team:0})),...S.enemies]);
+  else drawUnits([...S.board.map(b=>Object.assign(b,{team:0})),...(S.sum||[]).map(b=>Object.assign(b,{team:0})),...S.enemies]);
   const f=findSel();
   cellsEl.querySelectorAll('.cell.a').forEach(c=>c.classList.toggle('drop',!!f&&S.phase==='plan'));
   // 대기석
@@ -2270,14 +2353,14 @@ function showInfo(u){
     '<div class="ist"><span>체력 '+(live?Math.max(0,Math.round(u.hp))+'/'+u.maxHp:Math.round(d.hp*m))+'</span><span>공격력 '+Math.round(live?u.atk:d.atk*m)+'</span>'+
     '<span>공격 속도 '+(live?u.as:d.as).toFixed(2)+'</span><span>사거리 '+d.rg+'</span><span>방어력 '+(live?u.ar:d.ar)+'</span><span>마나 '+d.mp+'</span>'+
     '<span>치명타 '+Math.round((live?u.crit:BASE_CRIT)*100)+'%</span><span>치명 피해 +'+Math.round((live?u.critDmg:BASE_CRITDMG)*100)+'%</span></div>'+
-    '<div class="isk"><b>'+d.sk+'</b><br>'+d.sd+'</div>'+
+    '<div class="isk"><b>'+d.sk+'</b><br>'+d.sd+'</div>'+(u.key==='abrel'||u.key==='hornA'?'<div class="itip">💡 팁: 군단 2명 이상이면 몽환의 뿔이 소환됩니다. 뿔은 <b>아브렐슈드와 같은 열(세로줄)</b>에만 놓을 수 있고, 아브렐슈드를 다른 열로 옮기면 뿔도 그 열로 따라갑니다.</div>':'')+(u.key==='biakiss'||u.key==='tentacleA'?'<div class="itip">💡 팁: 군단 2명 이상이면 욕망의 촉수 2개가 소환됩니다. 촉수는 아군 진영 어디에나 자유롭게 놓을 수 있고, 움직이지 않으니 적이 올 길목에 두세요.</div>':'')+
     (d.eu?'<div class="isk" style="margin-top:4px"><b>에스더 고유 효과</b>'+(tiers()['에스더']>=5?' <span style="color:var(--gold)">(×1.25 강화)</span>':'')+'<br>'+d.eu+'</div>':'')+
     (u.eq?'<div class="isk" style="margin-top:4px"><b>전용 아이템: '+ITEMS[u.eq.k].n+' '+'★'.repeat(u.eq.star)+'</b><br>'+itemInfoHTML(u.eq.k,u.eq.star)+'</div>':'');
 }
 
 /* ───────── 초기화 ───────── */
 for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
-  const c=document.createElement('div'); c.className='cell '+(y<4?'e':'a')+((x+y)%2?' alt':''); c.dataset.y=y;
+  const c=document.createElement('div'); c.className='cell '+(y<4?'e':'a')+((x+y)%2?' alt':''); c.dataset.y=y; c.dataset.x=x;
   c.style.left=cellL(x)+'%'; c.style.top=cellT(y)+'%'; c.style.width=spanW(1)+'%'; c.style.height=spanH(1)+'%';
   c.addEventListener('click',()=>clickCell(x,y));
   c.addEventListener('dragover',ev=>ev.preventDefault());
@@ -2363,6 +2446,7 @@ const HELP={main:`<h2>아크 택틱스 도움말</h2>
 <li>초반에는 같은 기물을 모아 <b>2성을 빨리</b> 만드는 것이 가장 큰 전력 상승입니다.</li>
 <li>골드를 10 단위로 모아 두면 이자가 붙습니다. 무리한 새로고침보다 레벨 업이 나을 때가 많습니다.</li>
 <li><b>지휘관</b>은 아군 사이에, <b>아르데타인</b> 원거리는 적과 떨어진 뒷줄에 두세요.</li>
+<li><b>군단</b>을 2명 이상 모으면 비아키스의 촉수·아브렐슈드의 뿔이 소환됩니다. 직접 옮길 수 있고, 뿔은 아브렐슈드와 같은 열에만 놓입니다. 에스더와 군단을 함께 켜면 <b>대립</b>으로 둘 다 약해집니다.</li>
 <li>카제로스는 ⓐ→ⓑ→ⓒ로 강해집니다. 마지막 세 라운드 전에 덱을 완성해 두세요.</li>
 <li>기물에 마우스를 올리거나 탭하면 오른쪽에 능력치와 스킬이 나옵니다.</li></ul>
 <h3>단축키</h3><div>D 새로고침 · F 경험치 · E 판매 · Space 전투 시작 · G 에버그레이스의 가호(헬)</div>
