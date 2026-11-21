@@ -252,8 +252,27 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 #modePick .hot:hover{transform:none;filter:none;background:rgba(255,255,255,.07)}
 #modePick .hot:active{transform:scale(.98)}
 #modePick .hEasy:focus-visible,#modePick .hNormal:focus-visible,#modePick .hOpt:focus-visible,#modePick .hExit:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-#optPanel{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:260px;background:linear-gradient(180deg,#20263b,#10131f);border:1px solid var(--gold2);border-radius:14px;padding:16px 18px;box-shadow:0 8px 0 #070910,0 20px 40px rgba(0,0,0,.6)}
-#optPanel.on{display:block}
+#optPanel{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:260px;background:linear-gradient(180deg,#20263b,#10131f);border:1px solid var(--gold2);border-radius:14px;padding:16px 18px;box-shadow:0 8px 0 #070910,0 20px 40px rgba(0,0,0,.6)}
+#optWrap{position:fixed;inset:0;z-index:96;display:none;background:rgba(3,3,6,.55)}
+#optWrap.on{display:block}
+#optPanel label small{color:var(--mute);font-size:11px;flex:1}
+#optPanel .optRow{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.topIco{min-width:30px;padding:4px 9px!important;font-weight:800;font-size:14px}
+/* 도움말 */
+#help{position:fixed;inset:0;z-index:97;display:none;place-items:center;background:rgba(3,3,6,.78);cursor:pointer;padding:16px}
+#help.on{display:grid}
+#help .hbox{max-width:760px;width:100%;max-height:calc(100dvh - 32px);overflow:auto;background:linear-gradient(180deg,#1b1713,#0d0b09);border:1px solid #8a7048;border-radius:8px;box-shadow:inset 0 0 0 3px rgba(138,112,72,.18),0 10px 40px rgba(0,0,0,.8);padding:18px 22px;color:#e8dcc4;font-size:13.5px;line-height:1.6;cursor:pointer}
+#help h2{margin:0 0 4px;color:#f2d38a;font-family:'Noto Serif KR',serif;font-size:22px}
+#help h3{margin:14px 0 4px;color:#e8c170;font-size:15px;border-bottom:1px solid rgba(232,193,112,.25);padding-bottom:3px}
+#help ul{margin:4px 0;padding-left:18px} #help li{margin:2px 0}
+#help b{color:#ffe0a0} #help .hm{display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+#help .hm span:nth-child(odd){color:#ffd76a;font-weight:800;white-space:nowrap}
+#help .hfoot{margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;color:#a89a80;font-size:12px}
+#help .hfoot label{cursor:pointer;display:flex;gap:6px;align-items:center}
+/* UI 간소화 모드 */
+body.simple #top h1 small,body.simple #benchHead>span:nth-of-type(2),body.simple .card .ct,body.simple .card .itag,
+body.simple #board .unit>.nm,body.simple .syn .td,body.simple .logSec,body.simple #vXp,body.simple .itm .in,body.simple #info>span{display:none!important}
+body.simple .syn{padding-top:4px!important;padding-bottom:4px!important}
 #optPanel h3{margin:0 0 12px;color:var(--gold)}
 #optPanel label{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px}
 #optPanel input{flex:1;accent-color:var(--gold)}
@@ -510,7 +529,7 @@ body.mobile #top{grid-area:top;padding:2px 8px!important;gap:4px 10px;flex-wrap:
 body.mobile #top h1{font-size:13px} body.mobile #top h1 small{display:none}
 body.mobile #top .bar{width:44px;height:7px} body.mobile #vXp,body.mobile #bgmPct{display:none}
 body.mobile #bgmBtn{padding:2px 6px;font-size:10px} body.mobile #bgmVol{width:56px}
-body.mobile #mobBtn{padding:2px 7px;font-size:10px}
+body.mobile #mobBtn{padding:2px 7px;font-size:10px} body.mobile .topIco{min-width:24px;padding:2px 6px!important;font-size:11px}
 body.mobile .stat b{font-size:12px}
 /* 왼쪽 레일 */
 body.mobile #mrail{grid-area:rail;display:flex;flex-direction:column;gap:6px}
@@ -590,7 +609,8 @@ html #cells .cell.a.drop{outline:2px dashed var(--gold);outline-offset:-3px;back
     <div class="stat"><span class="lab">배치</span><b id="vCap">0/2</b></div>
     <div class="spacer"></div>
     <button id="mobBtn" title="모바일(가로) 화면으로 전환">📱 모바일</button>
-    <div class="stat" id="bgmCtl"><button id="bgmBtn" title="배경음악 켜기/끄기">BGM 켜짐</button><input type="range" id="bgmVol" min="0" max="100" step="1" aria-label="배경음악 음량"><span class="lab" id="bgmPct"></span></div>
+    <button id="helpBtn" class="topIco" title="도움말">?</button>
+    <button id="setBtn" class="topIco" title="설정 (배경음악·UI 간소화)">⚙</button>
   </header>
 
   <main>
@@ -624,8 +644,8 @@ html #cells .cell.a.drop{outline:2px dashed var(--gold);outline-offset:-3px;back
       <h2>기물 정보</h2>
       <div id="info"><span style="color:var(--mute)">기물에 마우스를 올리거나 선택하면 정보가 표시됩니다.<br>기물 선택 → 칸 클릭으로 배치 (드래그 가능)</span></div>
       <div class="sep"></div>
-      <h2>전투 기록</h2>
-      <div id="log"></div>
+      <h2 class="logSec">전투 기록</h2>
+      <div id="log" class="logSec"></div>
       </div>
     </aside>
   </main>
@@ -665,12 +685,15 @@ html #cells .cell.a.drop{outline:2px dashed var(--gold);outline-offset:-3px;back
   <button id="optBtn" class="menuBtn hOpt">⚙ 옵션</button>
   <button id="exitBtn" class="menuBtn hExit">⏻ 나가기</button>
   <span class="verTag">Version 1.1</span>
-  <div id="optPanel"><h3>옵션</h3>
+</div></div>
+<div id="optWrap"><div id="optPanel"><h3>설정</h3>
     <label>배경음악 <button id="optBgm"></button></label>
     <label>음량 <input type="range" id="optVol" min="0" max="100" step="1"><span id="optPct"></span></label>
-    <button id="optClose">닫기</button>
-  </div>
+    <label>UI 간소화 <button id="optSimple"></button><small>설명 문구·이름표·전투 기록을 숨깁니다</small></label>
+    <label>화면 <button id="optMobile"></button><small>모바일(가로) 레이아웃</small></label>
+    <div class="optRow"><button id="optHelp">? 도움말 보기</button><button id="optClose">닫기</button></div>
 </div></div>
+<div id="help"><div class="hbox" id="helpBox"></div></div>
 <div id="bossIntro"><img alt=""><div class="bfig" style="display:none"></div><div class="bi"><small>최종 보스</small><b></b><span></span></div></div>
 <div id="over"><div><h2 id="overTitle">모험 종료</h2><p id="overTxt"></p><button id="restartBtn">다시 시작</button></div></div>
 
@@ -864,6 +887,7 @@ function pickMode(m){
   if(m==='hell'&&!hellUnlocked())return toast('확장(하드) 모드를 1회 이상 클리어하면 해금됩니다');
   S.mode=m; FINAL_ROUND=(m==='hard'||m==='hell')?40:25; S.score=0; S.lossRun=0; setSpeed(1); $('#modePick').classList.remove('on'); $('#vMode').textContent=m==='easy'?'이지':m==='hard'?'확장':m==='hell'?'헬':'노말'; $('#vMode').className='mode '+m;
   startPlan();
+  if(m==='hell'){ try{ if(localStorage.getItem('arcHellHelp')!=='1'){ localStorage.setItem('arcHellHelp','1'); setTimeout(()=>showHelp('hell'),300); } }catch(e){} }
 }
 function startPlan(){
   S.phase='plan'; C=null; S.sel=null; fxEl.querySelectorAll('.ft,.ring,.beam,.shot').forEach(e=>e.remove());
@@ -2281,9 +2305,66 @@ function setArena(a){ if(!ARENAS[a])a='abyss'; if(a==='abyss')document.documentE
   if(window.__bgmReady){ const r=S&&S.mode?S.round:0; bgmTrack(r?roundTrack(r):arenaTrack()); } try{localStorage.setItem('arcArena',a);}catch(e){} }
 document.querySelectorAll('#arenaPick button').forEach(b=>b.onclick=ev=>{ev.stopPropagation();setArena(b.dataset.a);toast('결투장: '+ARENAS[b.dataset.a]+' 테마');});
 
-function optSync(){ $('#optBgm').textContent=bgmOn?'켜짐':'꺼짐'; $('#optVol').value=Math.round(bgmVol*100); $('#optPct').textContent=Math.round(bgmVol*100)+'%'; }
-$('#optBtn').onclick=()=>{ optSync(); $('#optPanel').classList.add('on'); };
-$('#optClose').onclick=()=>$('#optPanel').classList.remove('on');
+function optSync(){ $('#optBgm').textContent=bgmOn?'켜짐':'꺼짐'; $('#optVol').value=Math.round(bgmVol*100); $('#optPct').textContent=Math.round(bgmVol*100)+'%';
+  $('#optSimple').textContent=document.body.classList.contains('simple')?'켜짐':'꺼짐'; $('#optMobile').textContent=document.body.classList.contains('mobile')?'모바일':'PC'; }
+function setSimple(on){ document.body.classList.toggle('simple',on); try{localStorage.setItem('arcSimple',on?'1':'0');}catch(e){} optSync(); }
+try{ if(localStorage.getItem('arcSimple')==='1')document.body.classList.add('simple'); }catch(e){}
+function openOpt(){ optSync(); $('#optWrap').classList.add('on'); }
+$('#optWrap').onclick=e=>{ if(e.target.id==='optWrap')$('#optWrap').classList.remove('on'); };
+$('#setBtn').onclick=openOpt; $('#helpBtn').onclick=()=>showHelp('main');
+$('#optSimple').onclick=()=>setSimple(!document.body.classList.contains('simple'));
+$('#optMobile').onclick=()=>{ setMobile(!document.body.classList.contains('mobile')); optSync(); };
+$('#optHelp').onclick=()=>{ $('#optWrap').classList.remove('on'); showHelp('main'); };
+/* ───────── 도움말 ───────── */
+const HELP={main:`<h2>아크 택틱스 도움말</h2>
+<div>로스트아크의 영웅과 군단장을 모아 전장에 배치하고, <b>자동으로 진행되는 전투</b>에서 적을 쓰러뜨리는 오토배틀러입니다. 라운드마다 기물을 사고 배치와 시너지를 다듬어, 마지막에 기다리는 <b>카제로스</b>를 토벌하세요.</div>
+<h3>라운드 진행</h3><ul>
+<li><b>준비</b>: 상점에서 기물을 사고 전장에 배치한 뒤 <b>[전투 시작]</b>(Space)을 누릅니다.</li>
+<li><b>전투</b>: 기물이 알아서 싸웁니다. 마나가 차면 스킬을 씁니다.</li>
+<li><b>결과</b>: 이기면 골드를 더 받고, 지면 남은 적 수와 라운드에 따라 체력이 깎입니다. 체력이 0이 되면 모험이 끝납니다.</li></ul>
+<h3>기본 규칙</h3><ul>
+<li><b>상점</b>: 카드를 눌러 구매. 새로고침 2골드(D), 경험치 구매 4골드·+4(F).</li>
+<li><b>레벨</b> = 전장에 놓을 수 있는 기물 수 (최대 10). 레벨이 높을수록 비싼 기물이 자주 나옵니다.</li>
+<li><b>성급</b>: 같은 기물 3개 → 2성, 2성 3개 → 3성. 3성은 상점에 나오지 않습니다.</li>
+<li><b>이자</b>: 라운드마다 기본 5골드 + 보유 골드 10당 1골드 (최대 +5).</li>
+<li><b>배치</b>: 기물 선택 → 칸 클릭 (PC는 드래그도 가능). 아래쪽 4줄이 아군 진영입니다. 근거리는 앞줄, 원거리는 뒷줄이 기본.</li>
+<li><b>판매</b>: 기물 선택 후 E 또는 [판매]. 상점 영역으로 끌어다 놓아도 됩니다.</li>
+<li><b>시너지</b>: 같은 계열(에스더·군단·세이크리아…)이나 직업(전사·마법사…)을 모으면 효과가 켜집니다. 서로 다른 기물만 셉니다. 왼쪽 패널에서 확인하세요.</li>
+<li><b>전용 아이템</b>: 레벨 10 이후, 2성 이상인 기물의 전용 무기가 상점에 나옵니다. 그 기물 위에 놓으면 장착되고, 같은 아이템 3개로 성급이 오릅니다.</li></ul>
+<h3>모드</h3><div class="hm">
+<span>이지</span><span>가장 쉬운 난이도. 25라운드, 5·10·15·20라운드 군단장, 23~25라운드 카제로스.</span>
+<span>노말</span><span>기본 난이도. 라운드 구성은 이지와 같고 적이 더 강합니다.</span>
+<span>확장</span><span>40라운드. 10~35라운드마다 기믹을 가진 군단장 → 패배해도 재도전 가능, 승리하면 <b>각인</b> 선택. 15라운드부터 <b>운명의 편린</b>이 떨어집니다. 38~40라운드 카제로스.</span>
+<span>헬</span><span>확장 모드를 클리어하면 해금. 군단장·카제로스가 훨씬 강하고, 점수가 기록되며, 카제로스전에서 지면 즉시 끝납니다. 대신 <b>에버그레이스의 가호</b>를 쓸 수 있습니다.</span></div>
+<h3>팁</h3><ul>
+<li>초반에는 같은 기물을 모아 <b>2성을 빨리</b> 만드는 것이 가장 큰 전력 상승입니다.</li>
+<li>골드를 10 단위로 모아 두면 이자가 붙습니다. 무리한 새로고침보다 레벨 업이 나을 때가 많습니다.</li>
+<li><b>지휘관</b>은 아군 사이에, <b>아르데타인</b> 원거리는 적과 떨어진 뒷줄에 두세요.</li>
+<li>카제로스는 ⓐ→ⓑ→ⓒ로 강해집니다. 마지막 세 라운드 전에 덱을 완성해 두세요.</li>
+<li>기물에 마우스를 올리거나 탭하면 오른쪽에 능력치와 스킬이 나옵니다.</li></ul>
+<h3>단축키</h3><div>D 새로고침 · F 경험치 · E 판매 · Space 전투 시작 · G 에버그레이스의 가호(헬)</div>
+<div class="hfoot"><span>화면을 클릭하면 닫힙니다 · 상단 <b>?</b> 버튼으로 다시 볼 수 있습니다</span><label onclick="event.stopPropagation()"><input type="checkbox" id="helpHide"> 시작할 때 표시하지 않기</label></div>`,
+hell:`<h2>헬 모드 — 에버그레이스의 가호</h2>
+<div>헬 모드의 카제로스는 확장 모드보다 훨씬 강하고, <b>카제로스전에서 지면 그대로 모험이 끝납니다.</b> 이를 버티기 위한 단 한 번의 구원이 <b>에버그레이스의 가호</b>입니다.</div>
+<h3>충전</h3><ul>
+<li>라운드 승리: <b>+2%</b>, 연승 중이면 2연승부터 +1%씩 (보너스 최대 +3%)</li>
+<li>군단장전 승리 (재도전 포함): <b>+5%</b></li>
+<li>오른쪽 [배속] 아래 게이지 버튼에서 충전량을 볼 수 있습니다 (최대 100%).</li></ul>
+<h3>사용 (G 키 또는 버튼)</h3><ul>
+<li>조건: <b>카제로스 ⓑ·ⓒ 전투 중</b>, 게이지 100%, 쓰러진 아군이 1명 이상</li>
+<li>쓰러진 아군을 <b>모두 즉시 부활</b>시키고, 부활한 아군은 <b>마나 90%</b>로 시작합니다.</li>
+<li>카제로스의 다음 스킬 1회에 필요한 마나가 <b>2.5배</b>로 늘어납니다.</li>
+<li>대가로 <b>점수 -2,500</b>. 아군이 전멸하면 전투가 바로 끝나니, 몇 명 남았을 때 쓰세요.</li></ul>
+<h3>그 밖의 헬 규칙</h3><ul>
+<li>군단장 1.5배·카제로스 1.85배 능력치, 운명의 편린 없음, 전용 무기 성급 제한</li>
+<li>라운드·군단장·카제로스 클리어로 점수를 얻고, 패배하면 점수가 깎입니다. 최고 기록 5개가 저장됩니다.</li>
+<li>배속은 ×1·×2·×2.5만 쓸 수 있습니다.</li></ul>
+<div class="hfoot"><span>화면을 클릭하면 닫힙니다 · 상단 <b>?</b> 도움말에도 요약이 있습니다</span></div>`};
+function showHelp(k){ $('#helpBox').innerHTML=HELP[k]; const cb=$('#helpHide'); if(cb){ try{cb.checked=localStorage.getItem('arcHelpHide')==='1';}catch(e){} cb.onchange=()=>{try{localStorage.setItem('arcHelpHide',cb.checked?'1':'0');}catch(e){}}; } $('#help').classList.add('on'); }
+$('#help').onclick=()=>$('#help').classList.remove('on');
+try{ if(localStorage.getItem('arcHelpHide')!=='1')showHelp('main'); }catch(e){ showHelp('main'); }
+$('#optBtn').onclick=openOpt;
+$('#optClose').onclick=()=>$('#optWrap').classList.remove('on');
 $('#optBgm').onclick=()=>{ bgmOn=!bgmOn; bgmApply(); optSync(); };
 $('#optVol').oninput=e=>{ bgmVol=e.target.value/100; if(bgmVol>0)bgmOn=true; bgmApply(); optSync(); };
 $('#exitBtn').onclick=()=>{ window.close(); setTimeout(()=>toast('브라우저 탭을 닫으면 게임이 종료됩니다'),150); };
@@ -2295,7 +2376,7 @@ $('#shop').addEventListener('dragover',ev=>ev.preventDefault());
 $('#shop').addEventListener('drop',ev=>{ev.preventDefault();sell();});
 document.addEventListener('dragend',()=>{ if(S.sel){S.sel=null;render();} });
 document.addEventListener('keydown',ev=>{
-  if(ev.repeat||ev.target.tagName==='INPUT'||S.phase==='mode'||$('#augPick').classList.contains('on')||$('#shardPick').classList.contains('on'))return; const k=ev.key.toLowerCase();
+  if(ev.repeat||ev.target.tagName==='INPUT'||S.phase==='mode'||$('#help').classList.contains('on')||$('#optWrap').classList.contains('on')||$('#augPick').classList.contains('on')||$('#shardPick').classList.contains('on'))return; const k=ev.key.toLowerCase();
   if(k==='d')reroll(); else if(k==='f')buyXp(); else if(k==='e')sell();
   else if(k===' '){ev.preventDefault(); if(S.phase==='plan')startCombat();}
   else if(k==='g')useGrace();
@@ -2307,11 +2388,9 @@ try{ const v=JSON.parse(localStorage.getItem('arcTacticsBgm')||'null'); if(v){bg
 function bgmApply(){
   for(const a of Object.values(BGM))a.volume=bgmVol;
   if(bgmOn)bgm.play().catch(()=>{}); else bgm.pause();
-  $('#bgmBtn').textContent=bgmOn?'BGM 켜짐':'BGM 꺼짐'; $('#bgmVol').value=Math.round(bgmVol*100); $('#bgmPct').textContent=Math.round(bgmVol*100)+'%';
+  if(typeof optSync==='function'&&$('#optWrap').classList.contains('on'))optSync();
   try{ localStorage.setItem('arcTacticsBgm',JSON.stringify({on:bgmOn,vol:bgmVol})); }catch(e){}
 }
-$('#bgmBtn').onclick=()=>{bgmOn=!bgmOn;bgmApply();};
-$('#bgmVol').oninput=e=>{bgmVol=e.target.value/100; if(bgmVol>0)bgmOn=true; bgmApply();};
 // 브라우저 자동재생 정책: 첫 클릭/키 입력 때 재생 시작
 /* ───────── 효과음 (합성) ───────── */
 let AC=null;
