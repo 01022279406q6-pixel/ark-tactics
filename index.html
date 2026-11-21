@@ -760,7 +760,7 @@ const U={
   reaper: {n:'리퍼',tr:['갈증'],c:5,o:'데런',j:'전사·사냥꾼',js:['전사','사냥꾼'],hp:1000,atk:115,as:.85,rg:1,ar:40,mp:80,sk:'그림자 처형',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 380% 피해를 줍니다.'},
   kouku:  {n:'쿠크세이튼',tr:['카드'],c:4,o:'군단',j:'마법사·서포터',js:['마법사','서포터'],hp:800,atk:60,as:.75,rg:3,ar:25,mp:80,sk:'광기의 쇼타임',sd:'무작위 적 3명의 자리에 폭탄을 터뜨려 각각 공격력의 220% 마법 피해를 줍니다. [카드] 스킬마다 무작위 카드 1장 — 빨강: 아군 공격력 +10%(4초) / 파랑: 아군 마나 +15 / 검정: 무작위 적에게 공격력 150% 추가 피해'},
   abrel:  {n:'아브렐슈드',tr:['아스텔지어'],c:5,o:'군단',j:'마법사',hp:880,atk:72,as:.7,rg:3,ar:30,mp:100,sk:'몽환의 운석',sd:'적이 가장 밀집한 곳에 운석을 떨어뜨려 3×3 범위에 공격력의 380% 마법 피해를 줍니다. [아스텔지어] 전투 시작 시 최대 체력 20%의 뿔 보호막을 얻고, 보호막이 남아 있는 동안 매초 마나 +5'},
-  illiakan:{n:'일리아칸',tr:['질병'],c:5,o:'군단',j:'마법사',hp:1000,atk:80,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상에게 공격력의 330% 피해를 주고 주변 1칸의 적에게 질병을 퍼뜨립니다. [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
+  illiakan:{n:'일리아칸',tr:['질병'],c:5,o:'군단',j:'마법사',hp:1000,atk:80,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상과 주변 1칸의 적에게 공격력의 260% 마법 피해를 주고 질병을 강화합니다(4초, 매초 공격력 30%). 이미 질병에 걸린 적은 피해 +60%. 준 피해의 25%만큼 회복합니다. [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
   tentacle:{n:'욕망의 촉수',c:0,o:'군단',j:'촉수',g:1,passive:1,hp:1000,atk:0,as:.01,rg:0,ar:0,mp:9999,sk:'-',sd:'공격하지 않습니다. 살아 있는 동안 비아키스가 매초 체력 300을 회복합니다.'},
   horn:   {n:'몽환의 뿔',c:0,o:'군단',j:'뿔',g:1,passive:1,hp:3000,atk:0,as:.01,rg:0,ar:40,mp:9999,sk:'-',sd:'공격하지 않습니다. 하나라도 남아 있으면 아브렐슈드가 받는 피해 80% 감소, 매초 마나 +10.'},
   // 최종 보스: 카제로스 (마지막 3라운드)
@@ -1557,7 +1557,11 @@ function castImpl(u,t){
       later(300,()=>{FX.pillar(c,'#9a3aff',1.8,4.5,.9);FX.ring(c,0,2,'#e0c0ff',.22);FX.burst(c,40,'#c87aff',7.5,.15);FX.debris(c,16,'#3a1450');FX.shake(2.2);});
       for(const e of F)if(dist(e,best)<=1)hurt(u,e,u.atk*3.8,{mag:1}); break; }
     case 'illiakan':{ FX.magic(P(t),1.2,'#9aff6a',.8); FX.burst(t,24,'#6aff3a',5,.12); FX.swirl(t,1.2,16,'#c9ffb0'); FX.shake(1.2);
-      hurt(u,t,u.atk*(u.legion?3:3.3)); for(const e of F)if(e!==t&&dist(e,t)<=1){ e.disease={t:3,dps:u.atk*.2}; FX.rise(e,6,'#9aff6a'); } break; }
+      if(u.legion){ hurt(u,t,u.atk*3); for(const e of F)if(e!==t&&dist(e,t)<=1){ e.disease={t:3,dps:u.atk*.2}; FX.rise(e,6,'#9aff6a'); } break; }
+      // 아군 일리아칸: 대상 주변 3×3에 부패 폭발 — 질병 걸린 적은 피해 +60%, 질병 강화(4초·공격력 30%/초), 준 피해의 25% 회복
+      let sum=0; FX.ring(t,0,1.6,'#9aff6a',.16); FX.burst(t,30,'#4aff2a',6,.13);
+      for(const e of F)if(dist(e,t)<=1){ const sick=e.disease&&e.disease.t>0; sum+=hurt(u,e,u.atk*2.6*(sick?1.6:1),{mag:1}); if(e.alive){ e.disease={t:4,dps:u.atk*.3}; FX.rise(e,8,sick?'#d8ff3a':'#9aff6a'); } }
+      heal(u,sum*.25); break; }
     case 'bahun':{ const dur=[3,3.5,4][u.star-1], dr=[.35,.45,.6][u.star-1], am=1+[.08,.12,.18][u.star-1];
       FX.magic(u,1.6,'#6fd0ff',1); FX.ring(u,.2,3.2,'#ffd76a',.16,.7); FX.shake(1);
       for(const a of A){ (a.buffs=a.buffs||[]).push({t:dur,dr,atk:am}); a.atk*=am; FX.pillar(a,'#6fd0ff',.6,2.2,.7); FX.ring(a,.1,.8,'#bfe8ff',.1,.6); FX.rise(a,8,'#ffe9a8'); }
