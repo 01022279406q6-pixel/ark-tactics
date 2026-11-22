@@ -757,7 +757,7 @@ const U={
   gusto:  {n:'구스토',tr:['지휘관'],c:5,o:'세이크리아',j:'서포터',hp:950,atk:60,as:.65,rg:3,ar:35,mp:85,sk:'여신의 은총',sd:'[지휘관] 성급이 오를수록 지휘 범위 확대 (1성 상하좌우 1칸 · 2성 주위 8칸 · 3성 주위 2칸). 아군 전체를 320 회복시키고 보호막 320을 부여하며, 기절·매혹을 해제합니다.'},
   enviska:{n:'엔비스카',c:1,o:'실린',j:'마법사',hp:430,atk:46,as:.7,rg:3,ar:15,mp:60,sk:'비전 화살',sd:'무작위 적 3명에게 마력 화살을 날려 각각 공격력의 90% 마법 피해를 줍니다.'},
   kiesa:  {n:'키에사',c:1,o:'실린',j:'사냥꾼',hp:440,atk:48,as:.8,rg:4,ar:15,mp:50,sk:'연속 사격',sd:'대상에게 화살 3발을 쏘아 각각 공격력의 85% 피해를 줍니다.'},
-  rahart: {n:'라하르트',c:3,o:'실린',j:'전사·탱커',js:['전사','탱커'],hp:980,atk:62,as:.7,rg:1,ar:50,mp:80,sk:'실린 기사의 맹세',sd:'최대 체력의 25%만큼 보호막을 얻고, 주변 1칸의 적에게 공격력의 160% 피해를 줍니다.'},
+  rahart: {n:'라하르트',c:3,o:'실린',j:'전사·탱커',js:['전사','탱커'],hp:980,atk:62,as:.7,rg:1,ar:50,mp:80,sk:'실린 기사의 맹세',sd:'방패를 내려찍어 주변 1칸의 적에게 공격력의 160% 피해를 주고 2초간 도발합니다(군단장·보스 제외). 자신에게 최대 체력 15%, 주변 1칸 아군에게 라하르트 최대 체력 10%의 보호막을 주고, 4초간 그 아군들이 받는 피해를 12% 줄입니다. (보호막은 최대 체력의 50%까지만 쌓입니다)'},
   adel:   {n:'아델',c:4,o:'실린',j:'마법사·탱커',js:['마법사','탱커'],hp:1050,atk:60,as:.65,rg:3,ar:45,mp:75,sk:'원소의 결계',sd:'대상 주변 3×3 범위에 공격력의 260% 마법 피해를 주고, 자신과 인접한 아군에게 보호막 150을 부여합니다.'},
   azena:  {n:'아제나',eu:'스킬로 적을 처치하면 마나를 30 회복합니다.',c:5,o:'실린·에스더',os:['실린','에스더'],j:'마법사',hp:900,atk:78,as:.75,rg:3,ar:30,mp:90,sk:'분노의 화염',sd:'적이 가장 밀집한 3×3 범위에 공격력의 320% 화염 피해를 줍니다.'},
   inanna: {n:'이난나',tr:['지휘관'],eu:'수호의 지속 시간이 1초 늘어납니다.',c:5,o:'실린·에스더',os:['실린','에스더'],j:'서포터',hp:950,atk:58,as:.65,rg:3,ar:35,mp:100,sk:'수호의 빛',sd:'[지휘관] 성급이 오를수록 지휘 범위 확대 (1성 상하좌우 1칸 · 2성 주위 8칸 · 3성 주위 2칸). 4초 동안 아군 전체가 받는 피해를 40% 줄이고 공격력을 8% 올리며, 아군 전체를 최대 체력의 15%만큼 회복시킵니다.'},
@@ -1299,6 +1299,7 @@ const occ=(x,y)=>C.units.some(u=>u.alive&&covers(u,x,y))||!!(C.broken&&C.broken[
 const foes=u=>C.units.filter(e=>e.alive&&e.team!==u.team);
 const pals=u=>C.units.filter(e=>e.alive&&e.team===u.team);
 function pickTarget(u){
+  if(u.tauntT>0&&u.taunt&&u.taunt.alive)return u.tgt=u.taunt;
   if(u.gaze){ if(u.gaze.alive)return u.tgt=u.gaze; u.gaze=null; }
   if(u.tgt&&u.tgt.alive&&dist(u,u.tgt)<=u.rg)return u.tgt;
   let best=null,bd=1e9;
@@ -1323,6 +1324,7 @@ function step(dt){
     if(u.ghost){u.ghostT-=dt; if(u.ghostT<=0){u.alive=false;fxText(u.x,u.y,'소멸','sk');continue;}}
     if(u.haste>0)u.haste-=dt;
     if(u.fearT>0)u.fearT-=dt;
+    if(u.tauntT>0)u.tauntT-=dt;
     if(u.undead){ u.bombT-=dt; if(u.bombT<=0){ u.alive=false; FX.burst(u,26,'#9aff6a',6,.12); FX.ring(u,0,1.4,'#6aff3a',.14); fxText(cx(u),cy(u),'자폭','sk'); for(const a of C.units)if(a.alive&&!a.team&&dist(a,u)<=1)dmgPct(a,.2); continue; } }
     if(!u.team&&u.lgPow){ if(u.key==='biakiss'){ const n=C.units.filter(m=>m.alive&&m.summon&&m.owner===u.id).length; if(n&&u.hp<u.maxHp)u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.015*n*u.lgPow*dt); }
       if(u.key==='abrel'&&C.units.some(m=>m.alive&&m.summon&&m.owner===u.id))u.mana=Math.min(u.maxMana,u.mana+5*u.lgPow*dt); }
@@ -1348,7 +1350,7 @@ function step(dt){
         if(u.heavy){ const e2=C.units.filter(e=>e.alive&&e.team!==u.team&&e!==t&&dist(u,e)<=u.rg+1).sort((a,b)=>dist(u,a)-dist(u,b))[0]; if(e2){hurt(u,e2,u.atk);FX.burst(e2,4,'#c9ced8',2.4,.07);} }
         if(u.eu&&u.key==='wei'&&++u.hits%3===0&&t.alive){hurt(u,t,u.atk*.8*(C.euMul||1));FX.sky(t,'#fff2b0',.05);} FX.burst(t,4,u.team?'#ff8a7a':'#bfe0ff',2.4,.07);
         u.mana=Math.min(u.maxMana,u.mana+u.manaGain);
-        if(u.lance){ const amt=u.maxHp*u.lance; addShield(u,amt); (u.ltok=u.ltok||[]).push({t:3,amt,rem:amt}); }
+        if(u.lance){ const amt=addShield(u,u.maxHp*u.lance); if(amt>0)(u.ltok=u.ltok||[]).push({t:3,amt,rem:amt}); }
         if(u.moonSp)u.atk+=u.atk0*u.moonSp;
         if(C.slAs&&!u.team&&(u.slSt||0)<15){u.slSt=(u.slSt||0)+1;u.as*=1.02;} // 실린 6: 평타마다 공속 +2%
         u.atkCd=1/(u.as*(u.haste>0?1.4:1)*(u.derenAs&&u.hp<u.maxHp*.5?1+u.derenAs:1)*(1-(u.cmdSlow||0))*(u.fearT>0?1-C.fear:1)*(u.lgPow&&u.key==='kamen'&&u.hp<u.maxHp*.5?1+.3*u.lgPow:1));
@@ -1487,7 +1489,8 @@ function kill(t){
   FX.burst(t,16,t.team?'#ff6b5e':'#6fb8ff',3.6,.1); FX.ring(t,0,.8,t.team?'#ff6b5e':'#6fb8ff',.08);
 }
 let castSrc=null;
-function addShield(t,a){ let m=1; if(castSrc&&castSrc.shMul)m*=castSrc.shMul; if(t.team===0&&C&&C.lunatic)m*=C.lunatic; t.shield+=a*m; return a*m; }
+const SHIELD_CAP=.5; // 보호막은 최대 체력의 50%까지만 쌓임 (무한 중첩 방지)
+function addShield(t,a){ let m=1; if(castSrc&&castSrc.shMul)m*=castSrc.shMul; if(t.team===0&&C&&C.lunatic)m*=C.lunatic; const add=Math.max(0,Math.min(a*m,t.maxHp*SHIELD_CAP-t.shield)); t.shield+=add; return add; }
 function heal(t,n){ if(t.mad>0)t.mad--; if(t.plague>0)t.plague=Math.max(0,t.plague-15); n*=castSrc?castSrc.healMul||1:1; if(t.team===0&&C&&C.lunatic)n*=C.lunatic; if(t.team===0&&has('doll'))n*=.6; if(t.disease&&t.disease.t>0)n*=.5;
   n=Math.round(Math.min(n,t.maxHp-t.hp)); if(n>0){t.hp+=n;fxText(cx(t),cy(t),'+'+n,'heal');} }
 function freeNear(t,team){
@@ -1613,8 +1616,11 @@ function castImpl(u,t){
       for(const a of A){ heal(a,320*u.sm); addShield(a,320*u.sm); a.stun=0; FX.pillar(a,'#fff6c8',.7,3,.8); FX.rise(a,8,'#ffe9a8'); } break; }
     case 'enviska':{ const pool=F.slice(); for(let n=0;n<3&&F.length;n++){ const e=pool.length?pool.splice(rnd(pool.length),1)[0]:F[rnd(F.length)]; later(n*90,()=>{FX.beam(u,e,'#9fe8ff',.08,.3);FX.burst(e,10,'#cff4ff',3.5,.09);}); hurt(u,e,u.atk*.9,{mag:1}); } break; }
     case 'kiesa': for(let n=0;n<3;n++){ later(n*80,()=>{FX.beam(u,t,'#c9e8a0',.06,.25);FX.burst(t,6,'#e8ffc8',3,.07);}); hurt(u,t,u.atk*.85); } break;
-    case 'rahart':{ const sh=Math.round(u.maxHp*.25); addShield(u,sh); FX.ring(u,.1,1.6,'#9fd0ff',.16); FX.magic(u,1.2,'#6fb8ff',.7); fxText(cx(u),cy(u)+.3,'보호막 +'+sh,'heal');
-      for(const e of F)if(dist(e,u)<=1){FX.burst(e,8,'#cfe8ff',3.5,.09);hurt(u,e,u.atk*1.6);} break; }
+    case 'rahart':{ FX.ring(u,.1,1.6,'#9fd0ff',.16); FX.magic(u,1.2,'#6fb8ff',.7); FX.shake(.8);
+      for(const e of F)if(dist(e,u)<=1){ FX.burst(e,8,'#cfe8ff',3.5,.09); hurt(u,e,u.atk*1.6); if(!e.boss&&!e.legion){ e.taunt=u; e.tauntT=2; e.tgt=u; } }
+      const sh=addShield(u,u.maxHp*.15); fxText(cx(u),cy(u)+.3,'보호막 +'+Math.round(sh),'heal');
+      for(const a of A)if(a!==u&&dist(a,u)<=1){ addShield(a,u.maxHp*.1); (a.buffs=a.buffs||[]).push({t:4,dr:.12,atk:1}); FX.ring(a,.1,.8,'#9fd0ff',.08); FX.beam(u,a,'#cfe8ff',.05,.3); }
+      break; }
     case 'adel':{ const c=P(t); FX.magic(c,1.6,'#c9a0ff',.8); FX.ring(c,0,1.6,'#e0d0ff',.16); FX.burst(c,22,'#b48cff',5,.12); FX.shake(.8);
       for(const e of F)if(Math.abs(e.x-t.x)<=1&&Math.abs(e.y-t.y)<=1)hurt(u,e,u.atk*2.6,{mag:1});
       for(const a of A)if(dist(a,u)<=1){addShield(a,150*u.sm);FX.ring(a,.1,.8,'#c9a0ff',.08);} break; }
