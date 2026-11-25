@@ -733,11 +733,34 @@ const LX=c=>(c-.5)*(1+G)+.5, LY=c=>(c-.5)*(1+G)+.5+MID*Math.min(1,Math.max(0,c-3
 const PX=c=>LX(c)/BW*100, PY=c=>LY(c)/BH*100;                                          // 칸 좌표 → %
 const cellL=x=>x*(1+G)/BW*100, cellT=y=>(y*(1+G)+(y>=4?MID:0))/BH*100, spanW=n=>(n+(n-1)*G)/BW*100, spanH=n=>(n+(n-1)*G)/BH*100;
 const U={
-  neria:  {n:'네리아',ic:'🎤',c:1,o:'모든 계열 (에스더 제외)',os:['군단','아르데타인','세이크리아','데런','실린'],j:'서포터',hp:450,atk:35,as:.7,rg:3,ar:15,mp:60,sk:'구원의 세레나데',sd:'체력이 가장 낮은 아군을 회복시키고 3초간 공격 속도를 올립니다.'},
+  neria:  {n:'네리아',ic:'🎤',c:1,o:'모든 지역 계열 (에스더·창천구검 제외)',os:['군단','아르데타인','세이크리아','데런','실린','파푸니카','림레이크','슈샤이어'],j:'서포터',hp:450,atk:35,as:.7,rg:3,ar:15,mp:60,sk:'구원의 세레나데',sd:'체력이 가장 낮은 아군을 회복시키고 3초간 공격 속도를 올립니다.'},
   solas:  {n:'솔라스',ic:'🔫',c:1,o:'세이크리아',j:'마법사',hp:450,atk:50,as:.75,rg:4,ar:15,mp:50,sk:'심판의 뇌전',sd:'대상에게 번개를 내리꽂아 공격력의 260% 피해를 줍니다.'},
   sasha:  {n:'사샤',tr:['지휘관'],c:4,o:'아르데타인',j:'전사',hp:980,atk:46,as:.7,rg:1,ar:50,mp:80,sk:'헤비워커 강습',sd:'헤비워커로 주변 1칸의 적에게 공격력의 220% 피해를 주고 1초 기절시키며, 최대 체력 15% 보호막을 얻고 상하좌우 아군의 공격 속도를 2초간 높입니다.'},
   hawkeye:{n:'호크아이',tr:['실버호크'],c:5,o:'아르데타인',j:'사냥꾼',hp:820,atk:50,as:.72,rg:4,ar:25,mp:90,sk:'검은 까마귀의 비',sd:'무작위 적 4명에게 화살을 날려 각각 공격력의 140% 피해를 줍니다. (치명타 가능)'},
   gunslinger:{n:'건슬링어',tr:['사냥의 시간'],c:5,o:'아르데타인',j:'사냥꾼',hp:760,atk:68,as:.7,rg:5,ar:25,mp:90,sk:'퍼펙트 샷',sd:'가장 멀리 있는 적을 저격해 공격력의 450% 피해를 줍니다.'},
+  // ── 창천구검 (애니츠) ──
+  hari:   {n:'하리',c:1,o:'창천구검',j:'서포터',hp:450,atk:38,as:.7,rg:3,ar:15,mp:60,sk:'야래향의 춤',sd:'[창천 9검] 체력이 가장 낮은 아군 2명을 120 회복시키고 2초간 공격 속도를 높입니다.'},
+  manpo:  {n:'만포',c:1,o:'창천구검',j:'탱커',hp:640,atk:44,as:.6,rg:1,ar:40,mp:70,sk:'만두 한 판',sd:'[창천 8검] 최대 체력의 18%를 회복하고 주변 1칸의 적에게 공격력의 140% 피해를 줍니다.'},
+  miryeong:{n:'미령',c:1,o:'창천구검',j:'전사',hp:520,atk:52,as:.75,rg:1,ar:25,mp:60,sk:'사자쟁패',sd:'[창천 7검] 사자탈을 쓰고 대상에게 공격력의 220% 피해를 주고 1초 기절시킵니다.'},
+  hanson: {n:'한손',c:2,o:'창천구검',j:'전사',hp:650,atk:58,as:.8,rg:1,ar:30,mp:60,sk:'강철 주먹',sd:'[창천 6검] 기계팔로 대상을 3번 때려 각각 공격력의 95% 피해를 주고, 마지막 일격에 0.8초 기절시킵니다.'},
+  hodong: {n:'호동',c:2,o:'창천구검',j:'탱커',hp:780,atk:50,as:.65,rg:1,ar:45,mp:80,sk:'가문의 방패',sd:'[창천 5검] 최대 체력 22%의 보호막을 얻고 주변 1칸의 적을 2초간 도발합니다(군단장·보스 제외).'},
+  wonpo:  {n:'원포',c:2,o:'창천구검',j:'사냥꾼',hp:540,atk:56,as:.8,rg:3,ar:20,mp:60,sk:'독침 투척',sd:'[창천 4검] 무작위 적 3명에게 독 단검을 던져 각각 공격력의 100% 피해를 주고 4초간 중독(받는 치유 -50%, 매초 공격력 20% 피해)시킵니다.'},
+  gildal: {n:'길달',c:3,o:'창천구검',j:'전사',hp:860,atk:66,as:.75,rg:1,ar:40,mp:70,sk:'용조수',sd:'[창천 3검] 대상 방향 직선 2칸의 적에게 공격력의 260% 피해를 주고 3초간 공격 속도 +25%.'},
+  geumgang:{n:'금강',c:3,o:'창천구검',j:'마법사',hp:680,atk:62,as:.7,rg:3,ar:25,mp:80,sk:'금강장',sd:'[창천 2검] 대상 주변 3×3에 공격력의 230% 마법 피해를 주고, 창천구검 아군에게 보호막 100을 부여합니다.'},
+  habaek: {n:'하백',c:0,o:'창천구검',j:'전사',g:1,hp:1500,atk:105,as:.8,rg:1,ar:50,mp:70,sk:'창천일검',sd:'[창천제일검] 창천구검 8명이 모이면 전투 시작 시 강림합니다. 대상 방향 직선상의 모든 적에게 공격력의 420% 피해. 창천구검의 성급이 높을수록 강해집니다.'},
+  // ── 파푸니카 ──
+  nia:    {n:'니아',c:2,o:'파푸니카',j:'서포터',hp:560,atk:40,as:.65,rg:3,ar:20,mp:65,sk:'노을의 노래',sd:'아군 전체를 100 회복시키고 3초간 받는 피해를 10% 줄입니다.'},
+  shana:  {n:'샤나',c:3,o:'파푸니카',j:'전사',hp:880,atk:66,as:.8,rg:1,ar:40,mp:70,sk:'자경단의 칼날',sd:'주변 1칸의 적에게 공격력의 210% 피해를 줍니다. 이 스킬로 적을 처치하면 마나 30 회복.'},
+  nagi:   {n:'나기',c:1,o:'파푸니카',j:'사냥꾼',hp:440,atk:48,as:.8,rg:4,ar:15,mp:60,sk:'작살 투척',sd:'가장 멀리 있는 적에게 작살을 던져 공격력의 230% 피해를 줍니다.'},
+  liru:   {n:'리루',c:1,o:'파푸니카',j:'탱커',hp:600,atk:42,as:.6,rg:1,ar:40,mp:70,sk:'파도 방벽',sd:'자신에게 최대 체력 18% 보호막, 주변 1칸 아군에게 보호막 80을 부여합니다.'},
+  // ── 림레이크 ──
+  yuz:    {n:'유즈',c:3,o:'림레이크',j:'마법사',hp:660,atk:64,as:.7,rg:3,ar:25,mp:80,sk:'푸른 등불',sd:'대상 주변 3×3에 공격력의 240% 마법 피해를 주고 1초 기절시킵니다(군단장·보스 제외).'},
+  range:  {n:'란게',c:2,o:'림레이크',j:'서포터',hp:560,atk:42,as:.65,rg:3,ar:20,mp:70,sk:'환영 장막',sd:'아군 전체에 보호막 90을 부여합니다.'},
+  pahu:   {n:'파후',c:2,o:'림레이크',j:'탱커',hp:760,atk:48,as:.65,rg:1,ar:45,mp:80,sk:'우산 방패',sd:'3초간 받는 피해 -30%, 주변 1칸의 적에게 공격력의 150% 피해를 줍니다.'},
+  gin:    {n:'긴',c:1,o:'림레이크',j:'전사',hp:540,atk:50,as:.75,rg:1,ar:30,mp:60,sk:'돌풍 베기',sd:'주변 1칸의 적에게 공격력의 170% 피해를 줍니다.'},
+  // ── 슈샤이어 ──
+  madnick:{n:'진 매드닉',c:2,o:'슈샤이어',j:'전사',hp:700,atk:56,as:.75,rg:1,ar:35,mp:70,sk:'여명의 일격',sd:'[여명단 수장] 대상에게 공격력의 240% 피해를 주고 2초간 공격 속도를 높입니다.'},
+  baedan: {n:'바에단',c:3,o:'슈샤이어',j:'탱커',hp:980,atk:60,as:.6,rg:1,ar:50,mp:90,sk:'붉은 장막',sd:'[투기장의 주인] 주변 1칸의 적에게 공격력의 180% 피해를 주고 4초간 받는 피해 -30%.'},
   bastian:{n:'바스티안',ic:'🛰️',c:2,o:'아르데타인',j:'사냥꾼',hp:550,atk:55,as:.7,rg:3,ar:20,mp:70,sk:'드론 포격',sd:'대상과 인접한 적에게 공격력의 180% 피해를 줍니다.'},
   zaika:  {n:'사이카',ic:'🗡️',c:2,o:'데런',j:'사냥꾼',hp:600,atk:60,as:.85,rg:1,ar:25,mp:50,sk:'그림자 습격',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 250% 피해를 줍니다.'},
   wei:    {n:'웨이',eu:'기본 공격 3회마다 공격력의 80% 추가 피해를 줍니다.',ic:'🐉',c:2,o:'에스더',j:'탱커',hp:750,atk:55,as:.7,rg:1,ar:40,mp:70,sk:'현신 - 천룡의 일격',sd:'녹색 기운을 두른 주먹을 앞으로 내질러 공격력의 220% 피해를 주고, 잃은 체력의 10/15/20%(성급별)만큼 보호막을 얻습니다.'},
@@ -748,7 +771,7 @@ const U={
   biakiss:{n:'비아키스',tr:['군단장의 권능'],ic:'💋',c:4,o:'군단',j:'마법사',hp:800,atk:60,as:.75,rg:3,ar:30,mp:80,sk:'욕망의 폭풍',sd:'적이 가장 밀집한 3×3 범위에 마법 피해를 주고 1.5초 매혹(행동 불가)시킵니다. [권능] 욕망의 촉수 2개를 소환합니다(자유 배치). 촉수 1개당 비아키스가 매초 최대 체력 1.5% 회복.'},
   kamen:  {n:'카멘',tr:['군단장의 권능'],ic:'🌑',c:5,o:'군단',j:'전사',hp:1300,atk:110,as:.8,rg:1,ar:55,mp:100,sk:'어둠의 검무',sd:'주변 2칸의 모든 적에게 공격력의 280% 피해를 주고 피해량의 30%만큼 회복합니다. [권능] 체력 50% 이하에서 공격 속도 +30%, 받는 피해 -15%.'},
   bahun:  {n:'바훈투르',eu:'전투 시작 시 아군 전체에 보호막 150을 부여합니다.',ic:'🔨',c:4,o:'에스더',j:'탱커·서포터',js:['탱커','서포터'],hp:1150,atk:65,as:.65,rg:1,ar:60,mp:100,sk:'아크투르스의 숨결',sd:'3/3.5/4초(성급별) 동안 아군 전체가 받는 피해를 35/45/60% 줄이고, 아군 공격력을 8/12/18% 올립니다.'},
-  shandi: {n:'샨디',w:.5,tr:['환영술사'],eu:'시간 왜곡으로 회복시키는 마나가 5%p 늘어납니다.',ic:'⏳',c:5,o:'에스더',j:'마법사',hp:780,atk:84,as:.75,rg:3,ar:25,mp:65,sk:'시간 왜곡',sd:'아군 전체의 마나를 최대 마나의 20/30/45%(성급별)만큼 즉시 회복시키고, 1.5/2.5/4.5초 동안 자신의 공격력이 20% 증가합니다.'},
+  shandi: {n:'샨디',w:.5,tr:['환영술사'],eu:'시간 왜곡으로 회복시키는 마나가 5%p 늘어납니다.',ic:'⏳',c:5,o:'에스더·림레이크',os:['에스더','림레이크'],j:'마법사',hp:780,atk:84,as:.75,rg:3,ar:25,mp:65,sk:'시간 왜곡',sd:'아군 전체의 마나를 최대 마나의 20/30/45%(성급별)만큼 즉시 회복시키고, 1.5/2.5/4.5초 동안 자신의 공격력이 20% 증가합니다.'},
   kadan:  {n:'카단',eu:'적을 처치하면 마나를 50 회복합니다.',ic:'⚔️',c:5,o:'에스더',j:'전사',hp:1100,atk:92,as:.9,rg:1,ar:45,mp:80,sk:'나히니르 - 일섬',sd:'체력이 가장 높은 적에게 순간이동해 공격력의 500% 피해를 줍니다.'},
   ospear: {n:'오스피어',c:1,o:'세이크리아',j:'전사',hp:560,atk:52,as:.7,rg:1,ar:30,mp:60,sk:'성기사의 일격',sd:'대상에게 공격력의 200% 피해를 주고 보호막 120을 얻습니다.'},
   repus:  {n:'레퓌스',c:2,o:'세이크리아',j:'마법사',hp:540,atk:62,as:.7,rg:3,ar:20,mp:70,sk:'정화의 빛',sd:'대상과 주변 1칸의 적에게 공격력의 230% 마법 피해를 줍니다.'},
@@ -765,7 +788,7 @@ const U={
   reaper: {n:'리퍼',tr:['갈증'],c:5,o:'데런',j:'전사·사냥꾼',js:['전사','사냥꾼'],hp:1000,atk:100,as:.85,rg:1,ar:40,mp:80,sk:'그림자 처형',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 380% 피해를 줍니다.'},
   kouku:  {n:'쿠크세이튼',tr:['군단장의 권능'],c:4,o:'군단',j:'마법사·서포터',js:['마법사','서포터'],hp:800,atk:60,as:.75,rg:3,ar:25,mp:80,sk:'광기의 쇼타임',sd:'무작위 적 3명의 자리에 폭탄을 터뜨려 각각 공격력의 220% 마법 피해를 줍니다. [권능] 스킬마다 무작위 카드 1장 — 빨강: 아군 공격력 +10%(4초) / 파랑: 아군 마나 +15 / 검정: 무작위 적에게 공격력 150% 추가 피해'},
   abrel:  {n:'아브렐슈드',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:880,atk:78,as:.7,rg:3,ar:30,mp:100,sk:'몽환의 운석',sd:'적이 가장 밀집한 곳에 운석을 떨어뜨려 3×3 범위에 공격력의 440% 마법 피해를 줍니다. [권능] 몽환의 뿔 1개를 소환합니다(아브렐슈드와 같은 열에만 배치). 뿔이 남아 있는 동안 아브렐슈드는 받는 피해 -20%, 매초 마나 +5.'},
-  illiakan:{n:'일리아칸',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:1000,atk:85,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상과 주변 1칸의 적에게 공격력의 300% 마법 피해를 주고 질병을 강화합니다(4초, 매초 공격력 30%). 이미 질병에 걸린 적은 피해 +60%. 준 피해의 25%만큼 회복합니다. [권능] 기본 공격에 맞은 적은 3초간 질병(받는 치유 -50%, 매초 피해). [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
+  illiakan:{n:'일리아칸',tr:['군단장의 권능'],c:5,o:'군단·슈샤이어',os:['군단','슈샤이어'],j:'마법사',hp:1000,atk:85,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상과 주변 1칸의 적에게 공격력의 300% 마법 피해를 주고 질병을 강화합니다(4초, 매초 공격력 30%). 이미 질병에 걸린 적은 피해 +60%. 준 피해의 25%만큼 회복합니다. [권능] 기본 공격에 맞은 적은 3초간 질병(받는 치유 -50%, 매초 피해). [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
   tentacle:{n:'욕망의 촉수',c:0,o:'군단',j:'촉수',g:1,passive:1,hp:1000,atk:0,as:.01,rg:0,ar:0,mp:9999,sk:'-',sd:'공격하지 않습니다. 살아 있는 동안 비아키스가 매초 체력 300을 회복합니다.'},
   tentacleA:{n:'욕망의 촉수',c:0,o:'소환물',j:'촉수',g:1,hp:1,atk:1,as:.8,rg:1,ar:20,mp:9999,sk:'-',sd:'비아키스의 [권능]으로 소환됩니다. 자유롭게 배치할 수 있고, 움직이지 않으며 인접한 적을 공격합니다. 살아 있는 동안 비아키스가 매초 최대 체력 1.5% 회복.'},
   hornA:  {n:'몽환의 뿔',c:0,o:'소환물',j:'뿔',g:1,passive:1,hp:1,atk:0,as:.01,rg:0,ar:40,mp:9999,sk:'-',sd:'아브렐슈드의 [권능]으로 소환됩니다. 아브렐슈드와 같은 열에만 놓을 수 있습니다. 남아 있는 동안 아브렐슈드 받는 피해 -20%, 매초 마나 +5.'},
@@ -863,6 +886,10 @@ const SYN=[
   {k:'명의',f:'j',th:[1],d:['[각인: 전문의] 서포터가 스킬을 쓸 때마다 서포터가 아닌 아군 공격력 +2%(실버)/+3%(프리즘), 최대 5중첩']},
   {k:'대립',f:'x',th:[1],d:['에스더 결속(2명 이상)과 군단(2명 이상)이 함께 켜져, 에스더 결속·고유 효과와 군단 효과·권능이 모두 10% 약해집니다']},
   {k:'환영술사',f:'x',th:[1],d:['샨디 2성 이상: 체력이 최대 체력의 15% 이하가 된 적을 즉사시킵니다']},
+  {k:'창천구검',f:'o',th:[2,4,6,8],d:['창천구검 공격력 +10% · 성급 보너스(2성 1명당 피해 +2%, 3성 1명당 +6%)','창천구검 공격력 +18% · 공격 속도 +10% · 성급 보너스','창천구검 공격력 +28% · 공격 속도 +15% · 성급 보너스','창천제일검 강림: 공격력 +40% · 공격 속도 +20% · 성급 보너스 · 전투 시작 시 [하백] 소환 (창천구검 평균 성급에 비례해 강해짐)']},
+  {k:'파푸니카',f:'o',th:[2,3,4],d:['파푸니카 매초 최대 체력 2% 회복 (질병 중 제외)','파푸니카 매초 최대 체력 3% 회복','파푸니카 매초 최대 체력 4% 회복 · 아군 전체 매초 2% 회복']},
+  {k:'림레이크',f:'o',th:[2,3,4,5],d:['림레이크 기본 공격 회피 20%','림레이크 기본 공격 회피 28%','림레이크 기본 공격 회피 35% · 회피 시 환영 반격(공격력 60% 마법 피해)','림레이크 기본 공격 회피 40% · 환영 반격 공격력 100%']},
+  {k:'슈샤이어',f:'o',th:[2,3],d:['슈샤이어의 공격에 맞은 적: 3초간 공격 속도 -15% (혹한)','혹한 -25% · 같은 적을 기본 공격으로 4번 때리면 1초 빙결(군단장 제외)']},
   {k:'데런',f:'o',th:[2,3],d:['체력 50% 이하인 데런: 공격 속도 +30%','체력 50% 이하인 데런: 공격 속도 +60% · 흡혈 15%']},
   ...['전사','마법사','사냥꾼','서포터','탱커'].map(k=>({k,f:'j',th:JOBN,d:JOBN.map((_,i)=>k+' 체력 +'+(k==='탱커'?THP:JHP)[i]+' · '+JOB[k].lab+' +'+JOB[k].pct[i]+'%'+(k==='탱커'?' · 피격 시 마나 +'+(i+1):''))})),
 ];
@@ -1215,6 +1242,8 @@ function startCombat(){
   C={units:[...S.board.map(b=>mkCU(b,0,1)),...S.enemies.map(e=>mkCU(e,1,e.mul))],t:0,over:false,slAs:T['실린']>=3,kai:[],gazeDmg:{}};
   { const ina=S.board.find(b=>b.key==='inanna'&&b.eq&&b.eq.k==='lunatic'&&b.eq.star>=2); C.lunatic=ina?[0,0,1.05,1.08][ina.eq.star]:0; }
   C.legion=C.units.some(u=>u.legion); C.cmdTier=T['지휘관']||0; C.cmdT=0;
+  { const cg=[]; const seenK=new Set(); for(const b of S.board){ if(facs(U[b.key]).includes('창천구검')&&b.key!=='neria'&&!seenK.has(b.key)){seenK.add(b.key);cg.push(b);} }
+    C.cgStar=cg.reduce((a,b)=>a+(b.star===2?.02:b.star>=3?.06:0),0); C.cgAvg=cg.length?cg.reduce((a,b)=>a+b.star,0)/cg.length:1; }
   const LG=T['군단']||0, RIV=T['대립']?.9:1; C.riv=RIV; C.lgPow=(LG>=3?1.25:1)*RIV; C.lgRevive=LG>=3; C.fear=LG?.1*RIV:0; C.ev=[]; C.broken={}; C.pools=[];
   C.illiLegion=C.units.some(u=>u.legion&&!u.noGim&&u.key==='illiakan');
   if(LG)for(const e of C.units)if(e.team)e.fearT=5;  for(const u of C.units){
@@ -1244,6 +1273,11 @@ function startCombat(){
     if(has('awaken')&&d.c>=4)u.mana=Math.max(u.mana,u.maxMana*.5);
     if(has('ambush')&&J.includes('사냥꾼'))u.dmgMul*=1.2;
     if(F.includes('실린')&&T['실린'])u.skillMul*=[1,1.1,1.18,1.22][T['실린']];
+    if(F.includes('창천구검')&&T['창천구검']){ const ct=T['창천구검']; u.atk*=1+[0,.1,.18,.28,.4][ct]; u.as*=1+[0,0,.1,.15,.2][ct]; u.dmgMul*=1+(C.cgStar||0); }
+    if(F.includes('파푸니카')&&T['파푸니카'])u.regen=[0,.02,.03,.04][T['파푸니카']];
+    if(T['파푸니카']>=3&&!u.regen)u.regen=.02;
+    if(F.includes('림레이크')&&T['림레이크']){ u.dodge=[0,.2,.28,.35,.4][T['림레이크']]; u.counter=[0,0,0,.6,1][T['림레이크']]; }
+    if(F.includes('슈샤이어')&&T['슈샤이어']){ u.frost=[0,.15,.25][T['슈샤이어']]; u.freeze=T['슈샤이어']>=2; }
     if(T['실린']>=2)u.manaGain+=T['실린']>=3?3:2;
     if(u.key==='reaper'&&T['갈증'])u.thirstOn=true;
     if(u.key==='ren'&&T['데스 사이드'])u.dsLs=.2;
@@ -1259,6 +1293,9 @@ function startCombat(){
     }
   }
   // 아스텔지어: 아브렐슈드 뿔 보호막 (군단장 아브렐은 뿔 기믹으로 대체)
+  if((T['창천구검']||0)>=4){ let sp=null; for(const y of [6,5,7,4])for(const x of [3,2,4,1,5,0,6]){ if(!sp&&!C.units.some(o=>o.alive&&covers(o,x,y)))sp={x,y}; }
+    if(sp){ const m=1+.6*(C.cgAvg-1), h=mkCU({id:uid++,key:'habaek',star:1,x:sp.x,y:sp.y},0,1); h.maxHp=h.hp=Math.round(h.maxHp*m); h.atk*=m; h.atk*=1.25; h.as*=1.15; h.summon=true; h.habaek=true; h.dmgMul*=1+(C.cgStar||0); C.units.push(h);
+      setTimeout(()=>{ if(C){ FX.pillar(h,'#9fe8ff',1.2,4,.9); FX.ring(h,.1,1.8,'#cff4ff',.16); fxText(cx(h),cy(h)-.5,'창천제일검 강림','sk'); } },80); } }
   // 군단장의 권능 소환물 (플레이어가 배치한 촉수·뿔)
   for(const sm of (S.sum||[])){ const ow=C.units.find(x=>x.id===sm.owner&&!x.team); if(!ow||!ow.lgPow)continue; const o=mkCU(sm,0,1); o.summon=true; o.owner=sm.owner;
     if(sm.key==='tentacleA'){ o.maxHp=o.hp=Math.round(ow.maxHp*.3); o.atk=o.atk0=ow.atk*.35*ow.lgPow; o.as=.8; o.rg=1; o.rooted=true; o.maxMana=1e9; }
@@ -1329,6 +1366,8 @@ function step(dt){
     if(u.ghost){u.ghostT-=dt; if(u.ghostT<=0){u.alive=false;fxText(u.x,u.y,'소멸','sk');continue;}}
     if(u.haste>0)u.haste-=dt;
     if(u.fearT>0)u.fearT-=dt;
+    if(u.regen&&u.hp<u.maxHp&&!(u.disease&&u.disease.t>0))u.hp=Math.min(u.maxHp,u.hp+u.maxHp*u.regen*dt);
+    if(u.frostT>0)u.frostT-=dt;
     if(u.tauntT>0)u.tauntT-=dt;
     if(u.undead){ u.bombT-=dt; if(u.bombT<=0){ u.alive=false; FX.burst(u,26,'#9aff6a',6,.12); FX.ring(u,0,1.4,'#6aff3a',.14); fxText(cx(u),cy(u),'자폭','sk'); for(const a of C.units)if(a.alive&&!a.team&&dist(a,u)<=1)dmgPct(a,.2); continue; } }
     if(!u.team&&u.lgPow){ if(u.key==='biakiss'){ const n=C.units.filter(m=>m.alive&&m.summon&&m.owner===u.id).length; if(n&&u.hp<u.maxHp)u.hp=Math.min(u.maxHp,u.hp+u.maxHp*.015*n*u.lgPow*dt); }
@@ -1358,7 +1397,7 @@ function step(dt){
         if(u.lance){ const amt=addShield(u,u.maxHp*u.lance); if(amt>0)(u.ltok=u.ltok||[]).push({t:3,amt,rem:amt}); }
         if(u.moonSp)u.atk+=u.atk0*u.moonSp;
         if(C.slAs&&!u.team&&(u.slSt||0)<15){u.slSt=(u.slSt||0)+1;u.as*=1.02;} // 실린 6: 평타마다 공속 +2%
-        u.atkCd=1/(u.as*(u.haste>0?1.4:1)*(u.derenAs&&u.hp<u.maxHp*.5?1+u.derenAs:1)*(1-(u.cmdSlow||0))*(u.fearT>0?1-C.fear:1)*(!u.team&&has('weak')&&t.hp<t.maxHp*.5?1.08:1)*(u.lgPow&&u.key==='kamen'&&u.hp<u.maxHp*.5?1+.3*u.lgPow:1));
+        u.atkCd=1/(u.as*(u.haste>0?1.4:1)*(u.derenAs&&u.hp<u.maxHp*.5?1+u.derenAs:1)*(1-(u.cmdSlow||0))*(u.fearT>0?1-C.fear:1)*(u.frostT>0?1-u.frostAmt:1)*(!u.team&&has('weak')&&t.hp<t.maxHp*.5?1.08:1)*(u.lgPow&&u.key==='kamen'&&u.hp<u.maxHp*.5?1+.3*u.lgPow:1));
       }
     }else if(u.moveCd<=0&&!u.boss&&!u.rooted){ moveToward(u,t); u.moveCd=.32; }
   }
@@ -1434,6 +1473,8 @@ function spawnUndead(k,st,x,y){ if(!C||C.over||!C.units.some(u=>u.legion&&u.key=
   o.undead=true; o.bombT=8; C.units.push(o); fxText(cx(o),cy(o)-.4,'망자','mag'); FX.pillar(o,'#6aff3a',.8,3); FX.rise(o,14,'#9aff6a'); }
 function hurt(src,t,raw,o){
   if(!t.alive)return 0; o=o||{};
+  if(t.dodge&&!src.inSkill&&src.team!==t.team&&src.alive!==undefined&&Math.random()<t.dodge){ fxText(cx(t),cy(t)-.2,'회피','mag');
+    if(t.counter&&t.alive&&src.alive){ const tt=t; later(60,()=>{ if(C&&src.alive&&tt.alive)FX.beam(tt,src,'#9fd8ff',.06,.3); }); hurt({team:t.team,atk:t.atk,inSkill:true,skillMul:1},src,t.atk*t.counter,{mag:1}); } return 0; }
   let d=raw*(src.dmgMul||1)*(src.inSkill?src.skillMul||1:1), crit=false;
   if(src.team===0&&src.alive!==undefined){
     if(has('grudge')&&(t.legion||t.boss||(U[t.key]&&U[t.key].c>=4)))d*=1.2;
@@ -1468,6 +1509,8 @@ function hurt(src,t,raw,o){
     if(t.key==='illiakan')C.gazeDmg[src.id]=(C.gazeDmg[src.id]||0)+d;
   }
   if(src.key==='illiakan'&&(src.legion||src.lgPow)&&t.alive)t.disease={t:3,dps:src.atk*.2*(src.lgPow||1)};
+  if(src.frost&&t.alive&&t.team!==src.team&&!t.boss){ t.frostT=3; t.frostAmt=Math.max(t.frostAmt&&t.frostT>0?t.frostAmt:0,src.frost);
+    if(src.freeze&&!src.inSkill){ if(t.frostBy!==src){t.frostBy=src;t.frostN=0;} if(++t.frostN>=4){ t.frostN=0; if(!t.legion)t.stun=Math.max(t.stun,1); fxText(cx(t),cy(t)-.3,'빙결','mag'); FX.burst(t,10,'#cff4ff',3,.09); } } }
   if(src.legion&&!src.noGim&&src.key==='kouku'&&t.team===0&&!t.summon&&!t.passive&&t.alive){ t.mad=(t.mad||0)+1; if(t.mad>=5){ t.mad=0; t.confuse=2; fxText(cx(t),cy(t)-.4,'광기 — 혼란','sk'); FX.swirl(t,.8,12,'#ff7ad8'); } }
   let rest=d;
   if(t.shield>0){const a=Math.min(t.shield,rest);t.shield-=a;rest-=a; if(t.ltok){let x=a;for(const k of t.ltok){const y=Math.min(k.rem,x);k.rem-=y;x-=y;if(x<=0)break;}}}
@@ -1684,6 +1727,33 @@ function castImpl(u,t){
       FX.magic(u,1.4,'#9a6cff',1.1); FX.swirl(u,1.3,22,'#6fd0ff'); FX.ring(u,.2,2.6,'#e0d0ff',.12,.7);
       for(const a of A){ if(a===u)continue; a.mana=Math.min(a.maxMana,a.mana+a.maxMana*pct); FX.beam(u,a,'#b48cff',.05,.35); FX.rise(a,7,'#c9b0ff'); }
       (u.buffs=u.buffs||[]).push({t:dur,atk:1.2}); u.atk*=1.2; fxText(cx(u),cy(u)+.3,'마나 +'+Math.round(pct*100)+'%','mag'); break; }
+    case 'hari':{ const srt=A.filter(a=>!a.passive).sort((p,q)=>p.hp/p.maxHp-q.hp/q.maxHp).slice(0,2); FX.magic(u,.8,'#ff9ac8',.6);
+      for(const a of srt){ heal(a,120*u.sm); a.haste=Math.max(a.haste||0,2); FX.beam(u,a,'#ffb6d9',.06,.3); FX.rise(a,10,'#ffd0e6'); } break; }
+    case 'manpo':{ heal(u,u.maxHp*.18); FX.rise(u,12,'#ffe9a8'); FX.ring(u,.1,1.3,'#ffd08a',.12); for(const e of F)if(dist(e,u)<=1){hurt(u,e,u.atk*1.4);FX.burst(e,8,'#ffd08a',3,.09);} break; }
+    case 'miryeong':{ FX.magic(P(t),.8,'#ff5a3a',.6); FX.burst(t,18,'#ffb347',4.5,.11); hurt(u,t,u.atk*2.2); if(t.alive&&!t.boss&&!t.legion)t.stun=Math.max(t.stun,1); break; }
+    case 'hanson':{ for(let i=0;i<3;i++)later(i*90,()=>{ if(C&&t.alive){FX.burst(t,8,'#c9ced8',3.2,.08);FX.ring(t,0,.6,'#ffd08a',.06);} }); for(let i=0;i<3;i++)hurt(u,t,u.atk*.95); if(t.alive&&!t.boss&&!t.legion)t.stun=Math.max(t.stun,.8); FX.shake(.8); break; }
+    case 'hodong':{ const sh=addShield(u,u.maxHp*.22); fxText(cx(u),cy(u)+.3,'보호막 +'+Math.round(sh),'heal'); FX.ring(u,.1,1.5,'#9fd0ff',.14);
+      for(const e of F)if(dist(e,u)<=1&&!e.boss&&!e.legion){ e.taunt=u; e.tauntT=2; e.tgt=u; } break; }
+    case 'wonpo':{ const pool=F.slice(); for(let n=0;n<3&&F.length;n++){ const e=pool.length?pool.splice(rnd(pool.length),1)[0]:F[rnd(F.length)]; FX.beam(u,e,'#9aff6a',.05,.25); FX.burst(e,8,'#6aff3a',3,.09); hurt(u,e,u.atk); if(e.alive)e.disease={t:4,dps:u.atk*.2}; } break; }
+    case 'gildal':{ const L=eu(u,t)||1, dx=(cx(t)-cx(u))/L, dy=(cy(t)-cy(u))/L; FX.beam(u,{x:u.x+dx*2.4,y:u.y+dy*2.4},'#ffd76a',.4,.35); FX.shake(1);
+      for(const e of F){ const vx=cx(e)-cx(u),vy=cy(e)-cy(u),pr=vx*dx+vy*dy; if(pr>0&&pr<=2.5&&Math.hypot(vx-pr*dx,vy-pr*dy)<=.75){hurt(u,e,u.atk*2.6);FX.burst(e,12,'#ffd76a',4,.1);} }
+      (u.buffs=u.buffs||[]).push({t:3,as:1.25}); u.as*=1.25; break; }
+    case 'geumgang':{ const c=P(t); FX.magic(c,1.4,'#ffd76a',.9); FX.ring(c,0,1.6,'#fff0b8',.16); FX.burst(c,24,'#ffe9a8',5,.12);
+      for(const e of F)if(Math.abs(e.x-t.x)<=1&&Math.abs(e.y-t.y)<=1)hurt(u,e,u.atk*2.3,{mag:1});
+      for(const a of A)if(facs(U[a.key]).includes('창천구검')){ addShield(a,100*u.sm); FX.ring(a,.1,.7,'#ffd76a',.08); } break; }
+    case 'habaek':{ const L=eu(u,t)||1, dx=(cx(t)-cx(u))/L, dy=(cy(t)-cy(u))/L; FX.beam(u,{x:u.x+dx*9,y:u.y+dy*9},'#9fe8ff',.6,.5); FX.beam(u,{x:u.x+dx*9,y:u.y+dy*9},'#ffffff',.2,.4); FX.shake(2);
+      for(const e of F){ const vx=cx(e)-cx(u),vy=cy(e)-cy(u),pr=vx*dx+vy*dy; if(pr>0&&Math.hypot(vx-pr*dx,vy-pr*dy)<=.8){hurt(u,e,u.atk*4.2);FX.burst(e,16,'#cff4ff',5,.12);} } break; }
+    case 'nia':{ FX.magic(u,1.2,'#ffb36a',.9); for(const a of A){ heal(a,100*u.sm); (a.buffs=a.buffs||[]).push({t:3,dr:.1,atk:1}); FX.rise(a,6,'#ffd08a'); } break; }
+    case 'shana':{ FX.arc(u,1.3,0,TAU,'#ff9a6a',.18,.4); let k=0; for(const e of F)if(dist(e,u)<=1){ hurt(u,e,u.atk*2.1); if(!e.alive)k++; FX.burst(e,8,'#ffb38a',3.5,.09); } if(k)u.mana=Math.min(u.maxMana,u.mana+30); break; }
+    case 'nagi':{ const e=F.slice().sort((p,q)=>dist(u,q)-dist(u,p))[0]||t; FX.beam(u,e,'#6fd0ff',.1,.3); FX.burst(e,14,'#9fe8ff',4,.1); hurt(u,e,u.atk*2.3); break; }
+    case 'liru':{ const sh=addShield(u,u.maxHp*.18); fxText(cx(u),cy(u)+.3,'보호막 +'+Math.round(sh),'heal'); FX.ring(u,.1,1.4,'#6fd0ff',.14); for(const a of A)if(a!==u&&dist(a,u)<=1){addShield(a,80*u.sm);FX.ring(a,.1,.7,'#9fe8ff',.08);} break; }
+    case 'yuz':{ const c=P(t); FX.magic(c,1.3,'#6fb8ff',.9); FX.pillar(c,'#9fd8ff',.9,3); FX.burst(c,22,'#bfe8ff',5,.12);
+      for(const e of F)if(Math.abs(e.x-t.x)<=1&&Math.abs(e.y-t.y)<=1){ hurt(u,e,u.atk*2.4,{mag:1}); if(e.alive&&!e.boss&&!e.legion)e.stun=Math.max(e.stun,1); } break; }
+    case 'range':{ FX.magic(u,1.2,'#b48cff',.9); for(const a of A){ addShield(a,90*u.sm); FX.ring(a,.1,.7,'#c9a0ff',.08); } break; }
+    case 'pahu':{ (u.buffs=u.buffs||[]).push({t:3,dr:.3,atk:1}); FX.ring(u,.1,1.4,'#9fd0ff',.14); for(const e of F)if(dist(e,u)<=1){hurt(u,e,u.atk*1.5);FX.burst(e,8,'#cfe8ff',3,.09);} break; }
+    case 'gin':{ FX.arc(u,1.2,0,TAU,'#9fe8ff',.16,.35); for(const e of F)if(dist(e,u)<=1){hurt(u,e,u.atk*1.7);FX.burst(e,8,'#cff4ff',3,.09);} break; }
+    case 'madnick':{ FX.magic(P(t),.9,'#ffd08a',.6); FX.burst(t,18,'#ffb347',4.5,.11); hurt(u,t,u.atk*2.4); u.haste=Math.max(u.haste||0,2); break; }
+    case 'baedan':{ FX.ring(u,.1,1.5,'#c81e2a',.16); for(const e of F)if(dist(e,u)<=1){hurt(u,e,u.atk*1.8);FX.burst(e,8,'#ff5a5a',3.5,.09);} (u.buffs=u.buffs||[]).push({t:4,dr:.3,atk:1}); break; }
     case 'sasha':{ FX.magic(u,1.3,'#ffb347',1); FX.ring(u,.1,1.6,'#ffd08a',.16); FX.burst(u,26,'#ff9a3a',5,.12); FX.debris(u,10,'#c9ced8'); FX.shake(1.4);
       for(const e of F)if(dist(e,u)<=1){ hurt(u,e,u.atk*2.2); if(!e.boss&&!e.legion)e.stun=Math.max(e.stun,1); FX.burst(e,10,'#ffd08a',3.5,.09); }
       const sh=addShield(u,u.maxHp*.15); fxText(cx(u),cy(u)+.3,'보호막 +'+Math.round(sh),'heal');
@@ -2024,6 +2094,25 @@ document.body.insertAdjacentHTML('afterbegin','<svg width="0" height="0" style="
 const FIG={
   neria:  {skin:'#f8dfd0',hair:'#e4e1e8',hs:'long',top:'#1fa3c4',trim:'#f4fbff',robe:1,w:'mic',ex:['flower','choker']},
   solas:  {skin:'#e3bfa3',hair:'#3a2a22',hs:'long',top:'#a3221f',trim:'#d9b36a',robe:1,w:'bolt',ex:['stole','beard']},
+  hari:   {skin:'#f6dccb',hair:'#2a1e22',hs:'long',top:'#c83a6a',trim:'#ffd0e6',cape:'#f4e0ea',robe:1,w:'rapier',ex:['flower','sash']},
+  manpo:  {skin:'#e8c4a4',hair:'#2a2420',hs:'bald',top:'#f2eee4',trim:'#c83a2a',pad:'#d8c9a8',w:'fist',dwarf:1,ex:['bigbeard','headband']},
+  miryeong:{skin:'#f6dccb',hair:'#1c1a1e',hs:'pony',top:'#d02a2a',trim:'#ffd76a',w:'dual',blade:'#e6e9f0',ex:['mane','sash']},
+  hanson: {skin:'#e2bfa4',hair:'#3a2a22',hs:'short',top:'#3a3e4a',trim:'#c9a24a',w:'fist',ex:['gauntlet','headband','scarf']},
+  hodong: {skin:'#e6c6aa',hair:'#1c1a1e',hs:'side',top:'#2a3a5a',trim:'#c9a24a',pad:'#8a96ab',w:'hammer',ex:['lionpads','breastplate']},
+  wonpo:  {skin:'#e2bfa4',hair:'#2a2a30',hs:'hood',top:'#2a3a2a',trim:'#9aff6a',w:'daggers',blade:'#6a8a5a',ex:['mask','scarf']},
+  gildal: {skin:'#e8ccb8',hair:'#1c1a1e',hs:'long',top:'#1e2a3a',trim:'#ffd76a',cape:'#1a1a22',w:'katana',ex:['dragon','headband']},
+  geumgang:{skin:'#e2b08e',hair:'#e8e4dc',hs:'bald',top:'#f2c84a',trim:'#c83a2a',robe:1,w:'fist',ex:['wbeard','stole','halo']},
+  habaek: {skin:'#ecd2c2',hair:'#d8dce6',hs:'long',top:'#1a2a3a',trim:'#9fe8ff',cape:'#0e1a2a',w:'greatsword',blade:'#cff4ff',ex:['mask','scarf','gloweye'],big:1},
+  nia:    {skin:'#c89a7a',hair:'#f2e0b0',hs:'long',top:'#e8a040',trim:'#3ad0c8',robe:1,w:'staff',ex:['flower','pendant','lotus']},
+  shana:  {skin:'#c89a7a',hair:'#c83a2a',hs:'pony',top:'#2a5a6a',trim:'#ffd08a',w:'dual',blade:'#e6e9f0',ex:['headband','sash']},
+  nagi:   {skin:'#b88a6a',hair:'#1c1a1e',hs:'short',top:'#3ad0c8',trim:'#ffd08a',w:'bow',ex:['flower','sash']},
+  liru:   {skin:'#b88a6a',hair:'#6a3a22',hs:'side',top:'#4a7a5a',trim:'#e8c170',pad:'#8a6a3a',w:'hammer',ex:['fur','lionpads']},
+  yuz:    {skin:'#f4e6dc',hair:'#9fd8ff',hs:'short',top:'#2a3a6a',trim:'#9fd8ff',robe:1,w:'orb',orbC:'#9fd8ff',mini:1,ex:['elfears','stole']},
+  range:  {skin:'#f2dcd0',hair:'#b48cff',hs:'long',top:'#4a3a6a',trim:'#e0d0ff',robe:1,w:'staff',ex:['elfears','pendant']},
+  pahu:   {skin:'#e6c6aa',hair:'#e8e4dc',hs:'side',top:'#3a5a7a',trim:'#e8c170',robe:1,w:'staff',ex:['elfears','mustache']},
+  gin:    {skin:'#e6c6aa',hair:'#2a3a5a',hs:'short',top:'#2a4a6a',trim:'#9fe8ff',w:'katana',ex:['elfears','scarf']},
+  madnick:{skin:'#e2bfa4',hair:'#c9a46a',hs:'side',top:'#6a5a4a',trim:'#ffd08a',cape:'#8a6a3a',w:'sword',ex:['fur','scarf','gauntlet']},
+  baedan: {skin:'#d8b49a',hair:'#1c1a1e',hs:'bald',top:'#5a1a1e',trim:'#ffd76a',pad:'#3a2a24',cape:'#7a1418',w:'axe',ex:['spikes','goldplate','beard'],big:1},
   sasha:  {skin:'#f0d6c6',hair:'#f2dea4',hs:'short',top:'#1c1a1e',trim:'#c9ced8',pad:'#b8bec8',cape:'#9a1e22',w:'scepter',ex:['walker','lionpads','redcollar','buttons']},
   hawkeye:{skin:'#ecd2c2',hair:'#d8dce2',hs:'side',top:'#26262c',trim:'#c9a24a',pad:'#3a3a42',cape:'#4a1a22',w:'bow',ex:['featherwings','pauldrons','breastplate','collar']},
   gunslinger:{skin:'#f6e2da',hair:'#ece6da',hs:'long',top:'#18161a',trim:'#a01a2a',pad:'#222024',w:'rifle',ex:['cowhat','redcollar','belts']},
@@ -2490,6 +2579,7 @@ const HELP={main:`<h2>아크 택틱스 도움말</h2>
 <li>초반에는 같은 기물을 모아 <b>2성을 빨리</b> 만드는 것이 가장 큰 전력 상승입니다.</li>
 <li>골드를 10 단위로 모아 두면 이자가 붙습니다. 무리한 새로고침보다 레벨 업이 나을 때가 많습니다.</li>
 <li><b>지휘관</b>은 아군 사이에, <b>아르데타인</b> 원거리는 적과 떨어진 뒷줄에 두세요.</li>
+<li><b>창천구검</b>(1~3코스트 8명)은 리롤 덱입니다. 성급이 오를수록 시너지가 강해지고, 8명을 모두 모으면 창천제일검 <b>하백</b>이 전투에 강림합니다. 파푸니카·림레이크·슈샤이어는 저코스트 위주의 지역 시너지입니다.</li>
 <li><b>군단</b>을 2명 이상 모으면 비아키스의 촉수·아브렐슈드의 뿔이 소환됩니다. 직접 옮길 수 있고, 뿔은 아브렐슈드와 같은 열에만 놓입니다. 에스더와 군단을 함께 켜면 <b>대립</b>으로 둘 다 약해집니다.</li>
 <li>카제로스는 ⓐ→ⓑ→ⓒ로 강해집니다. 마지막 세 라운드 전에 덱을 완성해 두세요.</li>
 <li>기물에 마우스를 올리거나 탭하면 오른쪽에 능력치와 스킬이 나옵니다.</li></ul>
