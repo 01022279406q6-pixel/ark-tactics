@@ -735,24 +735,24 @@ const cellL=x=>x*(1+G)/BW*100, cellT=y=>(y*(1+G)+(y>=4?MID:0))/BH*100, spanW=n=>
 const U={
   neria:  {n:'네리아',ic:'🎤',c:1,o:'모든 계열 (에스더 제외)',os:['군단','아르데타인','세이크리아','데런','실린'],j:'서포터',hp:450,atk:35,as:.7,rg:3,ar:15,mp:60,sk:'구원의 세레나데',sd:'체력이 가장 낮은 아군을 회복시키고 3초간 공격 속도를 올립니다.'},
   solas:  {n:'솔라스',ic:'🔫',c:1,o:'세이크리아',j:'마법사',hp:450,atk:50,as:.75,rg:4,ar:15,mp:50,sk:'심판의 뇌전',sd:'대상에게 번개를 내리꽂아 공격력의 260% 피해를 줍니다.'},
-  sasha:  {n:'사샤',tr:['지휘관'],c:4,o:'아르데타인',j:'전사',hp:1050,atk:66,as:.7,rg:1,ar:50,mp:80,sk:'헤비워커 강습',sd:'헤비워커로 주변 1칸의 적에게 공격력의 220% 피해를 주고 1초 기절시키며, 최대 체력 15% 보호막을 얻고 상하좌우 아군의 공격 속도를 2초간 높입니다.'},
+  sasha:  {n:'사샤',tr:['지휘관'],c:4,o:'아르데타인',j:'전사',hp:980,atk:46,as:.7,rg:1,ar:50,mp:80,sk:'헤비워커 강습',sd:'헤비워커로 주변 1칸의 적에게 공격력의 220% 피해를 주고 1초 기절시키며, 최대 체력 15% 보호막을 얻고 상하좌우 아군의 공격 속도를 2초간 높입니다.'},
   hawkeye:{n:'호크아이',tr:['실버호크'],c:5,o:'아르데타인',j:'사냥꾼',hp:820,atk:50,as:.72,rg:4,ar:25,mp:90,sk:'검은 까마귀의 비',sd:'무작위 적 4명에게 화살을 날려 각각 공격력의 140% 피해를 줍니다. (치명타 가능)'},
   gunslinger:{n:'건슬링어',tr:['사냥의 시간'],c:5,o:'아르데타인',j:'사냥꾼',hp:760,atk:68,as:.7,rg:5,ar:25,mp:90,sk:'퍼펙트 샷',sd:'가장 멀리 있는 적을 저격해 공격력의 450% 피해를 줍니다.'},
   bastian:{n:'바스티안',ic:'🛰️',c:2,o:'아르데타인',j:'사냥꾼',hp:550,atk:55,as:.7,rg:3,ar:20,mp:70,sk:'드론 포격',sd:'대상과 인접한 적에게 공격력의 180% 피해를 줍니다.'},
   zaika:  {n:'사이카',ic:'🗡️',c:2,o:'데런',j:'사냥꾼',hp:600,atk:60,as:.85,rg:1,ar:25,mp:50,sk:'그림자 습격',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 250% 피해를 줍니다.'},
   wei:    {n:'웨이',eu:'기본 공격 3회마다 공격력의 80% 추가 피해를 줍니다.',ic:'🐉',c:2,o:'에스더',j:'탱커',hp:750,atk:55,as:.7,rg:1,ar:40,mp:70,sk:'현신 - 천룡의 일격',sd:'녹색 기운을 두른 주먹을 앞으로 내질러 공격력의 220% 피해를 주고, 잃은 체력의 10/15/20%(성급별)만큼 보호막을 얻습니다.'},
   valtan: {n:'발탄',tr:['군단장의 권능'],ic:'🐂',c:3,o:'군단',j:'탱커',hp:950,atk:65,as:.65,rg:1,ar:50,mp:90,sk:'마수의 분쇄',sd:'주변 1칸의 적에게 공격력의 200% 피해와 1초 기절. [권능] 처음 쓰러지면 4초간 유령이 되어 계속 싸웁니다.'},
-  aman:   {n:'아만',ic:'📿',c:3,o:'세이크리아·데런',os:['세이크리아','데런'],j:'마법사·서포터',js:['마법사','서포터'],hp:720,atk:54,as:.7,rg:3,ar:25,mp:65,sk:'빛과 어둠',sd:'아군 전체를 회복시키고 대상에게 마법 피해를 줍니다.'},
+  aman:   {n:'아만',ic:'📿',c:3,o:'세이크리아·데런',os:['세이크리아','데런'],j:'마법사·서포터',js:['마법사','서포터'],hp:720,atk:60,as:.7,rg:3,ar:25,mp:65,sk:'빛과 어둠',sd:'아군 전체를 회복시키고 대상에게 마법 피해를 줍니다.'},
   ninav:  {n:'니나브',eu:'파르쿠나스에 맞은 적 1명당 마나를 10 회복합니다.',ic:'🏹',c:3,o:'에스더',j:'사냥꾼',hp:600,atk:58,as:.8,rg:4,ar:20,mp:70,sk:'파르쿠나스',sd:'대상 방향 직선상의 모든 적을 관통해 공격력의 230% 피해를 줍니다.'},
-  silian: {n:'실리안',eu:'전투 시작 시 아군 전체의 공격력이 10% 증가합니다.',ic:'👑',tr:['지휘관'],c:4,o:'에스더',j:'전사',hp:1000,atk:52,as:.7,rg:1,ar:55,mp:90,sk:'왕의 일격',sd:'대상 방향 부채꼴(3칸) 범위의 적에게 공격력의 230% 피해를 주고 보호막을 얻습니다. 무작위 적 1/2/3명(성급별)에게 빛기둥을 떨어뜨려 공격력의 100% 피해를 줍니다.'},
+  silian: {n:'실리안',eu:'전투 시작 시 아군 전체의 공격력이 10% 증가합니다.',ic:'👑',tr:['지휘관'],c:4,o:'에스더',j:'전사',hp:1000,atk:45,as:.7,rg:1,ar:55,mp:90,sk:'왕의 일격',sd:'대상 방향 부채꼴(3칸) 범위의 적에게 공격력의 230% 피해를 주고 보호막을 얻습니다. 무작위 적 1/2/3명(성급별)에게 빛기둥을 떨어뜨려 공격력의 100% 피해를 줍니다.'},
   biakiss:{n:'비아키스',tr:['군단장의 권능'],ic:'💋',c:4,o:'군단',j:'마법사',hp:800,atk:60,as:.75,rg:3,ar:30,mp:80,sk:'욕망의 폭풍',sd:'적이 가장 밀집한 3×3 범위에 마법 피해를 주고 1.5초 매혹(행동 불가)시킵니다. [권능] 욕망의 촉수 2개를 소환합니다(자유 배치). 촉수 1개당 비아키스가 매초 최대 체력 1.5% 회복.'},
   kamen:  {n:'카멘',tr:['군단장의 권능'],ic:'🌑',c:5,o:'군단',j:'전사',hp:1300,atk:110,as:.8,rg:1,ar:55,mp:100,sk:'어둠의 검무',sd:'주변 2칸의 모든 적에게 공격력의 280% 피해를 주고 피해량의 30%만큼 회복합니다. [권능] 체력 50% 이하에서 공격 속도 +30%, 받는 피해 -15%.'},
   bahun:  {n:'바훈투르',eu:'전투 시작 시 아군 전체에 보호막 150을 부여합니다.',ic:'🔨',c:4,o:'에스더',j:'탱커·서포터',js:['탱커','서포터'],hp:1150,atk:65,as:.65,rg:1,ar:60,mp:100,sk:'아크투르스의 숨결',sd:'3/3.5/4초(성급별) 동안 아군 전체가 받는 피해를 35/45/60% 줄이고, 아군 공격력을 8/12/18% 올립니다.'},
-  shandi: {n:'샨디',w:.5,tr:['환영술사'],eu:'시간 왜곡으로 회복시키는 마나가 5%p 늘어납니다.',ic:'⏳',c:5,o:'에스더',j:'마법사',hp:780,atk:84,as:.75,rg:3,ar:25,mp:75,sk:'시간 왜곡',sd:'아군 전체의 마나를 최대 마나의 20/30/45%(성급별)만큼 즉시 회복시키고, 1.5/2.5/4.5초 동안 자신의 공격력이 20% 증가합니다.'},
+  shandi: {n:'샨디',w:.5,tr:['환영술사'],eu:'시간 왜곡으로 회복시키는 마나가 5%p 늘어납니다.',ic:'⏳',c:5,o:'에스더',j:'마법사',hp:780,atk:84,as:.75,rg:3,ar:25,mp:65,sk:'시간 왜곡',sd:'아군 전체의 마나를 최대 마나의 20/30/45%(성급별)만큼 즉시 회복시키고, 1.5/2.5/4.5초 동안 자신의 공격력이 20% 증가합니다.'},
   kadan:  {n:'카단',eu:'적을 처치하면 마나를 50 회복합니다.',ic:'⚔️',c:5,o:'에스더',j:'전사',hp:1100,atk:92,as:.9,rg:1,ar:45,mp:80,sk:'나히니르 - 일섬',sd:'체력이 가장 높은 적에게 순간이동해 공격력의 500% 피해를 줍니다.'},
   ospear: {n:'오스피어',c:1,o:'세이크리아',j:'전사',hp:560,atk:52,as:.7,rg:1,ar:30,mp:60,sk:'성기사의 일격',sd:'대상에게 공격력의 200% 피해를 주고 보호막 120을 얻습니다.'},
-  repus:  {n:'레퓌스',c:2,o:'세이크리아',j:'마법사',hp:540,atk:56,as:.7,rg:3,ar:20,mp:70,sk:'정화의 빛',sd:'대상과 주변 1칸의 적에게 공격력의 200% 마법 피해를 줍니다.'},
-  barutu: {n:'바루투',c:2,o:'세이크리아',j:'서포터',hp:620,atk:42,as:.65,rg:3,ar:25,mp:60,sk:'치유의 기도',sd:'체력이 가장 낮은 아군 2명을 220 회복시키고 보호막 80을 부여합니다.'},
+  repus:  {n:'레퓌스',c:2,o:'세이크리아',j:'마법사',hp:540,atk:62,as:.7,rg:3,ar:20,mp:70,sk:'정화의 빛',sd:'대상과 주변 1칸의 적에게 공격력의 230% 마법 피해를 줍니다.'},
+  barutu: {n:'바루투',c:2,o:'세이크리아',j:'서포터',hp:620,atk:42,as:.65,rg:3,ar:25,mp:50,sk:'치유의 기도',sd:'체력이 가장 낮은 아군 2명을 250 회복시키고 보호막 100을 부여합니다.'},
   federico:{n:'페데리코',c:4,o:'세이크리아',j:'마법사·서포터',js:['마법사','서포터'],hp:820,atk:68,as:.7,rg:3,ar:30,mp:80,sk:'황혼의 심판',sd:'체력이 가장 낮은 적에게 공격력의 260% 마법 피해를 주고, 체력이 가장 낮은 아군을 150 회복시킵니다.'},
   gusto:  {n:'구스토',tr:['지휘관'],c:5,o:'세이크리아',j:'서포터',hp:950,atk:60,as:.65,rg:3,ar:35,mp:70,sk:'여신의 은총',sd:'[지휘관] 성급이 오를수록 지휘 범위 확대 (1성 상하좌우 1칸 · 2성 주위 8칸 · 3성 주위 2칸). 아군 전체를 320 회복시키고 보호막 320을 부여하며, 기절·매혹을 해제합니다.'},
   enviska:{n:'엔비스카',c:1,o:'실린',j:'마법사',hp:430,atk:46,as:.7,rg:3,ar:15,mp:60,sk:'비전 화살',sd:'무작위 적 3명에게 마력 화살을 날려 각각 공격력의 90% 마법 피해를 줍니다.'},
@@ -760,12 +760,12 @@ const U={
   rahart: {n:'라하르트',c:3,o:'실린',j:'전사·탱커',js:['전사','탱커'],hp:980,atk:62,as:.7,rg:1,ar:50,mp:80,sk:'실린 기사의 맹세',sd:'방패를 내려찍어 주변 1칸의 적에게 공격력의 160% 피해를 주고 2초간 도발합니다(군단장·보스 제외). 자신에게 최대 체력 15%, 주변 1칸 아군에게 라하르트 최대 체력 10%의 보호막을 주고, 4초간 그 아군들이 받는 피해를 12% 줄입니다. (보호막은 최대 체력의 50%까지만 쌓입니다)'},
   adel:   {n:'아델',c:4,o:'실린',j:'마법사·탱커',js:['마법사','탱커'],hp:1050,atk:60,as:.65,rg:3,ar:45,mp:75,sk:'원소의 결계',sd:'대상 주변 3×3 범위에 공격력의 260% 마법 피해를 주고, 자신과 인접한 아군에게 보호막 150을 부여합니다.'},
   azena:  {n:'아제나',eu:'스킬로 적을 처치하면 마나를 30 회복합니다.',c:5,o:'실린·에스더',os:['실린','에스더'],j:'마법사',hp:900,atk:78,as:.75,rg:3,ar:30,mp:90,sk:'분노의 화염',sd:'적이 가장 밀집한 3×3 범위에 공격력의 320% 화염 피해를 줍니다.'},
-  inanna: {n:'이난나',tr:['지휘관'],eu:'수호의 지속 시간이 1초 늘어납니다.',c:5,o:'실린·에스더',os:['실린','에스더'],j:'서포터',hp:950,atk:58,as:.65,rg:3,ar:35,mp:75,sk:'수호의 빛',sd:'[지휘관] 성급이 오를수록 지휘 범위 확대 (1성 상하좌우 1칸 · 2성 주위 8칸 · 3성 주위 2칸). 4초 동안 아군 전체가 받는 피해를 40% 줄이고 공격력을 8% 올리며, 아군 전체를 최대 체력의 15%만큼 회복시킵니다.'},
+  inanna: {n:'이난나',tr:['지휘관'],eu:'수호의 지속 시간이 1초 늘어납니다.',c:5,o:'실린·에스더',os:['실린','에스더'],j:'서포터',hp:950,atk:58,as:.65,rg:3,ar:35,mp:75,sk:'수호의 빛',sd:'전투 시작 시 마나 40%. [지휘관] 성급이 오를수록 지휘 범위 확대 (1성 상하좌우 1칸 · 2성 주위 8칸 · 3성 주위 2칸). 4초 동안 아군 전체가 받는 피해를 40% 줄이고 공격력을 15% 올리며, 아군 전체를 최대 체력의 15%만큼 회복시킵니다.'},
   ren:    {n:'렌',tr:['데스 사이드'],c:4,o:'데런',j:'사냥꾼',hp:880,atk:74,as:.8,rg:1,ar:35,mp:70,sk:'사신의 낫',sd:'주변 1칸의 적에게 공격력의 230% 피해를 주고, 준 피해의 30%만큼 회복합니다.'},
-  reaper: {n:'리퍼',tr:['갈증'],c:5,o:'데런',j:'전사·사냥꾼',js:['전사','사냥꾼'],hp:1000,atk:115,as:.85,rg:1,ar:40,mp:80,sk:'그림자 처형',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 380% 피해를 줍니다.'},
+  reaper: {n:'리퍼',tr:['갈증'],c:5,o:'데런',j:'전사·사냥꾼',js:['전사','사냥꾼'],hp:1000,atk:100,as:.85,rg:1,ar:40,mp:80,sk:'그림자 처형',sd:'체력이 가장 낮은 적의 뒤로 순간이동해 공격력의 380% 피해를 줍니다.'},
   kouku:  {n:'쿠크세이튼',tr:['군단장의 권능'],c:4,o:'군단',j:'마법사·서포터',js:['마법사','서포터'],hp:800,atk:60,as:.75,rg:3,ar:25,mp:80,sk:'광기의 쇼타임',sd:'무작위 적 3명의 자리에 폭탄을 터뜨려 각각 공격력의 220% 마법 피해를 줍니다. [권능] 스킬마다 무작위 카드 1장 — 빨강: 아군 공격력 +10%(4초) / 파랑: 아군 마나 +15 / 검정: 무작위 적에게 공격력 150% 추가 피해'},
-  abrel:  {n:'아브렐슈드',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:880,atk:72,as:.7,rg:3,ar:30,mp:100,sk:'몽환의 운석',sd:'적이 가장 밀집한 곳에 운석을 떨어뜨려 3×3 범위에 공격력의 380% 마법 피해를 줍니다. [권능] 몽환의 뿔 1개를 소환합니다(아브렐슈드와 같은 열에만 배치). 뿔이 남아 있는 동안 아브렐슈드는 받는 피해 -20%, 매초 마나 +5.'},
-  illiakan:{n:'일리아칸',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:1000,atk:80,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상과 주변 1칸의 적에게 공격력의 260% 마법 피해를 주고 질병을 강화합니다(4초, 매초 공격력 30%). 이미 질병에 걸린 적은 피해 +60%. 준 피해의 25%만큼 회복합니다. [권능] 기본 공격에 맞은 적은 3초간 질병(받는 치유 -50%, 매초 피해). [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
+  abrel:  {n:'아브렐슈드',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:880,atk:78,as:.7,rg:3,ar:30,mp:100,sk:'몽환의 운석',sd:'적이 가장 밀집한 곳에 운석을 떨어뜨려 3×3 범위에 공격력의 440% 마법 피해를 줍니다. [권능] 몽환의 뿔 1개를 소환합니다(아브렐슈드와 같은 열에만 배치). 뿔이 남아 있는 동안 아브렐슈드는 받는 피해 -20%, 매초 마나 +5.'},
+  illiakan:{n:'일리아칸',tr:['군단장의 권능'],c:5,o:'군단',j:'마법사',hp:1000,atk:85,as:.7,rg:3,ar:35,mp:90,sk:'부패의 포식',sd:'대상과 주변 1칸의 적에게 공격력의 300% 마법 피해를 주고 질병을 강화합니다(4초, 매초 공격력 30%). 이미 질병에 걸린 적은 피해 +60%. 준 피해의 25%만큼 회복합니다. [권능] 기본 공격에 맞은 적은 3초간 질병(받는 치유 -50%, 매초 피해). [질병] 일리아칸에게 맞은 적은 3초간 받는 치유 -50%, 매초 일리아칸 공격력의 20% 피해'},
   tentacle:{n:'욕망의 촉수',c:0,o:'군단',j:'촉수',g:1,passive:1,hp:1000,atk:0,as:.01,rg:0,ar:0,mp:9999,sk:'-',sd:'공격하지 않습니다. 살아 있는 동안 비아키스가 매초 체력 300을 회복합니다.'},
   tentacleA:{n:'욕망의 촉수',c:0,o:'소환물',j:'촉수',g:1,hp:1,atk:1,as:.8,rg:1,ar:20,mp:9999,sk:'-',sd:'비아키스의 [권능]으로 소환됩니다. 자유롭게 배치할 수 있고, 움직이지 않으며 인접한 적을 공격합니다. 살아 있는 동안 비아키스가 매초 최대 체력 1.5% 회복.'},
   hornA:  {n:'몽환의 뿔',c:0,o:'소환물',j:'뿔',g:1,passive:1,hp:1,atk:0,as:.01,rg:0,ar:40,mp:9999,sk:'-',sd:'아브렐슈드의 [권능]으로 소환됩니다. 아브렐슈드와 같은 열에만 놓을 수 있습니다. 남아 있는 동안 아브렐슈드 받는 피해 -20%, 매초 마나 +5.'},
@@ -830,7 +830,7 @@ const KZ=new Proxy({},{get:(_,r)=>(HARDLIKE()?KZ_H:KZ_N)[r]});
 let FINAL_ROUND=25;
 // 하드 모드 군단장 라운드 (3성 군단장 1기 + 기믹, 승리 시 각인 선택)
 const LEGION={10:'valtan',15:'biakiss',20:'kouku',25:'abrel',30:'illiakan',35:'kamen'};
-const LEGION_STAT={valtan:{hp:2,atk:1},biakiss:{hp:3,atk:1.2},kouku:{hp:6.8,atk:1.44},abrel:{hp:5.75,atk:1.44},illiakan:{hp:14,atk:2},kamen:{hp:128,atk:1.1}}; // 카멘: 하드 모드 후반 전용 무기 성장에 맞춰 체력 8배 상향
+const LEGION_STAT={valtan:{hp:2,atk:1},biakiss:{hp:3,atk:1.2},kouku:{hp:6.8,atk:1.44},abrel:{hp:5.75,atk:1.33},illiakan:{hp:13.2,atk:1.86},kamen:{hp:128,atk:1.1}}; // 카멘: 하드 모드 후반 전용 무기 성장에 맞춰 체력 8배 상향
 const LEGION_HINT={valtan:'특수 기믹 없음 · 쓰러지면 6초간 유령으로 부활합니다',
   biakiss:'양옆 촉수 6개(체력 1000)가 살아 있으면 촉수 1개당 매초 체력 300 회복',
   kouku:'받는 피해 30% 감소 · [광기] 쿠크에게 5번 맞은 아군은 2초 혼란(회복받으면 1중첩 해제) · [빙고] 체력 70%·40%에서 아군 진영 가로·세로 한 줄씩 폭탄 (넓게 배치!)',
@@ -1234,6 +1234,7 @@ function startCombat(){
     if(has('stable'))u.dmgMul*=S.hp>=80?1.08:1.04;
     if(has('blunt'))u.critDmg+=.5;
     if(has('doll'))u.atk*=1.3;
+    if(u.key==='inanna')u.mana=Math.max(u.mana,u.maxMana*.4);
     if(has('crit'))u.crit+=.15;
     if(has('dagger')){u.crit+=.2;u.critDmg-=.12;}
     if(has('siphon'))u.as*=1.08; if(has('siphon2'))u.as*=1.18;
@@ -1602,9 +1603,9 @@ function castImpl(u,t){
       for(let i=0;i<8;i++){const a=i/8*TAU+rr(-.2,.2); FX.bolt(p,{x:p.x+Math.cos(a)*1.7,y:p.y+Math.sin(a)*1.7},'#ff8a3a',.06,.5);}
       FX.shake(2.2); for(const e of F)if(dist(e,u)<=1){hurt(u,e,u.atk*2);if(e.alive)e.stun=Math.max(e.stun,1);} addShield(u,150*u.sm); break; }
     case 'aman':{ FX.magic(u,1.3,'#ffe9a8',1.1); FX.ring(u,.2,2.2,'#fff3b0',.08,.7);
-      for(const a of A){heal(a,110*u.sm);FX.pillar(a,'#ffe9a8',.55,2.2);FX.rise(a,8,'#fff3b0');}
+      for(const a of A){heal(a,130*u.sm);FX.pillar(a,'#ffe9a8',.55,2.2);FX.rise(a,8,'#fff3b0');}
       FX.bolt(u,t,'#b388ff',.08); FX.bolt(u,t,'#7a4aff',.06,.42); FX.burst(t,22,'#9a6cff',5,.12); FX.ring(t,0,1,'#b388ff',.1); FX.pillar(t,'#8a5cff',.6,2.4);
-      hurt(u,t,230*u.sm,{mag:1}); break; }
+      hurt(u,t,270*u.sm,{mag:1}); break; }
     case 'ninav':{ const L=eu(u,t)||1, dx=(cx(t)-cx(u))/L, dy=(cy(t)-cy(u))/L, end={x:u.x+dx*11,y:u.y+dy*11};
       FX.magic(u,.7,'#9fe8ff',.6); FX.beam(u,end,'#9fe8ff',.36,.5); FX.beam(u,end,'#ffffff',.1,.6);
       for(let i=0;i<34;i++){const q=rr(0,9); pAdd({k:'p',x:u.x+.5+dx*q,y:u.y+.5+dy*q,vx:-dy*rr(-2.2,2.2)+dx*2,vy:dx*rr(-2.2,2.2)+dy*2,g:0,drag:2,s:rr(.05,.1),c:'#cff4ff',life:rr(.4,.9)});}
@@ -1617,7 +1618,7 @@ function castImpl(u,t){
       FX.shake(1.5);
       for(const e of F){ const dd=eu(u,e); if(dd>R)continue; let da=Math.abs(Math.atan2(cy(e)-cy(u),cx(e)-cx(u))-ang); if(da>Math.PI)da=TAU-da;
         if(dd<1.1||da<=half+.12){FX.burst(e,8,'#fff0b8',3.5,.09);hurt(u,e,u.atk*2.3);} }
-      addShield(u,250*u.sm);
+      addShield(u,180*u.sm);
       const pool=F.filter(e=>e.alive); for(let n=0;n<u.star&&pool.length;n++){ const e=pool.splice(rnd(pool.length),1)[0], q=P(e);
         later(220+n*120,()=>{FX.pillar(q,'#ffe9a8',1,4,.8);FX.sky(q,'#fff2b0',.09);FX.ring(q,0,1.1,'#ffd76a',.14);FX.burst(q,18,'#ffe27a',5,.11);});
         hurt(u,e,u.atk*1); }
@@ -1632,8 +1633,8 @@ function castImpl(u,t){
       later(230,()=>{FX.ring(p,.2,2.7,'#c9a8ff',.2,.6);FX.burst(p,44,'#8a5cff',7.5,.15);for(let i=0;i<7;i++){const a=i/7*TAU+rr(-.3,.3);FX.bolt(p,{x:p.x+Math.cos(a)*2.3,y:p.y+Math.sin(a)*2.3},'#a77bff',.07,.45);}});
       FX.shake(2.6); let sum=0; for(const e of F)if(dist(e,u)<=2){FX.pillar(e,'#6a3aff',.5,2);sum+=hurt(u,e,u.atk*2.8);} heal(u,sum*.3); break; }
     case 'ospear': FX.arc(P(t),.8,-2.4,.4,'#fff0b8',.16,.35); FX.burst(t,14,'#ffe9a8',4,.1); hurt(u,t,u.atk*2); addShield(u,120*u.sm); FX.ring(u,.1,.7,'#ffe9a8',.08); break;
-    case 'repus': FX.beam(u,t,'#fff6c8',.14); FX.magic(P(t),1.1,'#ffe9a8',.6); FX.ring(t,0,1.2,'#fff0b8',.12); for(const e of F)if(dist(e,t)<=1){FX.burst(e,8,'#fff6c8',3,.08);hurt(u,e,u.atk*2,{mag:1});} break;
-    case 'barutu':{ FX.magic(u,.8,'#9dffc0',.6); for(const a of A.slice().sort((p,q)=>p.hp/p.maxHp-q.hp/q.maxHp).slice(0,2)){ heal(a,220*u.sm); addShield(a,80*u.sm); FX.pillar(a,'#7dffa8',.6,2.2); FX.rise(a,10,'#c9ffd8'); } break; }
+    case 'repus': FX.beam(u,t,'#fff6c8',.14); FX.magic(P(t),1.1,'#ffe9a8',.6); FX.ring(t,0,1.2,'#fff0b8',.12); for(const e of F)if(dist(e,t)<=1){FX.burst(e,8,'#fff6c8',3,.08);hurt(u,e,u.atk*2.3,{mag:1});} break;
+    case 'barutu':{ FX.magic(u,.8,'#9dffc0',.6); for(const a of A.slice().sort((p,q)=>p.hp/p.maxHp-q.hp/q.maxHp).slice(0,2)){ heal(a,250*u.sm); addShield(a,100*u.sm); FX.pillar(a,'#7dffa8',.6,2.2); FX.rise(a,10,'#c9ffd8'); } break; }
     case 'federico':{ const e=F.slice().sort((p,q)=>p.hp-q.hp)[0]; FX.bolt(u,e,'#ff9a6a',.07); FX.magic(P(e),1,'#ff7a4a',.7); FX.burst(e,18,'#ffb38a',5,.11); hurt(u,e,u.atk*2.6,{mag:1});
       const a=A.slice().sort((p,q)=>p.hp/p.maxHp-q.hp/q.maxHp)[0]; heal(a,150*u.sm); FX.pillar(a,'#ffd76a',.6,2.2); break; }
     case 'gusto':{ FX.magic(u,1.8,'#fff6c8',1.1); FX.ring(u,.2,3,'#fff0b8',.12,.8); FX.shake(.8);
@@ -1653,7 +1654,7 @@ function castImpl(u,t){
       for(const e of F)if(dist(e,best)<=1)hurt(u,e,u.atk*3.2,{mag:1});
       if(u.eu&&F.filter(e=>e.alive).length<before)u.mana=Math.min(u.maxMana,u.mana+30*(C.euMul||1)); break; }
     case 'inanna':{ const dur=4+(u.eu?1*(C.euMul||1):0); FX.magic(u,1.8,'#bfe8ff',1.1); FX.ring(u,.2,3.2,'#ffffff',.14,.8);
-      for(const a of A){ (a.buffs=a.buffs||[]).push({t:dur,dr:.4,atk:1.08}); a.atk*=1.08; heal(a,a.maxHp*.15); FX.pillar(a,'#bfe8ff',.6,2.6,.8); FX.ring(a,.1,.8,'#ffffff',.08); } break; }
+      for(const a of A){ (a.buffs=a.buffs||[]).push({t:dur,dr:.4,atk:1.15}); a.atk*=1.15; heal(a,a.maxHp*.15); FX.pillar(a,'#bfe8ff',.6,2.6,.8); FX.ring(a,.1,.8,'#ffffff',.08); } break; }
     case 'ren':{ let sum=0; FX.arc(u,1.4,0,TAU*1.05,'#c83a5a',.22,.45); FX.swirl(u,1.2,18,'#ff7a9a'); FX.shake(1);
       for(const e of F)if(dist(e,u)<=1){FX.burst(e,8,'#ff5a7a',3.5,.09);sum+=hurt(u,e,u.atk*2.3);} heal(u,sum*.3); break; }
     case 'reaper':{ const e=F.slice().sort((p,q)=>p.hp-q.hp)[0], from={x:u.x,y:u.y}, c=freeNear(e,u.team); if(c){u.x=c.x;u.y=c.y;} u.tgt=e;
@@ -1668,12 +1669,12 @@ function castImpl(u,t){
     case 'abrel':{ let best=t,bc=0; for(const e of F){const n=F.filter(o=>dist(o,e)<=1).length; if(n>bc){bc=n;best=e;}} const c=P(best);
       FX.magic(c,1.8,'#c87aff',1.2); FX.beam({x:c.x+1.5,y:c.y-7},c,'#c87aff',.6,.5);
       later(300,()=>{FX.pillar(c,'#9a3aff',1.8,4.5,.9);FX.ring(c,0,2,'#e0c0ff',.22);FX.burst(c,40,'#c87aff',7.5,.15);FX.debris(c,16,'#3a1450');FX.shake(2.2);});
-      for(const e of F)if(dist(e,best)<=1)hurt(u,e,u.atk*3.8,{mag:1}); break; }
+      for(const e of F)if(dist(e,best)<=1)hurt(u,e,u.atk*(u.legion?3.8:4.4),{mag:1}); break; }
     case 'illiakan':{ FX.magic(P(t),1.2,'#9aff6a',.8); FX.burst(t,24,'#6aff3a',5,.12); FX.swirl(t,1.2,16,'#c9ffb0'); FX.shake(1.2);
       if(u.legion){ hurt(u,t,u.atk*3); for(const e of F)if(e!==t&&dist(e,t)<=1){ e.disease={t:3,dps:u.atk*.2}; FX.rise(e,6,'#9aff6a'); } break; }
       // 아군 일리아칸: 대상 주변 3×3에 부패 폭발 — 질병 걸린 적은 피해 +60%, 질병 강화(4초·공격력 30%/초), 준 피해의 25% 회복
       let sum=0; FX.ring(t,0,1.6,'#9aff6a',.16); FX.burst(t,30,'#4aff2a',6,.13);
-      for(const e of F)if(dist(e,t)<=1){ const sick=e.disease&&e.disease.t>0; sum+=hurt(u,e,u.atk*2.6*(sick?1.6:1),{mag:1}); if(e.alive){ e.disease={t:4,dps:u.atk*.3}; FX.rise(e,8,sick?'#d8ff3a':'#9aff6a'); } }
+      for(const e of F)if(dist(e,t)<=1){ const sick=e.disease&&e.disease.t>0; sum+=hurt(u,e,u.atk*3*(sick?1.6:1),{mag:1}); if(e.alive){ e.disease={t:4,dps:u.atk*.3}; FX.rise(e,8,sick?'#d8ff3a':'#9aff6a'); } }
       heal(u,sum*.25); break; }
     case 'bahun':{ const dur=[3,3.5,4][u.star-1], dr=[.35,.45,.6][u.star-1], am=1+[.08,.12,.18][u.star-1];
       FX.magic(u,1.6,'#6fd0ff',1); FX.ring(u,.2,3.2,'#ffd76a',.16,.7); FX.shake(1);
