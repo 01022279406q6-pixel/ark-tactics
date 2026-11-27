@@ -83,6 +83,7 @@ aside h2{font-size:12px;margin:0 0 8px;color:var(--mute);font-weight:600;letter-
 .bars .sh{position:absolute;top:0;left:0;height:100%;background:rgba(255,255,255,.75);width:0}
 .unit.sel .fig svg{filter:drop-shadow(0 0 3px var(--gold)) drop-shadow(0 0 7px var(--gold))}
 .unit.ghost .fig svg{opacity:.6;filter:hue-rotate(160deg) brightness(1.5) drop-shadow(0 0 6px #7df)}
+.unit.s4 .stars{color:#ff9af0;text-shadow:0 0 6px #ff5ad8}
 .unit.cmdA .fig svg{filter:drop-shadow(0 0 3px #ffd76a) drop-shadow(0 0 7px rgba(255,200,90,.6))}
 .unit.cmdS .fig svg{filter:saturate(.6) brightness(.85) drop-shadow(0 0 4px #6aa0ff)}
 .unit.stun .fig svg{filter:grayscale(.95) brightness(.8)}
@@ -255,6 +256,15 @@ button:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 1px 0 
 #optPanel{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:260px;background:linear-gradient(180deg,#20263b,#10131f);border:1px solid var(--gold2);border-radius:14px;padding:16px 18px;box-shadow:0 8px 0 #070910,0 20px 40px rgba(0,0,0,.6)}
 #optWrap{position:fixed;inset:0;z-index:96;display:none;background:rgba(3,3,6,.55)}
 #optWrap.on{display:block}
+#rankWrap{position:fixed;inset:0;z-index:96;display:none;place-items:center;background:rgba(3,3,6,.6)}
+#rankWrap.on{display:grid}
+#rankPanel{width:min(520px,92vw);max-height:90dvh;overflow:auto;background:linear-gradient(180deg,#1b1713,#0d0b09);border:1px solid #8a7048;border-radius:6px;box-shadow:inset 0 0 0 3px rgba(138,112,72,.18),0 10px 40px rgba(0,0,0,.8);padding:16px 18px;color:#e8dcc4}
+#rankPanel h3{margin:0 0 10px;color:var(--gold)}
+#rankPanel .rtabs{display:flex;gap:6px;margin-bottom:10px} #rankPanel .rtabs button{flex:1;padding:6px;font-size:12px} #rankPanel .rtabs button.on{border-color:var(--gold)!important;color:#fff3d0!important;box-shadow:0 0 8px rgba(232,193,112,.5)}
+#rankPanel table{width:100%;border-collapse:collapse;font-size:13px} #rankPanel td,#rankPanel th{padding:5px 6px;border-bottom:1px solid rgba(138,112,72,.25);text-align:left} #rankPanel th{color:#a89a80;font-weight:600;font-size:11px}
+#rankPanel tr.me td{color:#ffe0a0;background:rgba(232,193,112,.12);font-weight:700} #rankPanel td.num{text-align:right;font-variant-numeric:tabular-nums}
+#rankPanel .mine{margin:10px 0 4px;padding:8px 10px;border:1px solid rgba(232,193,112,.4);border-radius:5px;background:rgba(232,193,112,.07);font-size:13px}
+.nickReg{margin-top:10px;display:flex;gap:6px;align-items:center;justify-content:center} .nickReg input{background:#0d0b09;border:1px solid #8a7048;color:#fff;padding:5px 8px;border-radius:4px;width:140px}
 .itip{margin-top:6px;padding:6px 8px;border:1px solid rgba(232,193,112,.35);border-radius:5px;background:rgba(232,193,112,.08);font-size:12px;line-height:1.5;color:#f0e2c0}
 #optQuit{background:linear-gradient(180deg,#5a1a14,#2a0a08)!important;border-color:#b0402a!important}
 #confirm{position:fixed;inset:0;z-index:98;display:none;place-items:center;background:rgba(3,3,6,.6)}
@@ -400,7 +410,8 @@ html[data-kz] .cell{border-color:rgba(255,230,200,.2)}
 #modePick .hHell.locked small{color:#c9c9d0}
 #modePick .menuBtn{position:absolute;bottom:3%;padding:min(.5vw,.9vh) min(1.2vw,2vh);font-size:min(1vw,1.8vh);font-weight:700;color:#e8dcc4;background:linear-gradient(180deg,rgba(40,34,26,.88),rgba(16,14,12,.92));border:1px solid #8a7048;border-radius:6px;box-shadow:0 3px 0 #070605,0 0 10px rgba(0,0,0,.6)}
 #modePick .menuBtn:hover{border-color:var(--gold);color:#fff3d0}
-#modePick .hOpt{left:2.2%} #modePick .hExit{left:calc(2.2% + min(8vw,14vh))}
+#modePick .hOpt{left:2.2%} #modePick .hRank{left:calc(2.2% + min(8vw,14vh))} #modePick .hExit{left:calc(2.2% + 2*min(8vw,14vh))}
+#modePick .hCont{left:2.2%;bottom:calc(3% + min(3.4vw,6vh));border-color:var(--gold);color:#fff3d0}
 #modePick .verTag{position:absolute;right:2%;bottom:3.4%;font-size:min(.8vw,1.4vh);color:rgba(255,255,255,.55);text-shadow:0 1px 2px #000}
 #augReroll{margin-top:14px;padding:7px 18px;font-weight:700}
 #augPick h2{margin:0 0 4px;color:var(--gold)} #augPick p{margin:0 0 14px;color:var(--mute);font-size:13px}
@@ -699,18 +710,22 @@ html #cells .cell.a.drop{outline:2px dashed var(--gold);outline-offset:-3px;back
   </div></div>
   <button id="hardBtn" class="hot hHard" aria-label="확장 모드(하드) 시작"></button>
   <button id="hellBtn" class="hot hHell" aria-label="헬 모드 시작"><small id="hellSub">확장 모드 클리어 시 해금</small></button>
+  <button id="contBtn" class="menuBtn hCont" style="display:none">▶ 이어하기</button>
   <button id="optBtn" class="menuBtn hOpt">⚙ 옵션</button>
+  <button id="rankBtn" class="menuBtn hRank">🏆 랭킹</button>
   <button id="exitBtn" class="menuBtn hExit">⏻ 나가기</button>
-  <span class="verTag">Version 1.1</span>
+  <span class="verTag">Version 1.2</span>
 </div></div>
 <div id="optWrap"><div id="optPanel"><h3>설정</h3>
     <label>배경음악 <button id="optBgm"></button></label>
     <label>음량 <input type="range" id="optVol" min="0" max="100" step="1"><span id="optPct"></span></label>
     <label>UI 간소화 <button id="optSimple"></button><small>설명 문구·이름표·전투 기록을 숨깁니다</small></label>
     <label>화면 <button id="optMobile"></button><small>모바일(가로) 레이아웃</small></label>
+    <div class="optRow"><button id="optSave">💾 진행 저장</button></div>
     <div class="optRow"><button id="optQuit">⏻ 나가기</button><span style="flex:1"></span><button id="optHelp">? 도움말 보기</button><button id="optClose">닫기</button></div>
 </div></div>
 <div id="help"><div class="hbox" id="helpBox"></div></div>
+<div id="rankWrap"><div id="rankPanel"><h3>🏆 랭킹</h3><div class="rtabs"><button data-t="score" class="on">헬 모드 점수</button><button data-t="plays">플레이 횟수 (확장·헬)</button></div><div id="rankBody"></div><div class="optRow"><span style="flex:1;font-size:11px;color:#a89a80">기록은 이 브라우저에 저장됩니다</span><button id="rankClose">닫기</button></div></div></div>
 <div id="confirm"><div class="cbox"><p id="cfMsg"></p><div class="cbtn"><button id="cfYes">예</button><button id="cfNo">아니오</button></div></div></div>
 <div id="bossIntro"><img alt=""><div class="bfig" style="display:none"></div><div class="bi"><small>최종 보스</small><b></b><span></span></div></div>
 <div id="over"><div><h2 id="overTitle">모험 종료</h2><p id="overTxt"></p><button id="restartBtn">다시 시작</button></div></div>
@@ -847,6 +862,9 @@ const ITEMS={
   crowbow:  {n:'검은 까마귀의 활',u:'hawkeye',ic:'bow',fx:{as:.25,crit:.1},d:'공격 속도 +25% · 치명타 확률 +10%'},
   redrifle: {n:'붉은 정벌의 총',u:'gunslinger',ic:'rifle',fx:{skill:.35,critDmg:.3},d:'스킬 피해 +35% · 치명타 피해 +30%'},
   prabhasa: {n:'프라바사',u:'albion',ic:'fireorb',fx:{skill:.35,as:.15},d:'스킬 피해 +35% · 공격 속도 +15% · 알비온이 품은 작은 화구호'},
+  goejo:    {n:'괴조변신 술서',u:'gildal',ic:'scroll',fx:{skill:.3,as:.15},d:'스킬 피해 +30% · 공격 속도 +15% · 괴조로 변신하는 비술이 적힌 두루마리'},
+  gigongpae:{n:'기공패',u:'geumgang',ic:'redorb',fx:{skill:.3,mana:25},d:'스킬 피해 +30% · 시작 마나 +25 · 기공을 응축한 붉은 구슬 패'},
+  twohand:  {n:'투핸드소드',u:'baedan',ic:'oldsword',fx:{hp:.25,dr:.12},d:'체력 추가 +25% · 받는 피해 -12% · 투박하고 낡은 양손검'},
   gienna:   {n:'기에나의 가호',u:'nia',ic:'orbI',fx:{heal:.35,mana:30},d:'회복량 +35% · 시작 마나 +30 · 파란 바다의 여신 기에나의 가호가 깃든 구슬'},
   umbrella: {n:'환영의 우산칼',u:'pahu',ic:'umbrella',fx:{skill:.3,dr:.1},d:'스킬 피해 +30% · 받는 피해 -10% · 짙은 초록색 우산 속에 감춘 칼날'},
   roar:     {n:'마수의 포효',u:'valtan',ic:'axe',fx:{hp:.3,dr:.15},d:'체력 추가 +30% · 받는 피해 -15%'},
@@ -896,7 +914,7 @@ const SYN=[
   {k:'명의',f:'j',th:[1],d:['[각인: 전문의] 서포터가 스킬을 쓸 때마다 서포터가 아닌 아군 공격력 +2%(실버)/+3%(프리즘), 최대 5중첩']},
   {k:'대립',f:'x',th:[1],d:['에스더 결속(2명 이상)과 군단(2명 이상)이 함께 켜져, 에스더 결속·고유 효과와 군단 효과·권능이 모두 10% 약해집니다']},
   {k:'환영술사',f:'x',th:[1],d:['샨디 2성 이상: 체력이 최대 체력의 15% 이하가 된 적을 즉사시킵니다']},
-  {k:'창천구검',f:'o',th:[2,4,6,8],d:['창천구검 공격력 +10% · 성급 보너스(2성 1명당 피해 +2%, 3성 1명당 +6%) · 3명 이상 배치 시 새로고침마다 창천구검 기물 1명 이상 등장','창천구검 공격력 +18% · 공격 속도 +10% · 성급 보너스','창천구검 공격력 +28% · 공격 속도 +15% · 성급 보너스','창천제일검 강림: 공격력 +40% · 공격 속도 +20% · 성급 보너스 · 전투 시작 시 [하백] 소환 (창천구검 평균 성급에 비례해 강해짐)']},
+  {k:'창천구검',f:'o',th:[2,4,6,8],d:['창천구검 공격력 +10% · 성급 보너스(2성 1명당 창천구검 전체 피해 +3%, 3성 1명당 +9% · 체력은 그 60%) · 구검의 경지(2성 체력·공격력 ×1.15, 3성 ×1.95) · 3명 이상 배치 시 새로고침마다 창천구검 기물 1명 이상 등장','창천구검 공격력 +18% · 공격 속도 +10% · 성급 보너스','창천구검 공격력 +28% · 공격 속도 +15% · 성급 보너스','창천제일검 강림: 공격력 +40% · 공격 속도 +20% · 성급 보너스 · 전투 시작 시 [하백] 소환 — 군단장을 쓰러뜨릴수록 성장 (확장·헬: 아브렐슈드 2성 · 일리아칸 3성 · 카멘 4성 / 이지·노말: 비아키스 2성 · 쿠크세이튼 3성 · 카멘 4성)']},
   {k:'신수',f:'x',th:[1],d:['알비온 전용 (니아와 함께 배치 시): 알비온 체력 +10% · 공격력 +8% · 스킬 피해 +8% · 알비온에게 맞은 적은 4초간 받는 치유 -25% · 배치 한도 +1']},
   {k:'파푸니카',f:'o',th:[2,3,4],d:['파푸니카 매초 최대 체력 2% 회복 (질병 중 제외)','파푸니카 매초 최대 체력 3% 회복','파푸니카 매초 최대 체력 4% 회복 · 아군 전체 매초 2% 회복']},
   {k:'림레이크',f:'o',th:[2,3,4,5],d:['림레이크 기본 공격 회피 20%','림레이크 기본 공격 회피 28%','림레이크 기본 공격 회피 35% · 회피 시 환영 반격(공격력 60% 마법 피해)','림레이크 기본 공격 회피 40% · 환영 반격 공격력 100%']},
@@ -939,7 +957,7 @@ function newGame(){
 }
 function pickMode(m){
   if(m==='hell'&&!hellUnlocked())return toast('확장(하드) 모드를 1회 이상 클리어하면 해금됩니다');
-  S.mode=m; FINAL_ROUND=(m==='hard'||m==='hell')?40:25; S.score=0; S.lossRun=0; setSpeed(1); $('#modePick').classList.remove('on'); $('#vMode').textContent=m==='easy'?'이지':m==='hard'?'확장':m==='hell'?'헬':'노말'; $('#vMode').className='mode '+m;
+  S.mode=m; S.runId=Date.now(); if(m==='hard'||m==='hell')bumpPlays(m); FINAL_ROUND=(m==='hard'||m==='hell')?40:25; S.score=0; S.lossRun=0; setSpeed(1); $('#modePick').classList.remove('on'); $('#vMode').textContent=m==='easy'?'이지':m==='hard'?'확장':m==='hell'?'헬':'노말'; $('#vMode').className='mode '+m;
   startPlan();
   if(m==='hell'){ try{ if(localStorage.getItem('arcHellHelp')!=='1'){ localStorage.setItem('arcHellHelp','1'); setTimeout(()=>showHelp('hell'),300); } }catch(e){} }
 }
@@ -1267,7 +1285,7 @@ function startCombat(){
   { const ina=S.board.find(b=>b.key==='inanna'&&b.eq&&b.eq.k==='lunatic'&&b.eq.star>=2); C.lunatic=ina?[0,0,1.05,1.08][ina.eq.star]:0; }
   C.legion=C.units.some(u=>u.legion); C.cmdTier=T['지휘관']||0; C.cmdT=0;
   { const cg=[]; const seenK=new Set(); for(const b of S.board){ if(facs(U[b.key]).includes('창천구검')&&b.key!=='neria'&&!seenK.has(b.key)){seenK.add(b.key);cg.push(b);} }
-    C.cgStar=cg.reduce((a,b)=>a+(b.star===2?.02:b.star>=3?.06:0),0); C.cgAvg=cg.length?cg.reduce((a,b)=>a+b.star,0)/cg.length:1; }
+    C.cgStar=cg.reduce((a,b)=>a+(b.star===2?.03:b.star>=3?.09:0),0); C.cgAvg=cg.length?cg.reduce((a,b)=>a+b.star,0)/cg.length:1; }
   const LG=T['군단']||0, RIV=T['대립']?.9:1; C.riv=RIV; C.lgPow=(LG>=3?1.25:1)*RIV; C.lgRevive=LG>=3; C.fear=LG?.1*RIV:0; C.ev=[]; C.broken={}; C.pools=[];
   C.illiLegion=C.units.some(u=>u.legion&&!u.noGim&&u.key==='illiakan');
   if(LG)for(const e of C.units)if(e.team)e.fearT=5;  for(const u of C.units){
@@ -1298,7 +1316,8 @@ function startCombat(){
     if(has('awaken')&&d.c>=4)u.mana=Math.max(u.mana,u.maxMana*.5);
     if(has('ambush')&&J.includes('사냥꾼'))u.dmgMul*=1.2;
     if(F.includes('실린')&&T['실린'])u.skillMul*=[1,1.1,1.18,1.22][T['실린']];
-    if(F.includes('창천구검')&&T['창천구검']){ const ct=T['창천구검']; u.atk*=1+[0,.1,.18,.28,.4][ct]; u.as*=1+[0,0,.1,.15,.2][ct]; u.dmgMul*=1+(C.cgStar||0); }
+    if(F.includes('창천구검')&&T['창천구검']){ const ct=T['창천구검']; u.atk*=1+[0,.1,.18,.28,.4][ct]; u.as*=1+[0,0,.1,.15,.2][ct]; u.dmgMul*=1+(C.cgStar||0); const hb=Math.round(u.maxHp*(C.cgStar||0)*.6); u.maxHp+=hb; u.hp+=hb;
+      const km=CG_STAR_MUL[u.star-1]||1; u.maxHp=Math.round(u.maxHp*km); u.hp=u.maxHp; u.atk*=km; }
     if(F.includes('파푸니카')&&T['파푸니카'])u.regen=[0,.02,.03,.04][T['파푸니카']];
     if(T['파푸니카']>=3&&!u.regen)u.regen=.02;
     if(F.includes('림레이크')&&T['림레이크']){ u.dodge=[0,.2,.28,.35,.4][T['림레이크']]; u.counter=[0,0,0,.6,1][T['림레이크']]; }
@@ -1319,7 +1338,7 @@ function startCombat(){
   }
   // 아스텔지어: 아브렐슈드 뿔 보호막 (군단장 아브렐은 뿔 기믹으로 대체)
   if((T['창천구검']||0)>=4){ let sp=null; for(const y of [6,5,7,4])for(const x of [3,2,4,1,5,0,6]){ if(!sp&&!C.units.some(o=>o.alive&&covers(o,x,y)))sp={x,y}; }
-    if(sp){ const m=1+.6*(C.cgAvg-1), h=mkCU({id:uid++,key:'habaek',star:1,x:sp.x,y:sp.y},0,1); h.maxHp=h.hp=Math.round(h.maxHp*m); h.atk*=m; h.atk*=1.25; h.as*=1.15; h.summon=true; h.habaek=true; h.dmgMul*=1+(C.cgStar||0); C.units.push(h);
+    if(sp){ const hs=S.habaekStar||1, m=[1,2,3.8,7][hs-1]*(1+.2*(C.cgAvg-1)), h=mkCU({id:uid++,key:'habaek',star:1,x:sp.x,y:sp.y},0,1); h.star=hs; h.maxHp=h.hp=Math.round(h.maxHp*m); h.atk*=m; h.atk*=1.25; h.as*=1.15; h.summon=true; h.habaek=true; h.dmgMul*=1+(C.cgStar||0); C.units.push(h);
       setTimeout(()=>{ if(C){ FX.pillar(h,'#9fe8ff',1.2,4,.9); FX.ring(h,.1,1.8,'#cff4ff',.16); fxText(cx(h),cy(h)-.5,'창천제일검 강림','sk'); } },80); } }
   // 군단장의 권능 소환물 (플레이어가 배치한 촉수·뿔)
   for(const sm of (S.sum||[])){ const ow=C.units.find(x=>x.id===sm.owner&&!x.team); if(!ow||!ow.lgPow)continue; const o=mkCU(sm,0,1); o.summon=true; o.owner=sm.owner;
@@ -1373,6 +1392,7 @@ function pickTarget(u){
   for(const e of foes(u)){const d=dist(u,e)*10+eu(u,e); if(d<bd){bd=d;best=e;}}
   return u.tgt=best;
 }
+const CG_STAR_MUL=[1,1.15,1.95]; // 창천구검 개인 성급 보너스 (2성 ×1.15, 3성 ×1.6 체력·공격력)
 const CMD_SLOW=[0,.05,.10,.15];
 function cmdUpdate(){ // 지휘관: 상하좌우 1칸 아군 받는 피해 -10%·공격력 +5%, 적 공격 속도 감소 (매초 갱신, 중첩 없음)
   const cms=C.units.filter(u=>u.alive&&u.cmd);
@@ -1917,15 +1937,43 @@ function useGrace(){
   if(bs&&!bs.graceBase){ bs.graceBase=bs.maxMana; bs.maxMana=Math.round(bs.maxMana*2.5); fxText(cx(bs),cy(bs),'스킬 지연','sk'); FX.ring(bs,0,1.6,'#ffe9a0',.14); }
   FX.shake(1); banner('에버그레이스의 가호'); S.log.unshift('에버그레이스의 가호: 아군 '+n+'명 부활 (점수 -2500)'); render();
 }
+// 하백 성장: 군단장 처치 시 성급 상승 (4성까지)
+function habaekGrow(k){ const map=HARDLIKE()?{abrel:2,illiakan:3,kamen:4}:{biakiss:2,kouku:3,kamen:4}; const st=map[k]; if(st&&(S.habaekStar||1)<st){ S.habaekStar=st; S.log.unshift('창천제일검 하백이 '+st+'성으로 성장했습니다'); toast('창천제일검 하백 '+st+'성 성장!'); } }
 function addScore(n,why){ if(!HELL())return; S.score=(S.score||0)+n; if(why)S.log.unshift((n>0?'+':'')+n+'점 · '+why); }
+// ── 랭킹 (이 브라우저 로컬 저장) ──
+const FAKE_HELL=[['카단의검',98400],['로헨델엘프',91200],['베른의기사',86500],['모코코수집가',79300],['파푸니카서퍼',72800],['아만팬클럽',64100],['실린궁수',57600],['루테란용병',49900],['애니츠무사',41200],['슈샤이어곰',33700]].map(([n,s])=>({n,s,fake:1}));
+const FAKE_PLAYS=[['모코코수집가',142,61],['카단의검',118,74],['베른의기사',97,40],['로헨델엘프',88,52],['아만팬클럽',73,19],['애니츠무사',61,22],['파푸니카서퍼',54,13],['루테란용병',42,9],['실린궁수',35,6],['슈샤이어곰',21,3]].map(([n,h,e])=>({n,hard:h,hell:e,fake:1}));
+const lsJ=(k,d)=>{ try{ return JSON.parse(localStorage.getItem(k)||'null')??d; }catch(e){ return d; } };
+const lsS=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} };
+function bumpPlays(m){ const p=lsJ('arcPlays',{hard:0,hell:0}); p[m]=(p[m]||0)+1; lsS('arcPlays',p); }
+function hellBoard(){ const mine=lsJ('arcRankHell',[]); return [...mine,...FAKE_HELL].sort((a,b)=>b.s-a.s||(a.fake?1:0)-(b.fake?1:0)); }
+function myNick(){ return lsJ('arcNick','')||''; }
+function renderRank(t){ document.querySelectorAll('#rankPanel .rtabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); let h='';
+  if(t==='score'){ const L=hellBoard().slice(0,10), mine=lsJ('arcRankHell',[]), best=Math.max(0,...mine.map(x=>x.s),...lsJ('arcHellScores',[]).map(x=>x.s||0));
+    h='<table><tr><th>순위</th><th>닉네임</th><th class="num">점수</th><th>도달</th></tr>'+L.map((x,i)=>'<tr class="'+(x.fake?'':'me')+'"><td>'+(i+1)+'</td><td>'+x.n+'</td><td class="num">'+x.s.toLocaleString()+'</td><td>'+(x.r?x.r+'R':'-')+'</td></tr>').join('')+'</table>';
+    h='<div class="mine">내 최고 기록: <b>'+(best?best.toLocaleString()+'점':'없음')+'</b>'+(myNick()?' · '+myNick():'')+'</div>'+h; }
+  else{ const p=lsJ('arcPlays',{hard:0,hell:0}), me={n:myNick()||'나',hard:p.hard||0,hell:p.hell||0}; const L=[...FAKE_PLAYS,...((me.hard+me.hell)?[me]:[])].sort((a,b)=>(b.hard+b.hell)-(a.hard+a.hell)||(a.fake?1:0)-(b.fake?1:0));
+    const rank=L.indexOf(me)+1;
+    h='<div class="mine">내 플레이 횟수: 확장 <b>'+me.hard+'</b> · 헬 <b>'+me.hell+'</b> · 합계 <b>'+(me.hard+me.hell)+'</b>'+(rank?' ('+rank+'위)':'')+'</div><table><tr><th>순위</th><th>닉네임</th><th class="num">확장</th><th class="num">헬</th><th class="num">합계</th></tr>'+L.slice(0,10).map((x,i)=>'<tr class="'+(x.fake?'':'me')+'"><td>'+(i+1)+'</td><td>'+x.n+'</td><td class="num">'+x.hard+'</td><td class="num">'+x.hell+'</td><td class="num">'+(x.hard+x.hell)+'</td></tr>').join('')+'</table>'; }
+  $('#rankBody').innerHTML=h; }
+$('#rankBtn').onclick=()=>{ renderRank('score'); $('#rankWrap').classList.add('on'); };
+$('#rankClose').onclick=()=>$('#rankWrap').classList.remove('on');
+$('#rankWrap').onclick=e=>{ if(e.target.id==='rankWrap')$('#rankWrap').classList.remove('on'); };
+document.querySelectorAll('#rankPanel .rtabs button').forEach(b=>b.onclick=()=>renderRank(b.dataset.t));
+function regNick(score,round){ const inp=$('#nickIn'); const n=(inp.value||'').trim().slice(0,12); if(!n)return toast('닉네임을 입력하세요'); lsS('arcNick',n);
+  const mine=lsJ('arcRankHell',[]); mine.push({n,s:score,r:round,d:new Date().toISOString().slice(0,10)}); mine.sort((a,b)=>b.s-a.s); lsS('arcRankHell',mine.slice(0,20));
+  const rank=hellBoard().findIndex(x=>!x.fake&&x.s===score&&x.n===n)+1; $('#nickBox').innerHTML='<b style="color:var(--gold)">랭킹 '+rank+'위로 등재되었습니다!</b>'; }
 function hellRecord(){
   if(!HELL())return '';
   let best=[]; try{ best=JSON.parse(localStorage.getItem('arcHellScores')||'[]'); }catch(e){}
   best.push({s:S.score||0,r:S.round,d:new Date().toISOString().slice(0,10)}); best.sort((a,b)=>b.s-a.s); best=best.slice(0,5);
   try{ localStorage.setItem('arcHellScores',JSON.stringify(best)); }catch(e){}
-  return '<div class="hellScore"><b>최종 점수 '+(S.score||0).toLocaleString()+'점</b><ol>'+best.map(x=>'<li>'+x.s.toLocaleString()+'점 · '+x.r+'라운드 · '+x.d+'</li>').join('')+'</ol></div>';
+  const sc=S.score||0, tenth=(hellBoard()[9]||{s:0}).s, can=sc>0&&sc>tenth;
+  const reg=can?'<div id="nickBox" class="nickReg"><span>TOP10 진입!</span><input id="nickIn" maxlength="12" placeholder="닉네임" value="'+myNick().replace(/"/g,'')+'"><button onclick="regNick('+sc+','+S.round+')">랭킹 등록</button></div>':'<div style="margin-top:8px;font-size:12px;color:#a89a80">TOP10 진입 점수: '+(tenth+1).toLocaleString()+'점</div>';
+  return '<div class="hellScore">'+reg+'<b>최종 점수 '+(S.score||0).toLocaleString()+'점</b><ol>'+best.map(x=>'<li>'+x.s.toLocaleString()+'점 · '+x.r+'라운드 · '+x.d+'</li>').join('')+'</ol></div>';
 }
 function gameOver(title,txt){
+  { const d=readSave(); if(d&&d.S.runId===S.runId){ try{localStorage.removeItem(SAVE_KEY);}catch(e){} } }
   S.phase='over'; C=null; render(); $('#overTitle').textContent=title; $('#overTxt').innerHTML=txt+hellRecord(); $('#over').classList.add('on');
 }
 // 이지 모드 승리 보상 (노말: +1골드, 경험치 2)
@@ -1941,7 +1989,7 @@ function winReward(r){
 }
 function endRetry(win,eLeft){
   const r=S.retry; S.enemies=S.savedEnemies||genWave(S.round); S.savedEnemies=null; S.phase='plan'; C=null; bgmTrack(roundTrack(S.round));
-  if(win){ S.retry=null; banner('군단장 재도전 성공!'); S.log.unshift('군단장 재도전 성공 ('+r+'라운드)'); addScore(2500,'군단장 재도전 클리어'); addGrace(5); render(); offerAug(r,false,null,HELL()?hellTier(true):null); return; }
+  if(win){ habaekGrow(LEGION[r]); S.retry=null; banner('군단장 재도전 성공!'); S.log.unshift('군단장 재도전 성공 ('+r+'라운드)'); addScore(2500,'군단장 재도전 클리어'); addGrace(5); render(); offerAug(r,false,null,HELL()?hellTier(true):null); return; }
   const dmg=dmgFor(eLeft,r); S.hp=Math.max(0,S.hp-dmg); addScore(-15000,'군단장 재도전 패배'); banner('재도전 실패…'); S.log.unshift('군단장 재도전 실패 (체력 -'+dmg+')');
   if(S.hp<=0){ gameOver('모험 종료','군단장 재도전 중 쓰러졌습니다.'); return; }
   render();
@@ -1963,6 +2011,7 @@ function endCombat(win,eLeft){
   if(C&&C.retryFight)return endRetry(win,eLeft);
   const drops=(C&&C.drops)||[];
   S.streak=win?(S.streak||0)+1:0;
+  if(win&&bossOfRound(S.round))habaekGrow(bossOfRound(S.round));
   let msg;
   const rw=win?winReward(S.round):{g:0,xp:2};
   if(win&&has('first'))rw.g+=1;
@@ -2431,6 +2480,9 @@ function itemSVG(k){
     trumpet:'<path d="M10 38 L36 30 Q50 16 58 12 L58 52 Q50 46 36 38 Z" fill="'+F+'"/><rect x="6" y="32" width="10" height="8" rx="2" fill="#c8202a"/><circle cx="26" cy="34" r="2" fill="#c8202a"/>',
     hornI:'<path d="M18 58 Q8 30 24 8 Q22 28 34 40 Q30 50 18 58Z" fill="#3a1450"/><path d="M46 58 Q56 30 40 8 Q42 28 30 40 Q34 50 46 58Z" fill="#3a1450"/><path d="M24 8 Q20 24 28 34 M40 8 Q44 24 36 34" stroke="#c87aff" stroke-width="2" fill="none"/>',
     eye:'<ellipse cx="32" cy="32" rx="26" ry="16" fill="#2a3a22"/><circle cx="32" cy="32" r="12" fill="#9aff6a"/><circle cx="32" cy="32" r="5" fill="#0a1408"/><circle cx="28" cy="28" r="2" fill="#fff"/>',
+    scroll:'<rect x="14" y="18" width="36" height="28" rx="2" fill="#f2e6c8"/><rect x="10" y="14" width="6" height="36" rx="3" fill="#8a2a1e"/><rect x="48" y="14" width="6" height="36" rx="3" fill="#8a2a1e"/><path d="M20 24 L44 24 M20 30 L40 30 M20 36 L42 36" stroke="#3a2a1e" stroke-width="1.6"/><circle cx="13" cy="12" r="2.4" fill="#e8c170"/><circle cx="51" cy="52" r="2.4" fill="#e8c170"/>',
+    redorb:'<path d="M32 4 L32 14" stroke="#e8c170" stroke-width="2"/><circle cx="32" cy="34" r="17" fill="#b81e22"/><circle cx="32" cy="34" r="17" fill="none" stroke="#e8c170" stroke-width="2.4"/><circle cx="26" cy="28" r="4.5" fill="#ff8a7a" opacity=".8"/><path d="M22 52 L32 60 L42 52" fill="none" stroke="#e8c170" stroke-width="2"/><path d="M32 51 L32 62" stroke="#c83a2a" stroke-width="3"/>',
+    oldsword:'<path d="M30 4 L38 8 L36 44 L28 44 Z" fill="#9a958a"/><path d="M31 10 L33 12 L32 20 M34 26 L35 30" stroke="#5a564e" stroke-width="1.4"/><rect x="16" y="44" width="32" height="5" rx="1" fill="#5a3a22"/><rect x="29" y="49" width="6" height="12" rx="2" fill="#3a2a1e"/><circle cx="32" cy="62" r="2.6" fill="#7a6a5a"/>',
     fireorb:'<circle cx="32" cy="34" r="20" fill="#ff5a1e" opacity=".3"/><path d="M32 12 Q44 26 42 38 Q40 50 32 50 Q24 50 22 38 Q20 26 32 12Z" fill="#ff7a2a"/><path d="M32 24 Q38 32 37 40 Q35 46 32 46 Q29 46 27 40 Q26 32 32 24Z" fill="#ffd76a"/><circle cx="32" cy="40" r="3.5" fill="#fff"/>',
     orbI:'<circle cx="32" cy="32" r="22" fill="#1e4aa8" opacity=".35"/><circle cx="32" cy="32" r="16" fill="#3a7aff"/><circle cx="32" cy="32" r="16" fill="url(#ig'+k+')" opacity=".25"/><circle cx="26" cy="25" r="5" fill="#cfe8ff" opacity=".9"/><path d="M14 46 Q32 58 50 46" fill="none" stroke="#9fd8ff" stroke-width="2.5"/>',
     umbrella:'<path d="M8 30 Q32 4 56 30 Q50 26 44 30 Q38 26 32 30 Q26 26 20 30 Q14 26 8 30Z" fill="#1e4a32"/><path d="M32 30 L32 54 Q32 60 26 58" fill="none" stroke="#3a2a1e" stroke-width="3.5" stroke-linecap="round"/><path d="M34 30 L40 58" stroke="#d8dce6" stroke-width="2"/>',
@@ -2614,7 +2666,7 @@ function refreshHell(){ const b=$('#hellBtn'), on=hellUnlocked(); b.classList.to
   let best=0; try{ best=(JSON.parse(localStorage.getItem('arcHellScores')||'[]')[0]||{}).s||0; }catch(e){}
   $('#hellSub').textContent=on?(best?'최고 점수 '+best.toLocaleString()+'점':'점수 기록 · 40라운드'):'확장 모드 클리어 시 해금'; }
 $('#hellBtn').onclick=()=>askMode('hell');
-refreshHell();
+refreshHell(); setTimeout(contSync,0);
 const ARENAS={abyss:'심연',sea:'태만의 바다',totoike:'토토이크',temple:'부활한 기억의 사원'};
 function setArena(a){ if(!ARENAS[a])a='abyss'; if(a==='abyss')document.documentElement.removeAttribute('data-arena'); else document.documentElement.setAttribute('data-arena',a);
   document.querySelectorAll('#arenaPick button').forEach(b=>b.classList.toggle('on',b.dataset.a===a));
@@ -2625,7 +2677,7 @@ function optSync(){ $('#optBgm').textContent=bgmOn?'켜짐':'꺼짐'; $('#optVol
   $('#optSimple').textContent=document.body.classList.contains('simple')?'켜짐':'꺼짐'; $('#optMobile').textContent=document.body.classList.contains('mobile')?'모바일':'PC'; }
 function setSimple(on){ document.body.classList.toggle('simple',on); try{localStorage.setItem('arcSimple',on?'1':'0');}catch(e){} optSync(); }
 try{ if(localStorage.getItem('arcSimple')==='1')document.body.classList.add('simple'); }catch(e){}
-function openOpt(){ optSync(); $('#optQuit').style.display=S&&S.phase!=='mode'?'':'none'; $('#optWrap').classList.add('on'); }
+function openOpt(){ optSync(); $('#optQuit').style.display=S&&S.phase!=='mode'?'':'none'; saveBtnSync(); $('#optWrap').classList.add('on'); }
 $('#optWrap').onclick=e=>{ if(e.target.id==='optWrap')$('#optWrap').classList.remove('on'); };
 $('#setBtn').onclick=openOpt; $('#helpBtn').onclick=()=>showHelp('main');
 $('#optSimple').onclick=()=>setSimple(!document.body.classList.contains('simple'));
@@ -2636,10 +2688,23 @@ $('#confirm').onclick=e=>{ if(e.target.id==='confirm')$('#confirm').classList.re
 const MODE_NAME={easy:'이지',normal:'노말',hard:'확장',hell:'헬'};
 function askMode(m){ if(m==='hell'&&!hellUnlocked())return toast('확장(하드) 모드를 1회 이상 클리어하면 해금됩니다');
   askConfirm('<b>'+MODE_NAME[m]+' 모드</b>로 게임을 시작하시겠습니까?',()=>pickMode(m)); }
-function quitToTitle(){ clearInterval(timer); timer=null; C=null;
+const SAVE_KEY='arcSave';
+function canSave(){ return S&&HARDLIKE()&&S.round>=15&&S.phase==='plan'; }
+function saveBtnSync(){ const b=$('#optSave'); const inG=S&&S.mode&&S.phase!=='mode'; b.parentElement.style.display=inG&&HARDLIKE()?'':'none'; b.disabled=!canSave();
+  b.textContent=canSave()?'💾 진행 저장 ('+S.round+'라운드)':S&&S.round<15?'💾 진행 저장 (15라운드부터)':'💾 진행 저장 (준비 단계에서만)'; }
+function saveGame(silent){ if(!canSave())return false; try{ localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,t:Date.now(),S})); if(!silent)toast('진행 상황을 저장했습니다 ('+S.round+'라운드)'); contSync(); return true; }catch(e){ toast('저장에 실패했습니다'); return false; } }
+function readSave(){ try{ const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); return d&&d.S?d:null; }catch(e){ return null; } }
+function contSync(){ const d=readSave(), b=$('#contBtn'); if(!b)return; b.style.display=d?'':'none'; if(d)b.textContent='▶ 이어하기 ('+(d.S.mode==='hell'?'헬':'확장')+' '+d.S.round+'R)'; }
+function loadGame(){ const d=readSave(); if(!d)return; S=d.S; let mx=0; for(const u of [...S.board,...S.bench,...(S.enemies||[]),...(S.sum||[])])if(u&&u.id>mx)mx=u.id; uid=Math.max(uid,mx+1);
+  FINAL_ROUND=40; S.phase='plan'; S.sel=null; C=null; setSpeed(1); $('#modePick').classList.remove('on'); $('#vMode').textContent=S.mode==='hell'?'헬':'확장'; $('#vMode').className='mode '+S.mode;
+  if(KZ[S.round])document.documentElement.setAttribute('data-kz',KZ[S.round]); else document.documentElement.removeAttribute('data-kz');
+  bgmTrack(roundTrack(S.round)); render(); toast(S.round+'라운드부터 이어서 진행합니다'); }
+$('#optSave').onclick=()=>{ saveGame(); saveBtnSync(); };
+$('#contBtn').onclick=()=>{ const d=readSave(); if(!d)return; askConfirm('<b>'+(d.S.mode==='hell'?'헬':'확장')+' 모드 '+d.S.round+'라운드</b>부터 이어서 하시겠습니까?<br><small style="color:#a89a80">저장: '+new Date(d.t).toLocaleString()+'</small>',loadGame); };
+function quitToTitle(){ if(canSave())saveGame(true); clearInterval(timer); timer=null; C=null;
   ['#augPick','#shardPick','#bossIntro','#over','#optWrap'].forEach(q=>{const e=$(q); if(e)e.classList.remove('on');});
-  newGame(); bgmTrack(arenaTrack()); }
-$('#optQuit').onclick=()=>askConfirm('타이틀 화면으로 나가시겠습니까?<br><small style="color:#a89a80">진행 중인 게임은 저장되지 않습니다.</small>',quitToTitle);
+  newGame(); bgmTrack(arenaTrack()); contSync(); }
+$('#optQuit').onclick=()=>askConfirm('타이틀 화면으로 나가시겠습니까?<br><small style="color:#a89a80">'+(canSave()?'확장·헬 모드 15라운드 이상이라 현재 진행이 자동 저장됩니다.':'진행 중인 게임은 저장되지 않습니다.')+'</small>',quitToTitle);
 $('#optHelp').onclick=()=>{ $('#optWrap').classList.remove('on'); showHelp('main'); };
 /* ───────── 도움말 ───────── */
 const HELP={main:`<h2>아크 택틱스 도움말</h2>
